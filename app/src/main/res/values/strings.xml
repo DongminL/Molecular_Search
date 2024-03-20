@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CanChem</string>
+
+    <string name="naver_client_id">7xgMXnt2Nx3C3ZD_nIZ3</string>
+    <string name="naver_client_secret">Urenmf1NTB</string>
+    <string name="naver_client_name">CanChem</string>
+</resources>
