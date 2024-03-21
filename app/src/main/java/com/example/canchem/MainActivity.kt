@@ -98,5 +98,9 @@ class MainActivity : AppCompatActivity() {
             NaverIdLoginSDK.logout()
             Toast.makeText(this@MainActivity, "네이버 로그아웃 성공", Toast.LENGTH_SHORT).show()
         }
+
+        binding.btnNaverLogout.setOnClickListener {
+            naverLogout()
+        }
     }
 }
