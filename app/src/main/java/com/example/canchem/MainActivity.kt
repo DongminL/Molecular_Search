@@ -14,10 +14,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.canchem.databinding.ActivityMainBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
+import com.google.android.gms.tasks.Task
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
@@ -39,12 +41,6 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()  // 상태표시줄 투명하게 만듦
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
         /* 네아로 SDK 객체 초기화 */
         val naverClientId = getString(R.string.naver_client_id) // 발급 받은 naver client id 값
         val naverClientSecret = getString(R.string.naver_client_secret) // 발급 받은 naver client secret 값
@@ -52,11 +48,10 @@ class MainActivity : AppCompatActivity() {
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)    // 네아로 객체 초기화
 
         googleAuthLauncher()
+        googleSignInClient = getGoogleClient()
 
         /* Google 로그인 버튼 클릭*/
         binding.btnGoogleLogin.setOnClickListener {
-            googleSignInClient = getGoogleClient()
-            Toast.makeText(this@MainActivity, "구글 로그인 요청 성공", Toast.LENGTH_SHORT).show()
             resultLauncher.launch(googleSignInClient.signInIntent)
 
             /* 로그인한 상태 */
@@ -177,15 +172,15 @@ class MainActivity : AppCompatActivity() {
             .requestServerAuthCode(getString(R.string.google_client_id))    // OAuth Client ID 넘기기
             .requestId()    // ID 요청
             .requestEmail() // Email 요청
-            .requestIdToken(getString(R.string.google_client_id))   // ID Token 값 요청
             .build()
 
-        return GoogleSignIn.getClient(this, googleSignInOptions)
+        return GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
     }
 
+    /* Google 사용자 정보 받아오기 */
     private fun googleAuthLauncher() {
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            val task : Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
             try {
                 val account = task.getResult(ApiException::class.java)
@@ -196,12 +191,24 @@ class MainActivity : AppCompatActivity() {
 
                 Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
                         "user id : ${userId}\n" +
-                        "email: ${email}\n" +
+                        "email : ${email}\n" +
                         "token : ${token}", Toast.LENGTH_SHORT).show()
 
             } catch (e: ApiException) {
                 Log.e("Error : ",e.stackTraceToString())
             }
         }
+    }
+
+    /* Google 로그아웃 */
+    private fun googleLogout() {
+        googleSignInClient.signOut()
+        Toast.makeText(this@MainActivity, "구글 로그아웃 성공", Toast.LENGTH_SHORT).show()
+    }
+
+    /* Google 연동 해제 */
+    private fun googleDelete() {
+        googleSignInClient.revokeAccess()
+        Toast.makeText(this@MainActivity, "구글 연동 해제 성공", Toast.LENGTH_SHORT).show()
     }
 }
