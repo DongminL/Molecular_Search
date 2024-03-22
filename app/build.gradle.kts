@@ -5,6 +5,13 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 android {
     namespace = "com.example.canchem"
     compileSdk = 34
@@ -44,8 +51,14 @@ android {
 
 dependencies {
 
-    implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK
+    /* Google Play services */
+    implementation ("com.google.gms:google-services:4.3.15")
+    implementation ("androidx.credentials:credentials:<latest version>")
+    implementation ("androidx.credentials:credentials-play-services-auth:<latest version>")
+    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.0")
 
+    /* 네이버 아이디 로그인 API 서비스*/
+    implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
     implementation("androidx.appcompat:appcompat:1.3.1")
@@ -68,6 +81,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
