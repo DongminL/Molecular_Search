@@ -1,5 +1,6 @@
 package com.example.canchem
 
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
                     NidOAuthLogin().callProfileApi(nidProfileCallback)
 
-                    /* 로그인한 상태 */
+                    /* 로그인한 상태의 View 설정 */
                     binding.btnNaverLogin.visibility = View.INVISIBLE
                     binding.btnGoogleLogin.visibility = View.INVISIBLE
                     binding.btnNaverLogout.visibility = View.VISIBLE
@@ -121,9 +122,10 @@ class MainActivity : AppCompatActivity() {
 
         /* 로그아웃 버튼 클릭 */
         binding.btnNaverLogout.setOnClickListener {
-            naverLogout()   // 네이버 로그아웃
+            //naverLogout()   // 네이버 로그아웃
+            googleLogout()  // 구글 로그아웃
 
-            /* 로그아웃한 상태 */
+            /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
             binding.btnNaverLogin.visibility = View.VISIBLE
             binding.btnGoogleLogin.visibility = View.VISIBLE
@@ -131,14 +133,16 @@ class MainActivity : AppCompatActivity() {
 
         /* 탈퇴 버튼 클릭 */
         binding.btnNaverDelete.setOnClickListener {
-            naverDeleteToken()  // 네이버 연동 해제
+            //naverDeleteToken()  // 네이버 연동 해제
+            googleDelete()  // 구글 연동 해제
 
-            /* 로그아웃한 상태 */
+            /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
             binding.btnNaverLogin.visibility = View.VISIBLE
             binding.btnGoogleLogin.visibility = View.VISIBLE
         }
     }
+
     /* 네이버 로그아웃 */
     private fun naverLogout() {
         NaverIdLoginSDK.logout()
@@ -169,9 +173,8 @@ class MainActivity : AppCompatActivity() {
     /* Google 사용자 정보 요청 */
     private fun getGoogleClient() : GoogleSignInClient {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestServerAuthCode(getString(R.string.google_client_id))    // OAuth Client ID 넘기기
-            .requestId()    // ID 요청
             .requestEmail() // Email 요청
+            .requestId()    // ID 요청
             .build()
 
         return GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
@@ -180,22 +183,26 @@ class MainActivity : AppCompatActivity() {
     /* Google 사용자 정보 받아오기 */
     private fun googleAuthLauncher() {
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val task : Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            if (result.resultCode == Activity.RESULT_OK) {
+                val task : Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
-            try {
-                val account = task.getResult(ApiException::class.java)
+                try {
+                    val account = task.getResult(ApiException::class.java)
 
-                val userId = account?.id
-                val email = account?.email
-                val token = account?.idToken
+                    val userId = account.id // 식별 ID 값
+                    val email = account.email   // Email
+                    val givenName = account.givenName   // 이름
+                    val familyName = account.familyName // 성
+                    val token = account.serverAuthCode // 토큰값
 
-                Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
-                        "user id : ${userId}\n" +
-                        "email : ${email}\n" +
-                        "token : ${token}", Toast.LENGTH_SHORT).show()
-
-            } catch (e: ApiException) {
-                Log.e("Error : ",e.stackTraceToString())
+                    Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
+                            "User Id : ${userId}\n" +
+                            "Email : ${email}\n" +
+                            "Full Name : ${familyName}${givenName}\n" +
+                            "Token : ${token}", Toast.LENGTH_SHORT).show()
+                } catch (e: ApiException) {
+                    Toast.makeText(this@MainActivity, e.stackTraceToString(), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
