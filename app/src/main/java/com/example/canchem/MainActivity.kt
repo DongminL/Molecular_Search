@@ -33,6 +33,12 @@ class MainActivity : AppCompatActivity() {
     lateinit var googleSignInClient : GoogleSignInClient
     lateinit var resultLauncher : ActivityResultLauncher<Intent>
 
+    override fun onStart() {
+        super.onStart()
+        
+        googleLogInCheck()  // 구글 아이디로 로그인 되어 있는지 확인
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,12 +54,12 @@ class MainActivity : AppCompatActivity() {
         val naverClientName = getString(R.string.naver_client_name) // 어플 이름
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)    // 네아로 객체 초기화
 
-        googleAuthLauncher()
-        googleSignInClient = getGoogleClient()
+        googleAuthLauncher()    // 로그인 된 사용자 정보 가져오기
+        googleSignInClient = getGoogleClient()  // Google 사용자 정보를 담은 Token 요청
 
         /* Google 로그인 버튼 클릭*/
         binding.btnGoogleLogin.setOnClickListener {
-            resultLauncher.launch(googleSignInClient.signInIntent)
+            resultLauncher.launch(googleSignInClient.signInIntent)  // 구글 로그인 창으로 넘어감
 
             /* 로그인한 상태 */
             binding.btnNaverLogin.visibility = View.INVISIBLE
@@ -63,30 +69,6 @@ class MainActivity : AppCompatActivity() {
 
         /* 네이버 로그인 버튼 클릭 */
         binding.btnNaverLogin.setOnClickListener {
-            /* 사용자 정보 가져오기*/
-            val nidProfileCallback = object : NidProfileCallback<NidProfileResponse> {
-                override fun onSuccess(response: NidProfileResponse) {
-                    val userId = response.profile?.id   // 고유 아이디
-                    val email = response.profile?.email // 이메일
-                    val mobile = response.profile?.mobile   // 휴대폰 번호
-
-                    Toast.makeText(this@MainActivity, "네이버 로그인 성공\n" +
-                            "user id : ${userId}\n" +
-                            "email: ${email}\n" +
-                            "mobile : ${mobile}", Toast.LENGTH_SHORT).show()
-                }
-                override fun onFailure(httpState : Int, message: String) {
-                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                    val errorDesc = NaverIdLoginSDK.getLastErrorDescription()
-
-                    Toast.makeText(this@MainActivity, "네이버 로그인 실패\n" +
-                            "Error Code : ${errorCode}\n" +
-                            "Error Description : ${errorDesc}", Toast.LENGTH_SHORT).show()
-                }
-                override fun onError(errorCode: Int, message: String) {
-                    onFailure(errorCode, message)
-                }
-            }
 
             /* 네이버 Access Token 받기 */
             val oauthLoginCallback = object : OAuthLoginCallback {
@@ -98,7 +80,11 @@ class MainActivity : AppCompatActivity() {
                     val type = NaverIdLoginSDK.getTokenType().toString()    // 토큰 타입
                     val state = NaverIdLoginSDK.getState().toString()   // 로그인 인스턴트의 현재 상태
 
-                    Toast.makeText(this@MainActivity, "Access Token : ${accessToken}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Access Token : ${accessToken}\n" +
+                            "Refresh Token : ${refreshToken}\n" +
+                            "Expires at : ${expiresAt}\n" +
+                            "Type : ${type}\n" +
+                            "State : ${state}", Toast.LENGTH_SHORT).show()
 
                     NidOAuthLogin().callProfileApi(nidProfileCallback)
 
@@ -116,7 +102,6 @@ class MainActivity : AppCompatActivity() {
                     onFailure(errorCode, message)
                 }
             }
-
             NaverIdLoginSDK.authenticate(this, oauthLoginCallback)  // 토큰 가져오기
         }
 
@@ -140,6 +125,31 @@ class MainActivity : AppCompatActivity() {
             binding.btnNaverLogout.visibility = View.INVISIBLE
             binding.btnNaverLogin.visibility = View.VISIBLE
             binding.btnGoogleLogin.visibility = View.VISIBLE
+        }
+    }
+
+    /* 네이버 사용자 정보 가져오기*/
+    val nidProfileCallback = object : NidProfileCallback<NidProfileResponse> {
+        override fun onSuccess(response: NidProfileResponse) {
+            val userId = response.profile?.id   // 고유 아이디
+            val email = response.profile?.email // 이메일
+            val mobile = response.profile?.mobile   // 휴대폰 번호
+
+            Toast.makeText(this@MainActivity, "네이버 로그인 성공\n" +
+                    "user id : ${userId}\n" +
+                    "email: ${email}\n" +
+                    "mobile : ${mobile}", Toast.LENGTH_SHORT).show()
+        }
+        override fun onFailure(httpState : Int, message: String) {
+            val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+            val errorDesc = NaverIdLoginSDK.getLastErrorDescription()
+
+            Toast.makeText(this@MainActivity, "네이버 로그인 실패\n" +
+                    "Error Code : ${errorCode}\n" +
+                    "Error Description : ${errorDesc}", Toast.LENGTH_SHORT).show()
+        }
+        override fun onError(errorCode: Int, message: String) {
+            onFailure(errorCode, message)
         }
     }
 
@@ -170,12 +180,15 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    /* Google 사용자 정보 요청 */
+    /* Google 사용자 정보를 담은 Token 요청 */
     private fun getGoogleClient() : GoogleSignInClient {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            //.requestIdToken(getString(R.string.google_client_id))   // Id Token 값 요청
             .requestEmail() // Email 요청
-            .requestId()    // ID 요청
+            .requestProfile()   // 프로필 정보 요청
             .build()
+
+        Log.i("Request to Google", "Send Success")
 
         return GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
     }
@@ -193,13 +206,16 @@ class MainActivity : AppCompatActivity() {
                     val email = account.email   // Email
                     val givenName = account.givenName   // 이름
                     val familyName = account.familyName // 성
-                    val token = account.serverAuthCode // 토큰값
+                    val token = account.idToken // 토큰값
 
                     Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
                             "User Id : ${userId}\n" +
                             "Email : ${email}\n" +
                             "Full Name : ${familyName}${givenName}\n" +
                             "Token : ${token}", Toast.LENGTH_SHORT).show()
+
+                    Log.i("LogIn", "구글 로그인 성공")
+                    Log.i("Token", token.toString())
                 } catch (e: ApiException) {
                     Toast.makeText(this@MainActivity, e.stackTraceToString(), Toast.LENGTH_SHORT).show()
                 }
@@ -217,5 +233,16 @@ class MainActivity : AppCompatActivity() {
     private fun googleDelete() {
         googleSignInClient.revokeAccess()
         Toast.makeText(this@MainActivity, "구글 연동 해제 성공", Toast.LENGTH_SHORT).show()
+    }
+
+    /* 구글 아이디로 로그인 되어 있는지 확인 */
+    private fun googleLogInCheck() {
+        val account = GoogleSignIn.getLastSignedInAccount(this) // 로그인 되어 있는지 가져옴
+        if (account != null) {
+            Toast.makeText(this@MainActivity, "이미 로그인 됨", Toast.LENGTH_SHORT).show()
+
+            resultLauncher.launch(googleSignInClient.signInIntent)  // 구글 로그인 창으로 넘어감
+            googleAuthLauncher()    // 로그인 된 사용자 정보 가져오기
+        }
     }
 }
