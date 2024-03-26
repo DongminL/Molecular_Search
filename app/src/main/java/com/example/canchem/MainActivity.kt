@@ -11,8 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.canchem.databinding.ActivityMainBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -53,13 +51,13 @@ class MainActivity : AppCompatActivity() {
         val naverClientSecret = getString(R.string.naver_client_secret) // 발급 받은 naver client secret 값
         val naverClientName = getString(R.string.naver_client_name) // 어플 이름
         NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)    // 네아로 객체 초기화
-
-        googleAuthLauncher()    // 로그인 된 사용자 정보 가져오기
-        googleSignInClient = getGoogleClient()  // Google 사용자 정보를 담은 Token 요청
+        
+        googleAuthLauncher()    // Google 로그인 초기화
+        googleSignInClient = getGoogleClient()  // Google Client 초기화
 
         /* Google 로그인 버튼 클릭*/
         binding.btnGoogleLogin.setOnClickListener {
-            resultLauncher.launch(googleSignInClient.signInIntent)  // 구글 로그인 창으로 넘어감
+            resultLauncher.launch(googleSignInClient.getSignInIntent())  // 구글 로그인 창으로 넘어감
 
             /* 로그인한 상태 */
             binding.btnNaverLogin.visibility = View.INVISIBLE
@@ -107,8 +105,8 @@ class MainActivity : AppCompatActivity() {
 
         /* 로그아웃 버튼 클릭 */
         binding.btnNaverLogout.setOnClickListener {
-            //naverLogout()   // 네이버 로그아웃
-            googleLogout()  // 구글 로그아웃
+            naverLogout()   // 네이버 로그아웃
+            //googleLogout()  // 구글 로그아웃
 
             /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
@@ -118,8 +116,8 @@ class MainActivity : AppCompatActivity() {
 
         /* 탈퇴 버튼 클릭 */
         binding.btnNaverDelete.setOnClickListener {
-            //naverDeleteToken()  // 네이버 연동 해제
-            googleDelete()  // 구글 연동 해제
+            naverDeleteToken()  // 네이버 연동 해제
+            //googleDelete()  // 구글 연동 해제
 
             /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
@@ -180,10 +178,10 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    /* Google 사용자 정보를 담은 Token 요청 */
+    /* Google Client 초기화 */
     private fun getGoogleClient() : GoogleSignInClient {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            //.requestIdToken(getString(R.string.google_client_id))   // Id Token 값 요청
+            .requestIdToken(getString(R.string.google_client_id))   // Id Token 값 요청
             .requestEmail() // Email 요청
             .requestProfile()   // 프로필 정보 요청
             .build()
@@ -193,35 +191,49 @@ class MainActivity : AppCompatActivity() {
         return GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
     }
 
-    /* Google 사용자 정보 받아오기 */
+    /* Google 로그인 초기화 */
     private fun googleAuthLauncher() {
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val task : Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
 
-                try {
-                    val account = task.getResult(ApiException::class.java)
-
-                    val userId = account.id // 식별 ID 값
-                    val email = account.email   // Email
-                    val givenName = account.givenName   // 이름
-                    val familyName = account.familyName // 성
-                    val token = account.idToken // 토큰값
-
-                    Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
-                            "User Id : ${userId}\n" +
-                            "Email : ${email}\n" +
-                            "Full Name : ${familyName}${givenName}\n" +
-                            "Token : ${token}", Toast.LENGTH_SHORT).show()
-
-                    Log.i("LogIn", "구글 로그인 성공")
-                    Log.i("Token", token.toString())
-                } catch (e: ApiException) {
-                    Toast.makeText(this@MainActivity, e.stackTraceToString(), Toast.LENGTH_SHORT).show()
-                }
+                handleSignInResult(task)    // Google 사용자 정보 받아오기
+            } else if (result.resultCode == Activity.RESULT_CANCELED) {
+                // 사용자가 로그인을 취소한 경우
+                Log.e(TAG, "Google Sign-In canceled by user")
+                Toast.makeText(this@MainActivity, "Google Sign-In canceled by user", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.e(TAG, "Google Sign-In failed with resultCode: ${result.resultCode}")
+                Toast.makeText(this@MainActivity, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
+    /* Google 사용자 정보 받아오기 */
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+
+            val userId = account?.id // 식별 ID 값
+            val email = account?.email // Email
+            val givenName = account?.givenName // 이름
+            val familyName = account?.familyName // 성
+            val token = account?.idToken // 토큰값
+
+            Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
+                    "User Id : ${userId}\n" +
+                    "Email : ${email}\n" +
+                    "Full Name : ${familyName}${givenName}\n" +
+                    "Token : ${token}", Toast.LENGTH_SHORT).show()
+
+            Log.i("LogIn", "구글 로그인 성공")
+            Log.i("Token", token.toString())
+        } catch (e: ApiException) {
+            Toast.makeText(this@MainActivity, "구글 로그인 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("GoogleSignIn", "구글 로그인 실패: ${e.message}")
+        }
+    }
+
 
     /* Google 로그아웃 */
     private fun googleLogout() {
@@ -242,7 +254,6 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "이미 로그인 됨", Toast.LENGTH_SHORT).show()
 
             resultLauncher.launch(googleSignInClient.signInIntent)  // 구글 로그인 창으로 넘어감
-            googleAuthLauncher()    // 로그인 된 사용자 정보 가져오기
         }
     }
 }

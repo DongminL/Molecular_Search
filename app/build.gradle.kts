@@ -1,5 +1,3 @@
-import kotlin.script.experimental.jvm.util.KotlinJars.stdlib
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -8,7 +6,6 @@ plugins {
 buildscript {
     repositories {
         google()
-        mavenCentral()
     }
 }
 
@@ -51,11 +48,9 @@ android {
 
 dependencies {
 
-    /* Google Play services */
+    /* Google OAuth2.0 API */
     implementation ("com.google.gms:google-services:4.3.15")
-    implementation ("androidx.credentials:credentials:<latest version>")
-    implementation ("androidx.credentials:credentials-play-services-auth:<latest version>")
-    implementation ("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+    implementation ("com.google.android.gms:play-services-auth:20.4.1")
 
     /* 네이버 아이디 로그인 API 서비스*/
     implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK
