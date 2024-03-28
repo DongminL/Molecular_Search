@@ -36,3 +36,5 @@ logging:
             sql:
               BasicBinder: TRACE  # 파라미터 보여주기
         SQL: debug  # 디버깅 레벨로 쿼리 출력
+        
+# JWT 설정
