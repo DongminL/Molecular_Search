@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
                     // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
                     val accessToken = NaverIdLoginSDK.getAccessToken().toString()   // 접근 토큰
                     val refreshToken = NaverIdLoginSDK.getRefreshToken().toString() // 갱신 토큰
+                    val drefreshToken = NaverIdLoginSDK.getRefreshToken().toString() // 갱신 토큰
                     val expiresAt = NaverIdLoginSDK.getExpiresAt().toString()   // 만료 기한 (초)
                     val type = NaverIdLoginSDK.getTokenType().toString()    // 토큰 타입
                     val state = NaverIdLoginSDK.getState().toString()   // 로그인 인스턴트의 현재 상태
@@ -106,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         /* 로그아웃 버튼 클릭 */
         binding.btnNaverLogout.setOnClickListener {
             naverLogout()   // 네이버 로그아웃
-            //googleLogout()  // 구글 로그아웃
+            googleLogout()  // 구글 로그아웃
 
             /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
@@ -117,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         /* 탈퇴 버튼 클릭 */
         binding.btnNaverDelete.setOnClickListener {
             naverDeleteToken()  // 네이버 연동 해제
-            //googleDelete()  // 구글 연동 해제
+            googleDelete()  // 구글 연동 해제
 
             /* 로그아웃한 상태의 View 설정 */
             binding.btnNaverLogout.visibility = View.INVISIBLE
