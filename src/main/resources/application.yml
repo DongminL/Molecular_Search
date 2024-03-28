@@ -3,30 +3,30 @@ spring:
     name: MolecularSearch
 
   jpa:
-    open-in-view: false # OSIV \uB044\uAE30 (\uC131\uB2A5\uACFC \uD655\uC7A5\uC131 \uD5A5\uC0C1)
+    open-in-view: false # OSIV 끄기 (성능과 확장성 향상)
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect  # MySQL Dialect \uC124\uC815
-        format_sql: true  # \uCFFC\uB9AC\uBB38 \uAC00\uB3C5\uC131 \uB192\uC784
-    database: mysql # MySQL \uC0AC\uC6A9 \uBA85\uC2DC
+        format_sql: true  # 쿼리문 가독성 높임
+        dialect: org.hibernate.dialect.MySQLDialect
+    database: mysql # MySQL 사용 명시
     hibernate:
-      ddl-auto: create-drop  # \uC2A4\uD0A4\uB9C8 \uC790\uB3D9 \uC0DD\uC131
+      ddl-auto: create-drop  # 스키마 자동 생성
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl # \uD14C\uC774\uBE14 \uC774\uB984\uC744 \uC9C0\uC815\uD55C \uADF8\uB300\uB85C \uC0AC\uC6A9
-    show-sql: true  # SQL \uBB38\uC73C\uB85C log \uD45C\uC2DC
+    show-sql: true  # SQL 문으로 log 표시
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL \uC5F0\uB3D9
-    url:  # DB URL \uC5F0\uACB0
-    username: root  # MySQL \uC544\uC774\uB514
-    password: Dongmin5677@  # MySQL \uBE44\uBC00\uBC88\uD638
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 연동
+    url: jdbc:mysql://127.0.0.1:3306/canchem?serverTimezone=Asia/Seoul&characterEncoding=UTF-8 # DB URL 연결
+    username: root  # MySQL 아이디
+    password: Dongmin5677@  # MySQL 비밀번호
 
 server:
   servlet:
     session:
-      tracking-modes: cookie  # \uC138\uC158 \uCFE0\uAE30
+      tracking-modes: cookie  # 세션 쿠기
 
-# JPA \uB85C\uAE45 \uC124\uC815
+# JPA 로깅 설정
 logging:
   level:
     org:
@@ -34,5 +34,5 @@ logging:
         type:
           descriptor:
             sql:
-              BasicBinder: TRACE  # \uD30C\uB77C\uBBF8\uD130 \uBCF4\uC5EC\uC8FC\uAE30
-        SQL: debug  # \uB514\uBC84\uAE45 \uB808\uBCA8\uB85C \uCFFC\uB9AC \uCD9C\uB825
+              BasicBinder: TRACE  # 파라미터 보여주기
+        SQL: debug  # 디버깅 레벨로 쿼리 출력
