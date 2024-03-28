@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass   // BaseTime을 상속하면 해당 Entity가 저장될 때 Column으로 생성일과 수정일이 추가됨
 @EntityListeners(AuditingEntityListener.class)  // Auditing 기능 추가
 public class BaseTime {
+
     @CreatedDate    // DB 저장 시 자동으로 생성일 추가
     private LocalDateTime createDate;   // 생성일
 

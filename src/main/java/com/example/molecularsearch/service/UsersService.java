@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class UsersService {
+
     private final UsersRepository usersRepository;
 
     @Transactional
