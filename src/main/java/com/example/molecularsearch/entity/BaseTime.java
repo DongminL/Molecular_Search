@@ -2,14 +2,12 @@ package com.example.molecularsearch.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-@Getter
 @MappedSuperclass   // BaseTime을 상속하면 해당 Entity가 저장될 때 Column으로 생성일과 수정일이 추가됨
 @EntityListeners(AuditingEntityListener.class)  // Auditing 기능 추가
 public class BaseTime {
