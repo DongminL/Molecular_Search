@@ -1,7 +1,7 @@
 package com.example.molecularsearch.entity;
 
-import com.example.molecularsearch.constant.RoleType;
-import com.example.molecularsearch.constant.SignUpType;
+import com.example.molecularsearch.constant.RoleTypeConverter;
+import com.example.molecularsearch.constant.SignUpTypeConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,14 +39,16 @@ public class Users extends BaseTime {
     @Column
     private String profileImage;  // 프로필 사진 url
 
+    @Convert(converter = SignUpTypeConverter.class)
     @Column(nullable = false)
-    private SignUpType signUpType;    // 회원가입한 경로 (NAVER or GOOGLE)
+    private String signUpType;    // 회원가입한 경로 (NAVER or GOOGLE)
 
+    @Convert(converter = RoleTypeConverter.class)
     @Column(nullable = false)
-    private RoleType roleType;    // 유저 등급 (ADMIN or USER)
+    private String roleType;    // 유저 등급 (ADMIN or USER)
 
     @Builder
-    public Users(Long id, String userId, String email, String name, String nickname, String mobile, String gender, String profileImage, SignUpType signUpType, RoleType roleType) {
+    public Users(Long id, String userId, String email, String name, String nickname, String mobile, String gender, String profileImage, String signUpType, String roleType) {
         this.id = id;
         this.userId = userId;
         this.email = email;
