@@ -39,11 +39,11 @@ public class Users extends BaseTime {
     @Column
     private String profileImage;  // 프로필 사진 url
 
-    @Convert(converter = SignUpTypeConverter.class)
+    @Convert(converter = SignUpTypeConverter.class) // Convert로 데이터 형식 변환
     @Column(nullable = false)
     private String signUpType;    // 회원가입한 경로 (NAVER or GOOGLE)
 
-    @Convert(converter = RoleTypeConverter.class)
+    @Convert(converter = RoleTypeConverter.class)   // Convert로 데이터 형식 변환
     @Column(nullable = false)
     private String roleType;    // 유저 등급 (ADMIN or USER)
 
