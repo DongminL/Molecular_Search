@@ -38,19 +38,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
 dependencies {
 
     /* Google OAuth2.0 API */
-    implementation ("com.google.gms:google-services:4.3.15")
-    implementation ("com.google.android.gms:play-services-auth:20.4.1")
+    implementation("com.google.gms:google-services:4.3.15")
+    implementation("com.google.android.gms:play-services-auth:20.5.0")
 
     /* 네이버 아이디 로그인 API 서비스*/
     implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK

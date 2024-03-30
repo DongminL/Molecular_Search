@@ -16,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
@@ -182,9 +183,9 @@ class MainActivity : AppCompatActivity() {
     /* Google Client 초기화 */
     private fun getGoogleClient() : GoogleSignInClient {
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.google_client_id))   // Id Token 값 요청
+            .requestScopes(Scope(Scopes.DRIVE_APPFOLDER))
+            //.requestServerAuthCode(getString(R.string.google_client_id))   // 인증 코드 요청
             .requestEmail() // Email 요청
-            .requestProfile()   // 프로필 정보 요청
             .build()
 
         Log.i("Request to Google", "Send Success")
@@ -217,14 +218,13 @@ class MainActivity : AppCompatActivity() {
 
             val userId = account?.id // 식별 ID 값
             val email = account?.email // Email
-            val givenName = account?.givenName // 이름
-            val familyName = account?.familyName // 성
-            val token = account?.idToken // 토큰값
+            val name = account?.displayName // 이름
+            val token = account?.serverAuthCode // 인증 코드
 
             Toast.makeText(this@MainActivity, "구글 로그인 성공\n" +
                     "User Id : ${userId}\n" +
                     "Email : ${email}\n" +
-                    "Full Name : ${familyName}${givenName}\n" +
+                    "Full Name : $name}\n" +
                     "Token : ${token}", Toast.LENGTH_SHORT).show()
 
             Log.i("LogIn", "구글 로그인 성공")
