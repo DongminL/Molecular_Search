@@ -8,9 +8,9 @@ public class RoleTypeConverter implements AttributeConverter<String, Integer> {
 
     @Override
     public Integer convertToDatabaseColumn(String role) {
-        if ("ADMIN".equals(role)) {
+        if ("RULE_ADMIN".equals(role)) {
             return 1;
-        } else if ("USER".equals(role)) {
+        } else if ("RULE_USER".equals(role)) {
             return 2;
         }
         return null;
@@ -19,9 +19,9 @@ public class RoleTypeConverter implements AttributeConverter<String, Integer> {
     @Override
     public String convertToEntityAttribute(Integer db) {
         if (db == 1) {
-            return "ADMIN";
+            return "RULE_ADMIN";
         } else if (db == 2) {
-            return "USER";
+            return "RULE_USER";
         }
         return null;
     }

@@ -1,7 +1,7 @@
 package com.example.molecularsearch.jwt;
 
 import com.example.molecularsearch.dto.JwtDto;
-import com.example.molecularsearch.service.CustomUserService;
+import com.example.molecularsearch.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -32,7 +32,7 @@ public class JwtProvider {
     private static final String BEARER_TYPE = "Bearer"; // Token Type
     private Key key;    // JWT Key
 
-    private final CustomUserService customUsersService;
+    private final CustomUserDetailsService customUsersService;
 
     /* 빈이 생성되고 주입받은 후 Key 생성 */
     @PostConstruct
@@ -69,6 +69,21 @@ public class JwtProvider {
         }
     }
 
+    /* Access Token에서 유저 키 값 가져오기 */
+    public String getRoleType(String accessToken) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody()
+                    .get("role")
+                    .toString();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().toString();
+        }
+    }
+
     /* JWT를 생성한 후 JwtDto로 변환 */
     public JwtDto generate(Long userPk, String role) {
         long now = (new Date()).getTime();  // 현재 시간
@@ -83,7 +98,7 @@ public class JwtProvider {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .grantType(BEARER_TYPE)
-                .expiredAt(expiration_time / 1000L) // ms -> s
+                .expiredAt(expiration_time)
                 .build();
     }
 
@@ -105,40 +120,38 @@ public class JwtProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    /* Token의 유효성 검사 */
+    /* Token의 유효성 검증 */
     public boolean checkToken(String token) {
         try {
             Jws<Claims> claimsJwts = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);  // Token 유효성 검증 및 토큰에서 claims 가져오기
 
-            return !claimsJwts.getBody().getExpiration().before(new Date());    // 만료 기간 검사
+            return !claimsJwts.getBody().getExpiration().before(new Date());    // 만료 기간 검사 (true : 유효, false : 무효)
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.error("잘못된 JWT 서명입니다.");
-            throw new JwtException("TOKEN_INVALID");
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT 토큰입니다.");
-            throw new JwtException("TOKEN_EXPIRED");
         } catch (UnsupportedJwtException e) {
             log.error("지원되지 않는 JWT 토큰입니다.");
-            throw new JwtException("TOKEN_INVALID");
         } catch (IllegalArgumentException e) {
             log.error("JWT 토큰이 잘못되었습니다.");
-            throw new JwtException("TOKEN_INVALID");
         }
+
+        return false;
     }
 
-    /* Refresh Token 유효성 검사 */
-    public String checkRefreshToken(RefreshToken refreshTokenObj){
+    /* Refresh Token 유효성 검증 */
+    public String checkRefreshToken(Tokens tokensObj){
         
-        String refreshToken = refreshTokenObj.getRefreshToken();    // refreshToken 값 가져오기
+        String refreshToken = tokensObj.getRefreshToken();    // refreshToken 값 가져오기
 
         try {
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);  // Token 유효성 검증 및 토큰에서 claims 가져오기
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);  // Refresh Token 유효성 검증 및 토큰에서 claims 가져오기
 
-            //refresh 토큰의 만료시간이 지나지 않았을 경우, 새로운 access 토큰을 생성
+            // Refresh Token의 만료시간이 지나지 않았을 경우, 새로운 Access Token을 생성
             if (!claims.getBody().getExpiration().before(new Date())) {
                 return reGenerateAccessToken(Long.parseLong(claims.getBody().getSubject()), claims.getBody().get("role").toString());
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.info("Refresh Token이 만료되었을 경우, 로그인 필요!");
             return null;
 
@@ -148,14 +161,14 @@ public class JwtProvider {
     }
 
     /* 남은 만료 시간 가져오기 */
-    public Long getExpiration(String accessToken) {
+    public Long getExpiration(String token) {
 
         try {
-            // accessToken 남은 유효시간
-            Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().getExpiration();
+            // token 남은 유효시간
+            Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getExpiration();
             long now = new Date().getTime();
 
-            // accessToken 의 현재 남은시간 반환
+            // token의 현재 남은시간 반환
             return (expiration.getTime() - now);
 
         } catch (SignatureException e) {

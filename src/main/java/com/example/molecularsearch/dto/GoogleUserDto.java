@@ -14,7 +14,7 @@ public class GoogleUserDto {
     @JsonProperty("email")
     private String email;   // Email
 
-    @JsonProperty("full_name")
+    @JsonProperty("name")
     private String name;    // 유저 이름
 
     @JsonProperty("photo_url")
