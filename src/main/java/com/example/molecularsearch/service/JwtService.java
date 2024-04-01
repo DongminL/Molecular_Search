@@ -56,23 +56,33 @@ public class JwtService {
     }
 
     /* Access Token만 갱신 */
-    @Transactional(readOnly = true)
+    @Transactional
     public String reissueAccessToken(String accessToken) {
-        Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
+        if (!jwtProvider.checkToken(accessToken)) {
+            Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
+            log.info(tokens.toString());
 
-        if (tokens == null) {
-            throw new RuntimeException("Refresh Token이 만료되었습니다!");
+            if (tokens == null) {
+                throw new RuntimeException("Refresh Token이 만료되었습니다!");
+            }
+
+            String newAccessToken = jwtProvider.checkRefreshToken(tokens);  // Access Token 갱신
+            // Redis 값도 갱신
+            tokens.updateAccessToken(newAccessToken);
+            tokensRepository.save(tokens);
+
+            if (newAccessToken == null) {
+                throw new RuntimeException("Refresh Token이 만료되었습니다!");
+            }
+
+            return newAccessToken;
+        } else {
+            return null;
         }
+    }
 
-        String newAccessToken = jwtProvider.checkRefreshToken(tokens);  // Access Token 갱신
-        // Redis 값도 갱신
-        tokens.updateAccessToken(newAccessToken);
-        tokensRepository.save(tokens);
-
-        if (newAccessToken == null) {
-            throw new RuntimeException("Refresh Token이 만료되었습니다!");
-        }
-
-        return newAccessToken;
+    /* Authorization Header에서 Token 값만 가져오기*/
+    public String getHeaderToken(String bearerToken) {
+        return bearerToken.substring(7);    // "Bearer " 문자열 제거
     }
 }
