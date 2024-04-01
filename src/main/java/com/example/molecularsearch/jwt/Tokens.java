@@ -1,7 +1,8 @@
 package com.example.molecularsearch.jwt;
 
-import jakarta.persistence.Id;
+
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @RedisHash(value = "tokens") // Key의 prefix 설정
 public class Tokens {
 
-    @Id // Key
+    @Id // Key (Auto Increase)
     private Long id;    // Primary Key
 
     private String refreshToken;  // Refresh Token 값

@@ -19,6 +19,7 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final CustomUserDetailsService customUserService;
+    private final JwtService jwtService;
 
     /* 네이버 로그인으로 회원가입 */
     @Transactional
@@ -27,11 +28,12 @@ public class UsersService {
             log.error("이미 가입된 유저입니다!");
             throw new RuntimeException("Already existed user");
         }
-
+        // Dto -> Entity
         Users users = Users.builder()
                 .userId(info.getUserId())
                 .name(info.getName())
                 .email(info.getEmail())
+                .nickname(info.getNickname())
                 .mobile(info.getMobile())
                 .gender(info.getGender())
                 .profileImage(info.getProfileImage())
@@ -49,7 +51,7 @@ public class UsersService {
             log.error("이미 가입된 유저입니다!");
             throw new RuntimeException("Already existed user");
         }
-
+        // Dto -> Entity
         Users users = Users.builder()
                 .userId(info.getUserId())
                 .name(info.getName())
