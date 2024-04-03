@@ -11,8 +11,8 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "index_smiles", columnList = "isomericSmiles,canonicalSmiles"),   // isomericSmiles Column 기준으로 Index 생성
-        @Index(name = "index_keyword", columnList = "molecularFormula") // molecularFormula에 대한 Index 생성
+        @Index(name = "index_smiles", columnList = "isomericSmiles,canonicalSmiles", unique = true),   // isomericSmiles Column 기준으로 Unique Index 생성
+        @Index(name = "index_formula", columnList = "molecularFormula") // molecularFormula에 대한 Index 생성
 })
 public class ChemInfo {
 
@@ -20,7 +20,7 @@ public class ChemInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // ChemInfo PK
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long cid;   // 분자 고유 ID
 
     @Column
@@ -32,16 +32,16 @@ public class ChemInfo {
     @Column
     private Double molecularWeight; // 분자량 (g/mol)
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String canonicalSmiles; // 표준 SMILES
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String isomericSmiles;  // 이성질체 SMILES (이성질체 : 분자식은 같지만 분자 구조가 다른 물질)
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String inchi;   // 국제 화학 식별자
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String inchiKey;    // InChI Key 값
 
     @Column
@@ -57,7 +57,6 @@ public class ChemInfo {
     private String image3DUrl;   // 3D 이미지 경로
 
     @Builder
-
     public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String synonyms, String description, String image2DUrl, String image3DUrl) {
         this.id = id;
         this.cid = cid;

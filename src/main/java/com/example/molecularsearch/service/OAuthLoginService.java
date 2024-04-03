@@ -5,6 +5,7 @@ import com.example.molecularsearch.dto.JwtDto;
 import com.example.molecularsearch.dto.NaverUserDto;
 import com.example.molecularsearch.entity.Users;
 import com.example.molecularsearch.jwt.JwtProvider;
+import com.example.molecularsearch.jwt.Tokens;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,7 +52,8 @@ public class OAuthLoginService {
         return jwtDto;
     }
 
-    public void logout(String accessToken) {
-        jwtService.deleteToken(accessToken);
+    public Tokens logout(String accessToken) {
+
+        return jwtService.deleteToken(accessToken);
     }
 }

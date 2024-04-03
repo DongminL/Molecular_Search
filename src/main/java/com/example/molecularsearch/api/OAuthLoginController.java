@@ -42,4 +42,9 @@ public class OAuthLoginController {
             return ResponseEntity.badRequest().body("토큰 만료");
         }
     }
+
+    @DeleteMapping("api/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(oAuthLoginService.logout(token));
+    }
 }

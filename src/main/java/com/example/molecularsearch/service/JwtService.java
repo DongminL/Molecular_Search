@@ -51,13 +51,15 @@ public class JwtService {
 
     /* Access Token 값으로 Tokens 삭제 */
     @Transactional
-    public void deleteToken(String accessToken) {
-        tokensRepository.deleteByAccessToken(accessToken);
+    public Tokens deleteToken(String accessToken) {
+        return tokensRepository.deleteByAccessToken(accessToken).orElseThrow( () ->
+                new EntityNotFoundException("존재하지 않은 토큰입니다!"));
     }
 
     /* Access Token만 갱신 */
     @Transactional
     public String reissueAccessToken(String accessToken) {
+        // Access Token이 유효하지 않을 때
         if (!jwtProvider.checkToken(accessToken)) {
             Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
             log.info(tokens.toString());
@@ -76,7 +78,7 @@ public class JwtService {
             }
 
             return newAccessToken;
-        } else {
+        } else {    // 유효하면 null 반환
             return null;
         }
     }

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ChemInfoRepository extends JpaRepository<ChemInfo, Long> {
-    Optional<ChemInfo> findByCanonicalSmiles(String cannoicalSmiles);   // 표준 SMILES로 분자 정보 조회
+    Optional<ChemInfo> findByCanonicalSmilesOOr(String cannoicalSmiles);   // 표준 SMILES로 분자 정보 조회
 
     Optional<ChemInfo> findByIsomericSmiles(String isomericSmiles); // 이성질체 SMILES로 분자 정보 조회
 
