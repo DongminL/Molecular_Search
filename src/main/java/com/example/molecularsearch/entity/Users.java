@@ -12,13 +12,14 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@Table(indexes = @Index(name = "index_user_id", columnList = "userId", unique = true))  // userId에 대한 Index 생성
 public class Users extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // Primary Key
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String userId;  // 식별 ID
 
     @Column
