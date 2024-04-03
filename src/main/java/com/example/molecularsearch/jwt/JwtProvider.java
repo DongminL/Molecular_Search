@@ -29,7 +29,7 @@ public class JwtProvider {
     @Value("${jwt.expiration-time}")
     private long expiration_time;   // 만료 시간
 
-    private static final String BEARER_TYPE = "Bearer"; // Token Type
+    private static final String GRANT_TYPE = "Bearer"; // Token Type
     private Key key;    // JWT Key
 
     private final CustomUserDetailsService customUsersService;
@@ -69,7 +69,7 @@ public class JwtProvider {
         }
     }
 
-    /* Access Token에서 유저 키 값 가져오기 */
+    /* Access Token에서 유저 권한 값 가져오기 */
     public String getRoleType(String accessToken) {
         try {
             return Jwts.parserBuilder()
@@ -97,7 +97,7 @@ public class JwtProvider {
         return JwtDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .grantType(BEARER_TYPE)
+                .grantType(GRANT_TYPE)
                 .expiredAt(expiration_time)
                 .build();
     }

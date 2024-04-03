@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class BaseTime {
 
     @CreatedDate    // DB 저장 시 자동으로 생성일 추가
-    private LocalDateTime createDate;   // 생성일
+    private LocalDateTime createdDate;   // 생성일
 
     @LastModifiedDate   // DB 저장 시 자동으로 생성일 추가
     private LocalDateTime modifiedDate; // 수정일

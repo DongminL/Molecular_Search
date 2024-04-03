@@ -1,6 +1,6 @@
 package com.example.molecularsearch.api;
 
-import com.example.molecularsearch.entity.ChemInfo;
+import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.service.ChemInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class ChemInfoController {
     private final ChemInfoService chemInfoService;
 
     @GetMapping("/api/search/chem")
-    public ResponseEntity<ChemInfo> seearchChem(@RequestParam String name) {
+    public ResponseEntity<ChemInfoDto> seearchChem(@RequestParam String name) {
         return ResponseEntity.ok(chemInfoService.getChemInfo(name));
     }
 }

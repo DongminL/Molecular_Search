@@ -10,6 +10,10 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@Table(indexes = {
+        @Index(name = "index_smiles", columnList = "isomericSmiles,canonicalSmiles"),   // isomericSmiles Column 기준으로 Index 생성
+        @Index(name = "index_keyword", columnList = "molecularFormula") // molecularFormula에 대한 Index 생성
+})
 public class ChemInfo {
 
     @Id
@@ -22,29 +26,39 @@ public class ChemInfo {
     @Column
     private String inpacName;   // 유기 화합물 이름
 
-    @Column
+    @Column(nullable = false)
     private String molecularFormula; // 화학식
 
     @Column
     private Double molecularWeight; // 분자량 (g/mol)
 
-    @Column
-    private String isomericSmiles;  // 이성질체 SMILES
+    @Column(nullable = false, unique = true)
+    private String canonicalSmiles; // 표준 SMILES
 
-    @Column
+    @Column(nullable = false, unique = true)
+    private String isomericSmiles;  // 이성질체 SMILES (이성질체 : 분자식은 같지만 분자 구조가 다른 물질)
+
+    @Column(nullable = false, unique = true)
     private String inchi;   // 국제 화학 식별자
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String inchiKey;    // InChI Key 값
 
     @Column
-    private String canonicalSmiles; // 표준 SMILES
+    private String synonyms;    // 비슷한 화합물들
 
     @Column
-    private String imagePath;   // 이미지 경로
+    private String description; // 화합물에 대한 설명
+
+    @Column
+    private String image2DUrl;   // 2D 이미지 경로
+
+    @Column
+    private String image3DUrl;   // 3D 이미지 경로
 
     @Builder
-    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String imagePath) {
+
+    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String synonyms, String description, String image2DUrl, String image3DUrl) {
         this.id = id;
         this.cid = cid;
         this.inpacName = inpacName;
@@ -54,6 +68,9 @@ public class ChemInfo {
         this.inchi = inchi;
         this.inchiKey = inchiKey;
         this.canonicalSmiles = canonicalSmiles;
-        this.imagePath = imagePath;
+        this.synonyms = synonyms;
+        this.description = description;
+        this.image2DUrl = image2DUrl;
+        this.image3DUrl = image3DUrl;
     }
 }
