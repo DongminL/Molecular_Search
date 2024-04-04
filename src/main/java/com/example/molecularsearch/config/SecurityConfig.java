@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 // URL 권한 설정 */
                 .authorizeHttpRequests((authorizeRequests) ->
-                        authorizeRequests.requestMatchers("/api/login/naver", "api/login/google").permitAll()  // 로그인 요청은 누구든지 허용
+                        authorizeRequests.requestMatchers("/api/login/naver", "/api/login/google", "/api/login/reissue").permitAll()  // 로그인, 토큰 갱신 요청은 누구든지 허용
                                 .anyRequest().authenticated()   // 그외 다른 요청들은 토큰 인증해야함
                 );
 

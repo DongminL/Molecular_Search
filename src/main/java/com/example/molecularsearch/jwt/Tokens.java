@@ -21,11 +21,11 @@ public class Tokens {
 
     private String refreshToken;  // Refresh Token 값
 
-    @Indexed    // 으로 검색허용
+    @Indexed    // 검색허용
     private String accessToken;   // Access Token 값
 
     @TimeToLive(unit = TimeUnit.MILLISECONDS)
-    private Long ttl;   // 데이터 만료시간 (Refresh Token 만료 시간과 같음)
+    private long ttl;   // 데이터 만료시간 (Refresh Token 만료 시간과 같음)
 
     @Builder
     public Tokens(Long id, String refreshToken, String accessToken, Long ttl) {

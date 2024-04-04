@@ -21,8 +21,7 @@ public class JwtService {
     /* Access Token 값으로 Refresh Token 정보도 가져오기 */
     @Transactional(readOnly = true)
     public Tokens getToken(String accessToken) {
-        return tokensRepository.findByAccessToken(accessToken).orElseThrow(() ->
-                new EntityNotFoundException("존재하지 않은 토큰입니다!"));
+        return tokensRepository.findByAccessToken(accessToken).orElse(null);    // 없으면 null 반환
     }
 
     /* Access Token 값으로 DB에 존재 여부 확인 */
@@ -62,13 +61,13 @@ public class JwtService {
         // Access Token이 유효하지 않을 때
         if (!jwtProvider.checkToken(accessToken)) {
             Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
-            log.info(tokens.toString());
 
             if (tokens == null) {
                 throw new RuntimeException("Refresh Token이 만료되었습니다!");
             }
 
             String newAccessToken = jwtProvider.checkRefreshToken(tokens);  // Access Token 갱신
+            log.info("new Access Token : {}", newAccessToken);
             // Redis 값도 갱신
             tokens.updateAccessToken(newAccessToken);
             tokensRepository.save(tokens);

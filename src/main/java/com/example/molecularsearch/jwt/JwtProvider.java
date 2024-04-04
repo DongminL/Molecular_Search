@@ -123,9 +123,9 @@ public class JwtProvider {
     /* Token의 유효성 검증 */
     public boolean checkToken(String token) {
         try {
-            Jws<Claims> claimsJwts = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);  // Token 유효성 검증 및 토큰에서 claims 가져오기
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);  // Token 유효성 검증 및 토큰에서 claims 가져오기
 
-            return !claimsJwts.getBody().getExpiration().before(new Date());    // 만료 기간 검사 (true : 유효, false : 무효)
+            return true;    // true : 유효
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.error("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
@@ -136,13 +136,14 @@ public class JwtProvider {
             log.error("JWT 토큰이 잘못되었습니다.");
         }
 
-        return false;
+        return false;   // false : 무효
     }
 
     /* Refresh Token 유효성 검증 */
     public String checkRefreshToken(Tokens tokensObj){
         
         String refreshToken = tokensObj.getRefreshToken();    // refreshToken 값 가져오기
+        log.info("Refresh Token : {}", refreshToken);
 
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);  // Refresh Token 유효성 검증 및 토큰에서 claims 가져오기
