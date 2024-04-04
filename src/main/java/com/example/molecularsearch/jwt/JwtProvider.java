@@ -55,13 +55,13 @@ public class JwtProvider {
                 .compact();
     }
 
-    /* Access Token에서 유저 키 값 가져오기 */
-    public String getUserPk(String accessToken) {
+    /* Token에서 유저 키 값 가져오기 */
+    public String getUserPk(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
         } catch (ExpiredJwtException e) {
@@ -69,13 +69,13 @@ public class JwtProvider {
         }
     }
 
-    /* Access Token에서 유저 권한 값 가져오기 */
-    public String getRoleType(String accessToken) {
+    /* Token에서 유저 권한 값 가져오기 */
+    public String getRoleType(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody()
                     .get("role")
                     .toString();
@@ -150,10 +150,10 @@ public class JwtProvider {
 
             // Refresh Token의 만료시간이 지나지 않았을 경우, 새로운 Access Token을 생성
             if (!claims.getBody().getExpiration().before(new Date())) {
-                return reGenerateAccessToken(Long.parseLong(claims.getBody().getSubject()), claims.getBody().get("role").toString());
+                return reGenerateAccessToken(Long.parseLong(getUserPk(refreshToken)), getRoleType(refreshToken));
             }
         } catch (Exception e) {
-            log.info("Refresh Token이 만료되었을 경우, 로그인 필요!");
+            log.info("Refresh Token이 만료되었을 경우, 재로그인 필요!");
             return null;
 
         }

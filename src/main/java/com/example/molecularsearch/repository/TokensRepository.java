@@ -11,5 +11,5 @@ public interface TokensRepository extends CrudRepository<Tokens, Long> {
 
     Optional<Tokens> findByAccessToken(String accessToken);   // Access Token 값으로 Refresh Token 정보 불러오기
 
-    Optional<Tokens> deleteByAccessToken(String accessToken);   // Access Token 값으로 Tokens 값 삭제
+    void deleteById(Long id);   // Token Key 값으로 Tokens 값 삭제
 }

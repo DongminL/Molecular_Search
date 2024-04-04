@@ -53,7 +53,6 @@ public class OAuthLoginService {
     }
 
     public Tokens logout(String accessToken) {
-
-        return jwtService.deleteToken(accessToken);
+        return jwtService.deleteToken(jwtService.getHeaderToken(accessToken));
     }
 }

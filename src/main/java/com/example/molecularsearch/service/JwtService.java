@@ -4,7 +4,6 @@ import com.example.molecularsearch.dto.JwtDto;
 import com.example.molecularsearch.jwt.JwtProvider;
 import com.example.molecularsearch.jwt.Tokens;
 import com.example.molecularsearch.repository.TokensRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,8 +50,15 @@ public class JwtService {
     /* Access Token 값으로 Tokens 삭제 */
     @Transactional
     public Tokens deleteToken(String accessToken) {
-        return tokensRepository.deleteByAccessToken(accessToken).orElseThrow( () ->
-                new EntityNotFoundException("존재하지 않은 토큰입니다!"));
+        Tokens tokens = getToken(accessToken);  // Tokens 객체 가져오기
+
+        if (tokens == null) {
+            return null;
+        }
+
+        tokensRepository.deleteById(tokens.getId());    // Tokens Key로 제거
+
+        return tokens;
     }
 
     /* Access Token만 갱신 */
