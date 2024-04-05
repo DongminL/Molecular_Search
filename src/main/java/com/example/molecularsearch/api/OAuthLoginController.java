@@ -26,7 +26,7 @@ public class OAuthLoginController {
     }
 
     /* 만료된 Access Token 갱신 */
-    @PatchMapping("api/login/reissue")
+    @PatchMapping("/api/login/reissue")
     public ResponseEntity<String> reissueToken(@RequestHeader("Authorization") String token) {
         String accessToken = jwtService.getHeaderToken(token);  // Header 값에서 Bearer 값 제외
 
@@ -43,7 +43,7 @@ public class OAuthLoginController {
         }
     }
 
-    @DeleteMapping("api/logout")
+    @DeleteMapping("/api/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(oAuthLoginService.logout(token));
     }

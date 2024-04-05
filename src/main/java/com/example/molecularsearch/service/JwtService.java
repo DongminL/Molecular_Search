@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -90,6 +91,11 @@ public class JwtService {
 
     /* Authorization Header에서 Token 값만 가져오기*/
     public String getHeaderToken(String bearerToken) {
-        return bearerToken.substring(7);    // "Bearer " 문자열 제거
+        // 유효한 헤더 값인지 검증
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);    // "Bearer " 부분을 자르고 JWT만 가져옴
+        }
+
+        return null;
     }
 }

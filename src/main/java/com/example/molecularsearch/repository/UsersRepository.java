@@ -15,4 +15,6 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByUserId(String userId);  // userId 값으로 User 정보 불러오기
 
     Optional<Users> findById(@NonNull Long id);  // Users Table의 PK 값으로 User 정보 불러오기
+
+    void deleteById(Long id);
 }

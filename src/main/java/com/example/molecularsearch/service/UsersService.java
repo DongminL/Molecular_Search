@@ -84,4 +84,10 @@ public class UsersService {
         return customUserService.getCurrentUserId()
                 .flatMap(usersRepository::findByUserId);
     }
+
+    /* 유저 정보 삭제 */
+    @Transactional
+    public void deleteUser(Long id) {
+        usersRepository.deleteById(id);
+    }
 }
