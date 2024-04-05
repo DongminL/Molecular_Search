@@ -1,5 +1,6 @@
 package com.example.molecularsearch.dto;
 
+import com.example.molecularsearch.entity.ChemInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,5 +46,19 @@ public class ChemInfoDto {
         this.inchi = inchi;
         this.inchiKey = inchiKey;
         this.canonicalSmiles = canonicalSmiles;
+    }
+
+    /* Dto -> Entity로 변환 */
+    public ChemInfo toEntity() {
+        return ChemInfo.builder()
+                .cid(this.getCid())
+                .inpacName(this.getInpacName())
+                .molecularFormula(this.getMolecularFormula())
+                .molecularWeight(this.getMolecularWeight())
+                .inchi(this.getInchi())
+                .inchiKey(this.getInchiKey())
+                .canonicalSmiles(this.getCanonicalSmiles())
+                .isomericSmiles(this.getIsomericSmiles())
+                .build();
     }
 }

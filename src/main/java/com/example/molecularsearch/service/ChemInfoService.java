@@ -68,16 +68,7 @@ public class ChemInfoService {
     /* 응답값으로 받은 분자정보 저장 */
     @Transactional
     public ChemInfo saveChemInfo(ChemInfoDto request) {
-        ChemInfo chemInfo = ChemInfo.builder()
-                .cid(request.getCid())
-                .inpacName(request.getInpacName())
-                .molecularFormula(request.getMolecularFormula())
-                .molecularWeight(request.getMolecularWeight())
-                .inchi(request.getInchi())
-                .inchiKey(request.getInchiKey())
-                .canonicalSmiles(request.getCanonicalSmiles())
-                .isomericSmiles(request.getIsomericSmiles())
-                .build();
+        ChemInfo chemInfo = request.toEntity();
 
         return chemInfoRepository.save(chemInfo);
     }
