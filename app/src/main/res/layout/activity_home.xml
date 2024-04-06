@@ -5,18 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".HomeActivity">
 
-    <ImageView
-        android:id="@+id/btn_naver_login"
-        android:layout_width="400dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/naver_login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.499" />
 
     <ImageView
         android:id="@+id/btn_naver_logout"
@@ -24,22 +14,10 @@
         android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:src="@drawable/naver_logout"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499" />
-
-    <ImageView
-        android:id="@+id/btn_google_login"
-        android:layout_width="400dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/google_login"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.604" />
 
     <TextView
         android:id="@+id/btn_naver_delete"
