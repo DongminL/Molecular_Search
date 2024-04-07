@@ -11,8 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.canchem.data.source.AccessTokenInterceptor
-import com.example.canchem.data.source.LogIn
 import com.example.canchem.data.source.LoginInterface
 import com.example.canchem.data.source.NaverToken
 import com.example.canchem.data.source.Token
@@ -23,19 +21,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.NidOAuthLogin
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.navercorp.nid.profile.NidProfileCallback
 import com.navercorp.nid.profile.data.NidProfileResponse
-import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -233,7 +225,7 @@ class MainActivity : AppCompatActivity() {
 
             // retrofit 변수 생성
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://121.155.81.240:8080")
+                .baseUrl("http://172.20.10.6:8080/")
                 .addConverterFactory(GsonConverterFactory.create()) //kotlin to json(역 일수도)
                 .build()
 
@@ -252,6 +244,7 @@ class MainActivity : AppCompatActivity() {
             // retrofit객체 생성
             val loginService = retrofit.create(LoginInterface::class.java)
             val call = loginService.getLoginToken(userInfo)
+            Log.i("call", call.toString())
             call.enqueue(object : Callback<Token> {
                 override fun onResponse(call: Call<Token>, response: Response<Token>) { //요청성공시
                     if (response.isSuccessful) {
@@ -263,7 +256,8 @@ class MainActivity : AppCompatActivity() {
                                 "nickname: ${nickname}\n" +
                                 "name: ${name}\n" +
                                 "gender: ${gender}\n" +
-                                "profileImage: ${profileImage}\n"
+                                "profileImage: ${profileImage}\n"+
+                                "accessToken: ${response.body()?.accessToken}"
                             , Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this@MainActivity, "실패", Toast.LENGTH_SHORT).show()
@@ -273,6 +267,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<Token>, t: Throwable) { //요청실패시
                     Toast.makeText(this@MainActivity, "아예 실패", Toast.LENGTH_SHORT).show()
+                    Log.e("call error", t.toString())
                 }
             })
         }
@@ -394,3 +389,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+
+// 이연제 해야 할 일
+// 네이버 로그인 성공하면 accessToken firebase에 저장.
+// 구글 data class 등 추가해서 구글 로그인도 마무리.

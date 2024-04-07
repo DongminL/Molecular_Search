@@ -2,15 +2,13 @@ package com.example.canchem.data.source
 
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
-import retrofit2.http.Query
 
 interface LoginInterface{
-    @POST("/api/login/naver")
+    @POST("api/login/naver")
     fun getLoginToken(
-//        @Header("Authorization") authorization : String,
+        //@Header("Authorization") accessToken: String?,  // Baerer AccessToken
         @Body naverToken: NaverToken
 
 

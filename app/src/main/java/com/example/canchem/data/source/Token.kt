@@ -4,9 +4,8 @@ import com.google.gson.annotations.SerializedName
 import com.navercorp.nid.NaverIdLoginSDK
 
 data class Token(
-    @SerializedName("Authorization") val accessToken : String?
-//    val refreshToken : String?, //var?
-//    val expiresAt : String?,
-//    val tokenType : String?,
-//    val state : String? //var?
+    @SerializedName("accessToken") val accessToken : String?,
+    @SerializedName("refreshToken")val refreshToken : String?, //var?
+    @SerializedName("grantType")val grantType : String?,
+    @SerializedName("expiredAt") val expiredAt : Long?
 )
