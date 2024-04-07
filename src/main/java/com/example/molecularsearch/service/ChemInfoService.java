@@ -50,6 +50,7 @@ public class ChemInfoService {
         }
 
         chemInfoDto = getChemInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
+        log.info(chemInfoDto.toString());
 
         saveChemInfo(chemInfoDto);  // 가져옴 값 저장
 
