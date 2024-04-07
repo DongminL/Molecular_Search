@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true) // 필요한 필드만 적용
+@JsonIgnoreProperties(ignoreUnknown = true) // Serialize를 필요한 필드만 적용
 public class ChemInfoDto {
 
     @JsonProperty("cid")
