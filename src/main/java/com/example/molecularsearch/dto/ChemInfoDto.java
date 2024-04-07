@@ -1,6 +1,7 @@
 package com.example.molecularsearch.dto;
 
 import com.example.molecularsearch.entity.ChemInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true) // 필요한 필드만 적용
 public class ChemInfoDto {
 
     @JsonProperty("cid")
@@ -36,8 +38,22 @@ public class ChemInfoDto {
     @JsonProperty("canonical_smlies")
     private String canonicalSmiles; // 표준 SMILES
 
+    @JsonProperty("synonyms")
+    private String synonyms;    // 비슷한 화합물들
+
+    @JsonProperty("description")
+    private String description; // 화합물에 대한 설명
+
+    @JsonProperty("image_2D_url")
+    private String image2DUrl;   // 2D 이미지 경로
+
+    @JsonProperty("image_3D_url")
+    private String image3DUrl;   // 3D 이미지 경로
+
     @Builder
-    public ChemInfoDto(Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles) {
+    public ChemInfoDto(Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles,
+                       String inchi, String inchiKey, String canonicalSmiles, String synonyms, String description,
+                       String image2DUrl, String image3DUrl) {
         this.cid = cid;
         this.inpacName = inpacName;
         this.molecularFormula = molecularFormula;
@@ -46,19 +62,43 @@ public class ChemInfoDto {
         this.inchi = inchi;
         this.inchiKey = inchiKey;
         this.canonicalSmiles = canonicalSmiles;
+        this.synonyms = synonyms;
+        this.description = description;
+        this.image2DUrl = image2DUrl;
+        this.image3DUrl = image3DUrl;
     }
 
     /* Dto -> Entity로 변환 */
     public ChemInfo toEntity() {
         return ChemInfo.builder()
-                .cid(this.getCid())
-                .inpacName(this.getInpacName())
-                .molecularFormula(this.getMolecularFormula())
-                .molecularWeight(this.getMolecularWeight())
-                .inchi(this.getInchi())
-                .inchiKey(this.getInchiKey())
-                .canonicalSmiles(this.getCanonicalSmiles())
-                .isomericSmiles(this.getIsomericSmiles())
+                .cid(this.cid)
+                .inpacName(this.inpacName)
+                .molecularFormula(this.molecularFormula)
+                .molecularWeight(this.molecularWeight)
+                .inchi(this.inchi)
+                .inchiKey(this.inchiKey)
+                .canonicalSmiles(this.canonicalSmiles)
+                .isomericSmiles(this.isomericSmiles)
+                .synonyms(this.synonyms)
+                .description(this.description)
+                .image2DUrl(this.image2DUrl)
+                .image3DUrl(this.image3DUrl)
                 .build();
+    }
+
+    /* Entity -> Dto로 변환 */
+    public ChemInfoDto(ChemInfo chemInfo) {
+        this.cid = chemInfo.getCid();
+        this.inpacName = chemInfo.getInpacName();
+        this.molecularFormula = chemInfo.getMolecularFormula();
+        this.molecularWeight = chemInfo.getMolecularWeight();
+        this.isomericSmiles = chemInfo.getIsomericSmiles();
+        this.inchi = chemInfo.getInchi();
+        this.inchiKey = chemInfo.getInchiKey();
+        this.canonicalSmiles = chemInfo.getCanonicalSmiles();
+        this.synonyms = chemInfo.getSynonyms();
+        this.description = chemInfo.getDescription();
+        this.image2DUrl = chemInfo.getImage2DUrl();
+        this.image3DUrl = chemInfo.getImage3DUrl();
     }
 }

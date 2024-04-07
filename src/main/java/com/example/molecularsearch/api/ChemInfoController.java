@@ -13,8 +13,15 @@ public class ChemInfoController {
 
     private final ChemInfoService chemInfoService;
 
-    @GetMapping("/api/search/chem")
+    /* 분자 이름 또는 화학식으로 분자 정보 검색 */
+    @GetMapping(value = "/api/search/chem", params = "name")
     public ResponseEntity<?> seearchChem(@RequestParam String name) {
-        return ResponseEntity.ok(chemInfoService.saveChemInfo(chemInfoService.getChemInfo(name)));
+        return ResponseEntity.ok(chemInfoService.saveChemInfo(chemInfoService.getChemInfoByName(name)));
+    }
+
+    /* SMILES 식을 통한 분자정보 검색 */
+    @GetMapping(value = "/api/search/chem", params = "smiles")
+    public ResponseEntity<?> smilesChem(@RequestParam String smiles) {
+        return ResponseEntity.ok(chemInfoService.searchSmiles(smiles));
     }
 }

@@ -37,6 +37,25 @@ public class ChemInfoService {
     private String SMILES_3D_URL; // SMILES 식으로 3D 이미지 검색 API URL
     private final ChemInfoRepository chemInfoRepository;
 
+    /* SMILES 식으로 분자정보 검색 */
+    @Transactional
+    public ChemInfoDto searchSmiles(String smiles) {
+        ChemInfoDto chemInfoDto;
+        ChemInfo entity = chemInfoRepository.findByIsomericSmiles(smiles).orElse(null); // SMILES 식으로 찾아 가져오기
+
+        // DB에 해당 정보가 있으면
+        if (entity != null) {
+            chemInfoDto = new ChemInfoDto(entity);
+            return chemInfoDto;
+        }
+
+        chemInfoDto = getChemInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
+
+        saveChemInfo(chemInfoDto);  // 가져옴 값 저장
+
+        return chemInfoDto;
+    }
+
     /* URL에 따른 WebClient 객체 생성 */
     public WebClient createWebclient(String url) {
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(url);  // URI 인코딩
@@ -48,8 +67,8 @@ public class ChemInfoService {
                 .build();    // 인스턴스 생성
     }
 
-    /* FAST API에 화합물 이름으로 분자정보 검색 */
-    public ChemInfoDto getChemInfo(String name) {
+    /* FAST API에 화합물 이름으로 분자정보 가져오기 */
+    public ChemInfoDto getChemInfoByName(String name) {
         WebClient webClient = createWebclient(NAME_INFO_URL);
 
         ChemInfoDto request = webClient.get()    // GET 요청
@@ -60,7 +79,24 @@ public class ChemInfoService {
                 .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 직렬화
                 .block();   //  동기 방식
 
-        assert request != null;
+        assert request != null : "찾지 못했습니다!";
+        log.info(request.toString());
+        return request;
+    }
+
+    /* FAST API에 SMILES 식으로 분자정보 가져오기 */
+    public ChemInfoDto getChemInfoBySmiles(String smiles) {
+        WebClient webClient = createWebclient(SMILES_INFO_URL);
+
+        ChemInfoDto request = webClient.get()    // GET 요청
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("mol_Smlies", smiles)   // Params 설정
+                        .build())
+                .retrieve() // 응답값을 가져옴
+                .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 직렬화
+                .block();   //  동기 방식
+
+        assert request != null : "찾지 못했습니다!";
         log.info(request.toString());
         return request;
     }
@@ -71,9 +107,5 @@ public class ChemInfoService {
         ChemInfo chemInfo = request.toEntity();
 
         return chemInfoRepository.save(chemInfo);
-    }
-
-    public ChemInfoDto searchChemInfo(String name) {
-        return null;
     }
 }

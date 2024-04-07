@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(name = "index_smiles", columnList = "isomericSmiles,canonicalSmiles", unique = true),   // isomericSmiles Column 기준으로 Unique Index 생성
+        @Index(name = "index_smiles", columnList = "isomericSmiles", unique = true),   // isomericSmiles Column 기준으로 Unique Index 생성
         @Index(name = "index_formula", columnList = "molecularFormula") // molecularFormula에 대한 Index 생성
 })
 public class ChemInfo {
