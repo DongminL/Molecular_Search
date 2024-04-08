@@ -41,7 +41,7 @@ public class ChemInfoService {
     @Transactional
     public ChemInfoDto searchSmiles(String smiles) {
         ChemInfoDto chemInfoDto;
-        ChemInfo entity = chemInfoRepository.findByIsomericSmiles(smiles).orElse(null); // SMILES 식으로 찾아 가져오기
+        ChemInfo entity = findChemInfoBySmiles(smiles); // SMILES 식으로 찾아 가져오기
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
@@ -55,6 +55,24 @@ public class ChemInfoService {
         saveChemInfo(chemInfoDto);  // 가져옴 값 저장
 
         return chemInfoDto;
+    }
+
+    @Transactional
+    public ChemInfoDto saveInfoByCid(Long cid) {
+        WebClient webClient = createWebclient("http://localhost:8008/getMolInfo_Cid");
+
+        ChemInfoDto request = webClient.get()    // GET 요청
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("mol_Cid", cid)   // Params 설정
+                        .build())
+                .retrieve() // 응답값을 가져옴
+                .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 직렬화
+                .block();   //  동기 방식
+
+        assert request != null : "찾지 못했습니다!";
+        log.info(request.toString());
+        saveChemInfo(request);
+        return request;
     }
 
     /* URL에 따른 WebClient 객체 생성 */
@@ -108,5 +126,11 @@ public class ChemInfoService {
         ChemInfo chemInfo = request.toEntity();
 
         return chemInfoRepository.save(chemInfo);
+    }
+    
+    /* SMILES 식으로 분자 정보 가져오기 */
+    @Transactional(readOnly = true)
+    public ChemInfo findChemInfoBySmiles(String smiles) {
+        return chemInfoRepository.findByIsomericSmiles(smiles).orElse(null);    // 없으면 null 반환
     }
 }
