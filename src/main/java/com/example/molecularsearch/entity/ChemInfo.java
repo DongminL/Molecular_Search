@@ -44,7 +44,7 @@ public class ChemInfo {
     @Column(nullable = false)
     private String inchiKey;    // InChI Key 값
 
-    @Column
+    @Column(length = 10000)
     private String synonyms;    // 비슷한 화합물들
 
     @Column

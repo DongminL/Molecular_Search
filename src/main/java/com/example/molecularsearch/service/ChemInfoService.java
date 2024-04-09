@@ -45,7 +45,7 @@ public class ChemInfoService {
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
-            chemInfoDto = new ChemInfoDto(entity);
+            chemInfoDto = new ChemInfoDto(entity, null);
             return chemInfoDto;
         }
 

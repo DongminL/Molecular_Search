@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @ToString
 @NoArgsConstructor
@@ -26,7 +28,7 @@ public class ChemInfoDto {
     @JsonProperty("molecular_weight")
     private Double molecularWeight; // 분자량 (g/mol)
 
-    @JsonProperty("isomeric_smlies")
+    @JsonProperty("isomeric_smiles")
     private String isomericSmiles;  // 이성질체 SMILES
 
     @JsonProperty("inchi")
@@ -35,11 +37,11 @@ public class ChemInfoDto {
     @JsonProperty("inchiKey")
     private String inchiKey;    // InChI Key 값
 
-    @JsonProperty("canonical_smlies")
+    @JsonProperty("canonical_smiles")
     private String canonicalSmiles; // 표준 SMILES
 
     @JsonProperty("synonyms")
-    private String synonyms;    // 비슷한 화합물들
+    private List<String> synonyms;    // 비슷한 화합물들
 
     @JsonProperty("description")
     private String description; // 화합물에 대한 설명
@@ -52,7 +54,7 @@ public class ChemInfoDto {
 
     @Builder
     public ChemInfoDto(Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles,
-                       String inchi, String inchiKey, String canonicalSmiles, String synonyms, String description,
+                       String inchi, String inchiKey, String canonicalSmiles, List<String> synonyms, String description,
                        String image2DUrl, String image3DUrl) {
         this.cid = cid;
         this.inpacName = inpacName;
@@ -79,15 +81,11 @@ public class ChemInfoDto {
                 .inchiKey(this.inchiKey)
                 .canonicalSmiles(this.canonicalSmiles)
                 .isomericSmiles(this.isomericSmiles)
-                .synonyms(this.synonyms)
-                .description(this.description)
-                .image2DUrl(this.image2DUrl)
-                .image3DUrl(this.image3DUrl)
                 .build();
     }
 
     /* Entity -> Dto로 변환 */
-    public ChemInfoDto(ChemInfo chemInfo) {
+    public ChemInfoDto(ChemInfo chemInfo, List<String> synonyms) {
         this.cid = chemInfo.getCid();
         this.inpacName = chemInfo.getInpacName();
         this.molecularFormula = chemInfo.getMolecularFormula();
@@ -96,7 +94,7 @@ public class ChemInfoDto {
         this.inchi = chemInfo.getInchi();
         this.inchiKey = chemInfo.getInchiKey();
         this.canonicalSmiles = chemInfo.getCanonicalSmiles();
-        this.synonyms = chemInfo.getSynonyms();
+        this.synonyms = synonyms;
         this.description = chemInfo.getDescription();
         this.image2DUrl = chemInfo.getImage2DUrl();
         this.image3DUrl = chemInfo.getImage3DUrl();

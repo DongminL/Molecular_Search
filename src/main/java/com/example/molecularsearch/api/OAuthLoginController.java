@@ -45,6 +45,10 @@ public class OAuthLoginController {
 
     @DeleteMapping("/api/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(oAuthLoginService.logout(token));
+        if (oAuthLoginService.logout(token) != null ) {
+            return ResponseEntity.ok("로그아웃 성공");
+        } else {
+            return ResponseEntity.status(406).body("잘못된 토큰 입니다.");
+        }
     }
 }
