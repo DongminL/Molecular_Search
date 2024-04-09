@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true) // Serialize를 필요한 필드만 적용
+@JsonIgnoreProperties(ignoreUnknown = true) // Deserialize를 필요한 필드만 적용
 public class ChemInfoDto {
 
     @JsonProperty("cid")
@@ -98,5 +98,10 @@ public class ChemInfoDto {
         this.description = chemInfo.getDescription();
         this.image2DUrl = chemInfo.getImage2DUrl();
         this.image3DUrl = chemInfo.getImage3DUrl();
+    }
+
+    /* Synonyms 정보 업데이트 */
+    public void updateSynonyms(List<String> synonyms) {
+        this.synonyms = synonyms;
     }
 }
