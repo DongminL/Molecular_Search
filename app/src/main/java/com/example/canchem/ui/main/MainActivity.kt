@@ -1,16 +1,17 @@
-package com.example.canchem
+package com.example.canchem.ui.main
 
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.canchem.R
+import com.example.canchem.SearchActivity
 import com.example.canchem.data.source.GoogleLoginInterface
 import com.example.canchem.data.source.GoogleToken
 import com.example.canchem.data.source.NaverLoginInterface
@@ -24,7 +25,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.navercorp.nid.NaverIdLoginSDK
@@ -37,9 +40,106 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.time.LocalDateTime //현재 시간
 
 class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        /* View Binding 설정 */
+        val binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+//        // retrofit 변수 생성
+//        val retrofit = Retrofit.Builder()
+//            .baseUrl("http://localhost:8080")
+//            .addConverterFactory(GsonConverterFactory.create()) //kotlin to json(역 일수도)
+//            .build()
+//
+//        // retrofit객체 생성
+//        val loginService = retrofit.create(LoginInterface::class.java)
+//
+////        val data = LogIn("12345") //여기 네이버에서 준 정보 넣으면 됨.
+//        val call = loginService.getLoginToken(something)
+//        call.enqueue(object : Callback<NaverToken> {
+//            override fun onResponse(call: Call<NaverToken>, response: Response<NaverToken>) { //요청성공시
+//                if (response.isSuccessful) {
+//                    Toast.makeText(this@MainActivity, "성공", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    Toast.makeText(this@MainActivity, "실패", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<NaverToken>, t: Throwable) { //요청실패시
+//                Toast.makeText(this@MainActivity, "아예 실패", Toast.LENGTH_SHORT).show()
+//            }
+//        })
+
+        enableEdgeToEdge()  // 상태표시줄 투명하게 만듦
+
+        /* 네아로 SDK 객체 초기화 */
+        val naverClientId = getString(R.string.naver_client_id) // 발급 받은 naver client id 값
+        val naverClientSecret = getString(R.string.naver_client_secret) // 발급 받은 naver client secret 값
+        val naverClientName = getString(R.string.naver_client_name) // 어플 이름
+        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)    // 네아로 객체 초기화
+
+        googleAuthLauncher()    // Google 로그인 초기화
+        googleSignInClient = getGoogleClient()  // Google Client 초기화
+        
+
+        /* Google 로그인 버튼 클릭*/
+        binding.btnGoogleLogin.setOnClickListener {
+            resultLauncher.launch(googleSignInClient.getSignInIntent())  // 구글 로그인 창으로 넘어감
+        }
+
+        /* 네이버 로그인 버튼 클릭 */
+        binding.btnNaverLogin.setOnClickListener {
+
+            /* 네이버 Access Token 받기 */
+            val oauthLoginCallback = object : OAuthLoginCallback {
+                override fun onSuccess() {
+                    // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
+                    val accessToken = NaverIdLoginSDK.getAccessToken().toString()   // 접근 토큰
+                    val refreshToken = NaverIdLoginSDK.getRefreshToken().toString() // 갱신 토큰
+                    val expiresAt = NaverIdLoginSDK.getExpiresAt().toString()   // 만료 기한 (초)
+                    val type = NaverIdLoginSDK.getTokenType().toString()    // 토큰 타입
+                    val state = NaverIdLoginSDK.getState().toString()   // 로그인 인스턴트의 현재 상태
+
+                    Toast.makeText(this@MainActivity, "Access Token : ${accessToken}\n" +
+                            "Refresh Token : ${refreshToken}\n" +
+                            "Expires at : ${expiresAt}\n" +
+                            "Type : ${type}\n" +
+                            "State : ${state}", Toast.LENGTH_SHORT).show()
+
+                    NidOAuthLogin().callProfileApi(nidProfileCallback)
+
+                    val intent = Intent(this@MainActivity, SearchActivity::class.java)
+                    startActivity(intent)
+                }
+                override fun onFailure(httpStatus: Int, message: String) {
+                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+                    val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+                    Toast.makeText(this@MainActivity,"errorCode:$errorCode, errorDesc:$errorDescription",Toast.LENGTH_SHORT).show()
+                }
+                override fun onError(errorCode: Int, message: String) {
+                    onFailure(errorCode, message)
+                }
+            }
+            NaverIdLoginSDK.authenticate(this, oauthLoginCallback)  // 토큰 가져오기
+        }
+
+        /* 로그아웃 버튼 클릭 */
+        binding.btnNaverLogout.setOnClickListener {
+            naverLogout()   // 네이버 로그아웃
+            googleLogout()  // 구글 로그아웃
+        }
+
+        /* 탈퇴 버튼 클릭 */
+        binding.btnNaverDelete.setOnClickListener {
+            naverDeleteToken()  // 네이버 연동 해제
+            googleDeleteToken()  // 구글 연동 해제
+        }
+    }
+
     val first : String = "Baerer"
     lateinit var googleSignInClient : GoogleSignInClient
     lateinit var resultLauncher : ActivityResultLauncher<Intent>
@@ -87,115 +187,7 @@ class MainActivity : AppCompatActivity() {
         googleLogInCheck()  // 구글 아이디로 로그인 되어 있는지 확인
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
 
-        /* View Binding 설정 */
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-//        // retrofit 변수 생성
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl("http://localhost:8080")
-//            .addConverterFactory(GsonConverterFactory.create()) //kotlin to json(역 일수도)
-//            .build()
-//
-//        // retrofit객체 생성
-//        val loginService = retrofit.create(LoginInterface::class.java)
-//
-////        val data = LogIn("12345") //여기 네이버에서 준 정보 넣으면 됨.
-//        val call = loginService.getLoginToken(something)
-//        call.enqueue(object : Callback<NaverToken> {
-//            override fun onResponse(call: Call<NaverToken>, response: Response<NaverToken>) { //요청성공시
-//                if (response.isSuccessful) {
-//                    Toast.makeText(this@MainActivity, "성공", Toast.LENGTH_SHORT).show()
-//                } else {
-//                    Toast.makeText(this@MainActivity, "실패", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<NaverToken>, t: Throwable) { //요청실패시
-//                Toast.makeText(this@MainActivity, "아예 실패", Toast.LENGTH_SHORT).show()
-//            }
-//        })
-
-        enableEdgeToEdge()  // 상태표시줄 투명하게 만듦
-
-        /* 네아로 SDK 객체 초기화 */
-        val naverClientId = getString(R.string.naver_client_id) // 발급 받은 naver client id 값
-        val naverClientSecret = getString(R.string.naver_client_secret) // 발급 받은 naver client secret 값
-        val naverClientName = getString(R.string.naver_client_name) // 어플 이름
-        NaverIdLoginSDK.initialize(this, naverClientId, naverClientSecret , naverClientName)    // 네아로 객체 초기화
-
-        googleAuthLauncher()    // Google 로그인 초기화
-        googleSignInClient = getGoogleClient()  // Google Client 초기화
-
-
-        /* Google 로그인 버튼 클릭*/
-        binding.btnGoogleLogin.setOnClickListener {
-            resultLauncher.launch(googleSignInClient.getSignInIntent())  // 구글 로그인 창으로 넘어감
-
-
-
-            /* 로그인한 상태 */
-            binding.btnNaverLogin.visibility = View.INVISIBLE
-            binding.btnGoogleLogin.visibility = View.INVISIBLE
-            binding.btnNaverLogout.visibility = View.VISIBLE
-        }
-
-        /* 네이버 로그인 버튼 클릭 */
-        binding.btnNaverLogin.setOnClickListener {
-
-            /* 네이버 Access Token 받기 */
-            val oauthLoginCallback = object : OAuthLoginCallback {
-                override fun onSuccess() {
-                    // 네이버 로그인 인증이 성공했을 때 수행할 코드 추가
-                    val accessToken = NaverIdLoginSDK.getAccessToken().toString()   // 접근 토큰
-                    val refreshToken = NaverIdLoginSDK.getRefreshToken().toString() // 갱신 토큰
-                    val expiresAt = NaverIdLoginSDK.getExpiresAt().toString()   // 만료 기한 (초)
-                    val type = NaverIdLoginSDK.getTokenType().toString()    // 토큰 타입
-                    val state = NaverIdLoginSDK.getState().toString()   // 로그인 인스턴트의 현재 상태
-
-                    Toast.makeText(this@MainActivity, "Access Token : ${accessToken}\n" +
-                            "Refresh Token : ${refreshToken}\n" +
-                            "Expires at : ${expiresAt}\n" +
-                            "Type : ${type}\n" +
-                            "State : ${state}", Toast.LENGTH_SHORT).show()
-
-                    NidOAuthLogin().callProfileApi(nidProfileCallback)
-
-                    val intent = Intent(this@MainActivity, HomeActivity::class.java)
-                    startActivity(intent)
-                }
-                override fun onFailure(httpStatus: Int, message: String) {
-                    val errorCode = NaverIdLoginSDK.getLastErrorCode().code
-                    val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
-                    Toast.makeText(this@MainActivity,"errorCode:$errorCode, errorDesc:$errorDescription",Toast.LENGTH_SHORT).show()
-                }
-                override fun onError(errorCode: Int, message: String) {
-                    onFailure(errorCode, message)
-                }
-            }
-            NaverIdLoginSDK.authenticate(this, oauthLoginCallback)  // 토큰 가져오기
-        }
-
-        /* 로그아웃 버튼 클릭 */
-        binding.btnNaverLogout.setOnClickListener {
-            naverLogout()   // 네이버 로그아웃
-            googleLogout()  // 구글 로그아웃
-        }
-
-        /* 탈퇴 버튼 클릭 */
-        binding.btnNaverDelete.setOnClickListener {
-            naverDeleteToken()  // 네이버 연동 해제
-            googleDeleteToken()  // 구글 연동 해제
-
-            /* 로그아웃한 상태의 View 설정 */
-            binding.btnNaverLogout.visibility = View.INVISIBLE
-            binding.btnNaverLogin.visibility = View.VISIBLE
-            binding.btnGoogleLogin.visibility = View.VISIBLE
-        }
-    }
 
     /* 네이버 사용자 정보 가져오기*/
     val nidProfileCallback = object : NidProfileCallback<NidProfileResponse> {
@@ -210,6 +202,21 @@ class MainActivity : AppCompatActivity() {
 
             val naverUserInfo = NaverToken(userId, email, name, nickname, mobile, gender, profileImage)
 
+            tokenInFirebase.setValue("HiImYenoJe")
+            // Read from the database
+            tokenInFirebase.addValueEventListener(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // This method is called once with the initial value and again
+                    // whenever data at this location is updated.
+                    val value = snapshot.getValue().toString()
+                    Toast.makeText(this@MainActivity, value, Toast.LENGTH_LONG).show()
+                    Log.d(TAG, "Value is: " + value)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w(TAG, "Failed to read value.", error.toException())
+                }
+            })
 
 
             // retrofit 변수 생성
@@ -224,9 +231,11 @@ class MainActivity : AppCompatActivity() {
 //
 //            val firebase = FirebaseDatabase.getInstance().reference
 
+
             // retrofit객체 생성
             val naverLoginService = retrofit.create(NaverLoginInterface::class.java)
             val call = naverLoginService.getLoginToken(naverUserInfo)
+
             Log.i("call", call.toString())
             call.enqueue(object : Callback<Token> {
                 override fun onResponse(call: Call<Token>, response: Response<Token>) { //요청성공시

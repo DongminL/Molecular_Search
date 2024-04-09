@@ -52,8 +52,8 @@ android {
 dependencies {
 
     //Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
