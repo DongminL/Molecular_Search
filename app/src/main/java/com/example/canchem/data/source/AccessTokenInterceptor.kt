@@ -3,7 +3,7 @@ package com.example.canchem.data.source
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AccessTokenInterceptor : Interceptor {
+class AccessTokenInterceptor : Interceptor { //인터셉터. 아마 안쓸듯?
     override fun intercept(chain: Interceptor.Chain): Response {
 //        //JWT 가져오기
 //        var token = TOKEN
