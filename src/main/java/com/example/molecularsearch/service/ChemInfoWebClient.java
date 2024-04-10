@@ -37,17 +37,55 @@ public class ChemInfoWebClient {
     @Value("${fastapi.search.cid.info}")
     private String CID_INFO_URL;    // cid로 분자 정보 검색 API URL
 
-    public ChemInfoDto getChemInfo(String smiles) {
+    @Value("${pubchem.search.cid}")
+    private String PUBCHEM_CID_URL;
+
+    @Value("${pubchem.search.name}")
+    private String PUBCHEM_NAME_URL;
+
+    @Value("${pubchem.search.smiles}")
+    private String PUBCHEM_SMILES_URL;
+
+    @Value("${pubchem.sysnonyms}")
+    private String REQUEST_SYNONYMS;
+
+    @Value("${pubchem.description}")
+    private String REQUEST_DESCRIPTION;
+
+    /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
+    public ChemInfoDto requestInfoBySmiles(String smiles) {
         Mono<ChemInfoDto> chemInfoMono = getChemInfoBySmiles(smiles); // 분자 정보
         Mono<SynonymsResponse> synonymsMono = getSynonymsBySmiles(smiles);   // Synonyms
+        ChemInfoDto chemInfoDto;
 
-        Tuple2<ChemInfoDto, SynonymsResponse> tuple2 = Mono.zip(chemInfoMono, synonymsMono).block();    // 두 Mono의 결과값을 묶어서 동기적으로 처리
+        try {
+            Tuple2<ChemInfoDto, SynonymsResponse> tuple2 = Mono.zip(chemInfoMono, synonymsMono).block();    // 두 Mono의 결과값을 묶어서 동기적으로 처리
 
-        assert tuple2 != null : "요청 실패";
-        ChemInfoDto dto = tuple2.getT1();
-        dto.updateSynonyms(tuple2.getT2().getSynonyms());
+            chemInfoDto = tuple2.getT1();
+            chemInfoDto.updateSynonyms(tuple2.getT2().getSynonyms());
+        } catch (NullPointerException e) {
+            throw new NullPointerException("요청 실패");
+        }
 
-        return dto;
+        return chemInfoDto;
+    }
+
+    /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
+    public ChemInfoDto requestInfoByCid(Long cid) {
+        Mono<ChemInfoDto> chemInfoMono = getChemInfoByCid(cid); // 분자 정보
+        Mono<SynonymsResponse> synonymsMono = getSynonymsByCid(cid);   // Synonyms
+        ChemInfoDto chemInfoDto;
+
+        try {
+            Tuple2<ChemInfoDto, SynonymsResponse> tuple2 = Mono.zip(chemInfoMono, synonymsMono).block();    // 두 Mono의 결과값을 묶어서 동기적으로 처리
+
+            chemInfoDto = tuple2.getT1();
+            chemInfoDto.updateSynonyms(tuple2.getT2().getSynonyms());
+        } catch (NullPointerException e) {
+            throw new NullPointerException("요청 실패");
+        }
+
+        return chemInfoDto;
     }
 
 
@@ -81,7 +119,6 @@ public class ChemInfoWebClient {
 
     /* FAST API에 SMILES 식으로 분자정보 가져오기 */
     public Mono<ChemInfoDto> getChemInfoBySmiles(String smiles) {
-        log.info("Fast Api Request");
         WebClient webClient = createWebclient(SMILES_INFO_URL);
 
         return webClient.get()    // GET 요청
@@ -94,27 +131,31 @@ public class ChemInfoWebClient {
 
     /* PubChem에서 SMILES 식에 대한 Synonyms 값 가져오기 */
     public Mono<SynonymsResponse> getSynonymsBySmiles(String smiles) {
-        log.info("PubChem Api Request");
-        WebClient webClient = createWebclient("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/" + smiles + "/synonyms/json");
+        WebClient webClient = createWebclient(PUBCHEM_SMILES_URL + smiles + REQUEST_SYNONYMS);
 
         return webClient.get()    // GET 요청
                 .retrieve() // 응답값을 가져옴
                 .bodyToMono(SynonymsResponse.class);  // 응답값을 ChemInfoDto로 직렬화
     }
 
-    public ChemInfoDto getChemInfoByCid(Long cid) {
+    /* FAST API에 CID로 분자정보 가져오기 */
+    public Mono<ChemInfoDto> getChemInfoByCid(Long cid) {
         WebClient webClient = createWebclient(CID_INFO_URL);
 
-        ChemInfoDto request = webClient.get()    // GET 요청
+        return webClient.get()    // GET 요청
                 .uri(uriBuilder -> uriBuilder
                         .queryParam("mol_Cid", cid)   // Params 설정
                         .build())
                 .retrieve() // 응답값을 가져옴
-                .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 직렬화
-                .block();   // 동기 방식
+                .bodyToMono(ChemInfoDto.class);  // 응답값을 ChemInfoDto로 직렬화
+    }
 
-        assert request != null : "찾지 못했습니다!";
-        log.info(request.toString());
-        return request;
+    /* PubChem에서 CID에 대한 Synonyms 값 가져오기 */
+    public Mono<SynonymsResponse> getSynonymsByCid(Long cid) {
+        WebClient webClient = createWebclient(PUBCHEM_CID_URL + cid + REQUEST_SYNONYMS);
+
+        return webClient.get()    // GET 요청
+                .retrieve() // 응답값을 가져옴
+                .bodyToMono(SynonymsResponse.class);  // 응답값을 ChemInfoDto로 직렬화
     }
 }

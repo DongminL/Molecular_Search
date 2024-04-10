@@ -3,9 +3,9 @@ package com.example.molecularsearch.api;
 import com.example.molecularsearch.service.ChemInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,9 +25,9 @@ public class ChemInfoController {
         return ResponseEntity.ok(chemInfoService.searchSmiles(smiles));
     }
 
-//    /* cid 값으로 분자 정보를 가져와 저장 */
-//    @PostMapping(value = "/api/save/chem")
-//    public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
-//        return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
-//    }
+    /* cid 값으로 분자 정보를 가져와 저장 */
+    @PostMapping(value = "/api/save/chem")
+    public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
+        return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
+    }
 }

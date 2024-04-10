@@ -28,12 +28,19 @@ public class ChemInfoService {
             return chemInfoDto;
         }
 
-        chemInfoDto = chemInfoWebClient.getChemInfo(smiles);  // Fast API로 요청하여 가져옴
+        chemInfoDto = chemInfoWebClient.requestInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
         log.info(chemInfoDto.toString());
 
         saveChemInfo(chemInfoDto);  // 가져옴 값 저장
 
         return chemInfoDto;
+    }
+
+    /* CID 값으로 요청한 분자정보 저장*/
+    public ChemInfo saveInfoByCid(Long cid) {
+        ChemInfoDto chemInfoDto = chemInfoWebClient.requestInfoByCid(cid);
+
+        return saveChemInfo(chemInfoDto);
     }
 
     /* 응답값으로 받은 분자정보 저장 */

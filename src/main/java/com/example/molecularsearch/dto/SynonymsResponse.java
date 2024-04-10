@@ -26,7 +26,7 @@ public class SynonymsResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class SynonymsList {
         @JsonProperty("Synonym")
-        private List<String> synonyms;
+        private List<String> synonyms;  // 해당 분자의 Synonyms 정보
     }
 
     public List<String> getSynonyms() {
