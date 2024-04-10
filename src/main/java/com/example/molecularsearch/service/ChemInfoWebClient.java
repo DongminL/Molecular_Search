@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 @Slf4j
@@ -39,13 +38,10 @@ public class ChemInfoWebClient {
     private String CID_INFO_URL;    // cid로 분자 정보 검색 API URL
 
     public ChemInfoDto getChemInfo(String smiles) {
-        Mono<ChemInfoDto> chemInfoMono = getChemInfoBySmiles(smiles) // 분자 정보
-                .subscribeOn(Schedulers.boundedElastic());  // 응답 결과를 기다리는 스레드 생성
-        Mono<SynonymsResponse> synonymsMono = getSynonymsBySmiles(smiles)   // Synonyms
-                .subscribeOn(Schedulers.boundedElastic()); // 응답 결과를 기다리는 스레드 생성
+        Mono<ChemInfoDto> chemInfoMono = getChemInfoBySmiles(smiles); // 분자 정보
+        Mono<SynonymsResponse> synonymsMono = getSynonymsBySmiles(smiles);   // Synonyms
 
-        Tuple2<ChemInfoDto, SynonymsResponse> tuple2 = Mono.zip(chemInfoMono, synonymsMono).block();    // Mono의 결과값을 묶어서 동기적으로 처리
-        log.info("Completed");
+        Tuple2<ChemInfoDto, SynonymsResponse> tuple2 = Mono.zip(chemInfoMono, synonymsMono).block();    // 두 Mono의 결과값을 묶어서 동기적으로 처리
 
         assert tuple2 != null : "요청 실패";
         ChemInfoDto dto = tuple2.getT1();
