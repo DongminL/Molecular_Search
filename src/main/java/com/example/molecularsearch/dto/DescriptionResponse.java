@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SynonymsResponse {
+public class DescriptionResponse {
 
     @JsonProperty("InformationList")
     private Information informationList;
@@ -21,20 +21,20 @@ public class SynonymsResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class Information {
         @JsonProperty("Information")
-        private List<SynonymsList> information;
+        private List<DescriptionList> information;
     }
 
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
-    static class SynonymsList {
-        @JsonProperty("Synonym")
-        private List<String> synonyms;  // 해당 분자의 Synonyms 정보
+    static class DescriptionList {
+        @JsonProperty("Description")
+        private String description;  // 해당 분자의 Description 정보
     }
 
-    public List<String> getSynonyms() {
+    public String getDescription() {
         try {
-            return informationList.information.get(0).synonyms;
-        } catch (Exception e) {
+            return informationList.information.get(1).getDescription();
+        } catch (IndexOutOfBoundsException e) {
             log.error(e.toString());
             return null;
         }

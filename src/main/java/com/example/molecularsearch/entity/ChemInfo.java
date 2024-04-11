@@ -32,13 +32,13 @@ public class ChemInfo {
     @Column
     private Double molecularWeight; // 분자량 (g/mol)
 
-    @Column(nullable = false)
+    @Column
     private String canonicalSmiles; // 표준 SMILES
 
     @Column(nullable = false)
     private String isomericSmiles;  // 이성질체 SMILES (이성질체 : 분자식은 같지만 분자 구조가 다른 물질)
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 400)
     private String inchi;   // 국제 화학 식별자
 
     @Column(nullable = false)
@@ -47,7 +47,7 @@ public class ChemInfo {
     @Column(length = 10000)
     private String synonyms;    // 비슷한 화합물들
 
-    @Column
+    @Column(length = 5000)
     private String description; // 화합물에 대한 설명
 
     @Column

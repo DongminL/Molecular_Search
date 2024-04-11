@@ -46,7 +46,15 @@ public class ChemInfoService {
     /* 응답값으로 받은 분자정보 저장 */
     @Transactional
     public ChemInfo saveChemInfo(ChemInfoDto request) {
-        ChemInfo chemInfo = request.toEntity();
+        ChemInfo chemInfo;
+
+        // Synonyms 값 처리
+        if (request.getSynonyms() == null) {
+            chemInfo = request.toEntity(null);
+        } else {
+            String synonyms = String.join(",", request.getSynonyms());  // List -> String
+            chemInfo = request.toEntity(synonyms);
+        }
 
         return chemInfoRepository.save(chemInfo);
     }
