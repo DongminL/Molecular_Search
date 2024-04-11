@@ -23,7 +23,7 @@ public class ChemInfo {
     @Column(nullable = false)
     private Long cid;   // 분자 고유 ID
 
-    @Column
+    @Column(length = 450)
     private String inpacName;   // 유기 화합물 이름
 
     @Column(nullable = false)
@@ -38,7 +38,7 @@ public class ChemInfo {
     @Column(nullable = false)
     private String isomericSmiles;  // 이성질체 SMILES (이성질체 : 분자식은 같지만 분자 구조가 다른 물질)
 
-    @Column(nullable = false, length = 400)
+    @Column(nullable = false, length = 500)
     private String inchi;   // 국제 화학 식별자
 
     @Column(nullable = false)
