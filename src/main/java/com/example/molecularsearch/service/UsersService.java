@@ -79,7 +79,7 @@ public class UsersService {
                 new UsernameNotFoundException(userPk + "번 사용자는 존재하지 않습니다!"));
     }
 
-    /* securityContext에 저장된 userId에 대한 정보만 가져오는 메소드 */
+    /* securityContext에 저장된 Users PK에 대한 정보만 가져오는 메소드 */
     @Transactional(readOnly = true)
     public Optional<Users> getUserInSecurityContext() {
         return customUserService.getCurrentUserPk()
@@ -89,7 +89,9 @@ public class UsersService {
     /* 유저 정보 삭제 */
     @Transactional
     public void deleteUser() {
-        searchLogRepository.deleteAllByUser(getUserInSecurityContext().get());    // 해당 유저의 모든 검색 기록 삭제
-        usersRepository.deleteById(getUserInSecurityContext().get().getId());   // 해당 유저 정보 삭제
+        getUserInSecurityContext().ifPresent(user -> {
+            searchLogRepository.deleteAllByUser(user);    // 해당 유저의 모든 검색 기록 삭제
+            usersRepository.deleteById(user.getId());   // 해당 유저 정보 삭제
+        });
     }
 }
