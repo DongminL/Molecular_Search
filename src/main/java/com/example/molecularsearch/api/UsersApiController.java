@@ -27,7 +27,7 @@ public class UsersApiController {
         }
 
         Long id = Long.parseLong(jwtProvider.getUserPk(accessToken));   // 토큰에 있는 Users Table의 PK 값 가져오기
-        usersService.deleteUser(id);    // PK로 유저 정보 삭제
+        usersService.deleteUser();    // PK로 유저 정보 삭제
         jwtService.deleteToken(accessToken);    // 해당 토큰 정보도 삭제
 
         return ResponseEntity.ok().body("회원 탈퇴 완료");

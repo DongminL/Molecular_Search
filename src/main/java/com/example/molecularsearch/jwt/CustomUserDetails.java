@@ -28,7 +28,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return users.getUserId();
+        return users.getId().toString();
     }
 
     /* 비밀번호는 없기 때문에 아무런 문자 반환 안함 */

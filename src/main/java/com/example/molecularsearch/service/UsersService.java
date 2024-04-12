@@ -3,6 +3,7 @@ package com.example.molecularsearch.service;
 import com.example.molecularsearch.dto.GoogleUserDto;
 import com.example.molecularsearch.dto.NaverUserDto;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.repository.SearchLogRepository;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final CustomUserDetailsService customUserService;
-    private final JwtService jwtService;
+    private final SearchLogRepository searchLogRepository;
 
     /* 네이버 로그인으로 회원가입 */
     @Transactional
@@ -81,13 +82,14 @@ public class UsersService {
     /* securityContext에 저장된 userId에 대한 정보만 가져오는 메소드 */
     @Transactional(readOnly = true)
     public Optional<Users> getUserInSecurityContext() {
-        return customUserService.getCurrentUserId()
-                .flatMap(usersRepository::findByUserId);
+        return customUserService.getCurrentUserPk()
+                .flatMap(usersRepository::findById);
     }
 
     /* 유저 정보 삭제 */
     @Transactional
-    public void deleteUser(Long id) {
-        usersRepository.deleteById(id);
+    public void deleteUser() {
+        searchLogRepository.deleteAllByUser(getUserInSecurityContext().get());    // 해당 유저의 모든 검색 기록 삭제
+        usersRepository.deleteById(getUserInSecurityContext().get().getId());   // 해당 유저 정보 삭제
     }
 }

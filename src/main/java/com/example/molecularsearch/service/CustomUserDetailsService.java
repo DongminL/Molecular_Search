@@ -37,8 +37,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(users.get());
     }
 
-    // Security Context에 저장된 User ID 가져오기
-    public Optional<String> getCurrentUserId() {
+    // Security Context에 저장된 User PK 가져오기
+    public Optional<Long> getCurrentUserPk() {
         // Request가 들어올 때 SecurityContext에 Authentication 객체를 저장해서 사용
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -47,13 +47,14 @@ public class CustomUserDetailsService implements UserDetailsService {
             return Optional.empty();
         }
 
-        String userId = null;
+        String userPk = null;
         if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
-            userId = springSecurityUser.getUsername();
+            userPk = springSecurityUser.getUsername();
         } else if (authentication.getPrincipal() instanceof String) {
-            userId = (String) authentication.getPrincipal();
+            userPk = (String) authentication.getPrincipal();
         }
 
-        return Optional.ofNullable(userId);
+        assert userPk != null : "User 정보를 찾을 수 없습니다.";
+        return Optional.of(Long.parseLong(userPk));
     }
 }
