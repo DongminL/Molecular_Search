@@ -15,6 +15,7 @@ public class ChemInfoService {
 
     private final ChemInfoWebClient chemInfoWebClient;
     private final ChemInfoRepository chemInfoRepository;
+    private final SynonymsService synonymsService;
 
     /* SMILES 식으로 분자정보 검색 */
     @Transactional
@@ -24,6 +25,7 @@ public class ChemInfoService {
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
+            log.info(entity.toString());
             chemInfoDto = new ChemInfoDto(entity, null);
             return chemInfoDto;
         }
@@ -50,13 +52,16 @@ public class ChemInfoService {
 
         // Synonyms 값 처리
         if (request.getSynonyms() == null) {
-            chemInfo = request.toEntity(null);
+            chemInfo = request.toEntity();
+            chemInfoRepository.save(chemInfo);  // 분자 정보 저장
         } else {
-            String synonyms = String.join(",", request.getSynonyms());  // List -> String
-            chemInfo = request.toEntity(synonyms);
+            chemInfo = request.toEntity();
+
+            ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
+            synonymsService.saveSynonyms(entity, request.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
         }
 
-        return chemInfoRepository.save(chemInfo);
+        return chemInfo;
     }
     
     /* SMILES 식으로 분자 정보 가져오기 */

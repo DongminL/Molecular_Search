@@ -44,9 +44,6 @@ public class ChemInfo {
     @Column(nullable = false)
     private String inchiKey;    // InChI Key 값
 
-    @Column(length = 10000)
-    private String synonyms;    // 비슷한 화합물들
-
     @Column(length = 5000)
     private String description; // 화합물에 대한 설명
 
@@ -57,7 +54,7 @@ public class ChemInfo {
     private String image3DUrl;   // 3D 이미지 경로
 
     @Builder
-    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String synonyms, String description, String image2DUrl, String image3DUrl) {
+    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String description, String image2DUrl, String image3DUrl) {
         this.id = id;
         this.cid = cid;
         this.inpacName = inpacName;
@@ -67,7 +64,6 @@ public class ChemInfo {
         this.inchi = inchi;
         this.inchiKey = inchiKey;
         this.canonicalSmiles = canonicalSmiles;
-        this.synonyms = synonyms;
         this.description = description;
         this.image2DUrl = image2DUrl;
         this.image3DUrl = image3DUrl;

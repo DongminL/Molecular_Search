@@ -12,7 +12,7 @@ public class SearchLog extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    // SearchLog 테이블 PK
+    private Long id;    // SearchLog PK
 
     @ManyToOne(fetch = FetchType.LAZY)  // 지연 로딩으로 설정 (Select 시 Users와 JOIN 방지)
     @JoinColumn(name = "users_id")

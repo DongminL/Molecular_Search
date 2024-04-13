@@ -71,7 +71,7 @@ public class ChemInfoDto {
     }
 
     /* Dto -> Entity로 변환 */
-    public ChemInfo toEntity(String synonyms) {
+    public ChemInfo toEntity() {
         return ChemInfo.builder()
                 .cid(this.cid)
                 .inpacName(this.inpacName)
@@ -81,7 +81,6 @@ public class ChemInfoDto {
                 .inchiKey(this.inchiKey)
                 .canonicalSmiles(this.canonicalSmiles)
                 .isomericSmiles(this.isomericSmiles)
-                .synonyms(synonyms)
                 .description(this.description)
                 .build();
     }
