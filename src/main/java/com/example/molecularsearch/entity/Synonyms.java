@@ -14,7 +14,7 @@ public class Synonyms {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    // Synonyms PK
     
-    @ManyToOne(fetch = FetchType.LAZY)   // 지연 로딩으로 설정 (Select 시 ChemInfo와 JOIN 방지)
+    @OneToOne(fetch = FetchType.LAZY)   // 지연 로딩으로 설정 (Select 시 ChemInfo와 JOIN 방지)
     @JoinColumn(name = "chemInfo_id")
     private ChemInfo chemInfo;  // ChemInfo 객체 참조
 
