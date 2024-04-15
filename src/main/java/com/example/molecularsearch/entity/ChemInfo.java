@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -38,11 +42,15 @@ public class ChemInfo {
     @Column(nullable = false)
     private String isomericSmiles;  // 이성질체 SMILES (이성질체 : 분자식은 같지만 분자 구조가 다른 물질)
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 1000)
     private String inchi;   // 국제 화학 식별자
 
     @Column(nullable = false)
     private String inchiKey;    // InChI Key 값
+
+    @Column(columnDefinition = "json")  // MySQL에 해당 Column을 JSON 타입으로 명시 
+    @JdbcTypeCode(SqlTypes.JSON)    // JSON 타입으로 설정
+    private List<String> synonyms;    // 상위 5개의 synonyms 값
 
     @Column(length = 5000)
     private String description; // 화합물에 대한 설명
@@ -54,7 +62,7 @@ public class ChemInfo {
     private String image3DUrl;   // 3D 이미지 경로
 
     @Builder
-    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, String description, String image2DUrl, String image3DUrl) {
+    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, List<String> synonyms, String description, String image2DUrl, String image3DUrl) {
         this.id = id;
         this.cid = cid;
         this.inpacName = inpacName;
@@ -64,6 +72,7 @@ public class ChemInfo {
         this.inchi = inchi;
         this.inchiKey = inchiKey;
         this.canonicalSmiles = canonicalSmiles;
+        this.synonyms = synonyms;
         this.description = description;
         this.image2DUrl = image2DUrl;
         this.image3DUrl = image3DUrl;

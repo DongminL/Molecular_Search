@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import reactor.netty.http.client.HttpClient;
@@ -32,6 +33,11 @@ public class WebClientConfig {
             )
             .responseTimeout(Duration.ofSeconds(10));    // 응답 초과 시간 10초로 설정
 
+    /*  */
+    ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024 * 5)) // 5MB로 제한
+            .build();
+
     /* WebClient 객체 생성 Bean 등록*/
     @Bean
     public WebClient webClient() {
@@ -41,6 +47,7 @@ public class WebClientConfig {
                 .uriBuilderFactory(factory) // URI 인코딩 설정
                 .clientConnector(new ReactorClientHttpConnector(httpClient))    // HTTPClient 설정
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)  // Header의 Content_Type 부분 JSON 형식으로 명시
+                .exchangeStrategies(exchangeStrategies) // 응답값의 크기를 10MB로 설정
                 .build();    // 인스턴스 생성
     }
 }

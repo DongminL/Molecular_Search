@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -26,14 +28,15 @@ public class ChemInfoService {
         // DB에 해당 정보가 있으면
         if (entity != null) {
             log.info(entity.toString());
-            chemInfoDto = new ChemInfoDto(entity, null);
+            chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
             return chemInfoDto;
         }
 
         chemInfoDto = chemInfoWebClient.requestInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
         log.info(chemInfoDto.toString());
 
-        saveChemInfo(chemInfoDto);  // 가져옴 값 저장
+        entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
+        chemInfoDto.updateSynonyms(entity.getSynonyms());   // Synonyms List 크기를 최대 5로 줄임
 
         return chemInfoDto;
     }
@@ -49,14 +52,23 @@ public class ChemInfoService {
     @Transactional
     public ChemInfo saveChemInfo(ChemInfoDto request) {
         ChemInfo chemInfo;
+        List<String> synonyms = request.getSynonyms();
 
         // Synonyms 값 처리
-        if (request.getSynonyms() == null) {
+        if (synonyms == null) {
             chemInfo = request.toEntity();
             chemInfoRepository.save(chemInfo);  // 분자 정보 저장
         } else {
-            chemInfo = request.toEntity();
+            List<String> entitySynonyms;
 
+            // 크기가 5인 Synonyms List로 변환
+            if (synonyms.size() > 5) {
+                entitySynonyms = synonyms.subList(0, 5);    // 0 ~ 4 번째 값만 리스트로 가져옴
+            } else {
+                entitySynonyms = synonyms;
+            }
+
+            chemInfo = request.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
             ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
             synonymsService.saveSynonyms(entity, request.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
         }

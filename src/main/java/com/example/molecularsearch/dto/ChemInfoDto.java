@@ -85,6 +85,22 @@ public class ChemInfoDto {
                 .build();
     }
 
+    /* Dto -> Entity로 변환 */
+    public ChemInfo toEntity(List<String> synonyms) {
+        return ChemInfo.builder()
+                .cid(this.cid)
+                .inpacName(this.inpacName)
+                .molecularFormula(this.molecularFormula)
+                .molecularWeight(this.molecularWeight)
+                .inchi(this.inchi)
+                .inchiKey(this.inchiKey)
+                .canonicalSmiles(this.canonicalSmiles)
+                .isomericSmiles(this.isomericSmiles)
+                .synonyms(synonyms)
+                .description(this.description)
+                .build();
+    }
+
     /* Entity -> Dto로 변환 */
     public ChemInfoDto(ChemInfo chemInfo, List<String> synonyms) {
         this.cid = chemInfo.getCid();
