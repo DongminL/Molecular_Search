@@ -3,18 +3,20 @@ package com.example.molecularsearch.dto;
 import com.example.molecularsearch.entity.ChemInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true) // Deserialize를 필요한 필드만 적용
 public class ChemInfoDto {
+
+    @JsonProperty("id")
+    private Long id;    // ChemInfo PK
 
     @JsonProperty("cid")
     private Long cid;   // 분자 고유 ID
@@ -52,24 +54,6 @@ public class ChemInfoDto {
     @JsonProperty("image_3D_url")
     private String image3DUrl;   // 3D 이미지 경로
 
-    @Builder
-    public ChemInfoDto(Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles,
-                       String inchi, String inchiKey, String canonicalSmiles, List<String> synonyms, String description,
-                       String image2DUrl, String image3DUrl) {
-        this.cid = cid;
-        this.inpacName = inpacName;
-        this.molecularFormula = molecularFormula;
-        this.molecularWeight = molecularWeight;
-        this.isomericSmiles = isomericSmiles;
-        this.inchi = inchi;
-        this.inchiKey = inchiKey;
-        this.canonicalSmiles = canonicalSmiles;
-        this.synonyms = synonyms;
-        this.description = description;
-        this.image2DUrl = image2DUrl;
-        this.image3DUrl = image3DUrl;
-    }
-
     /* Dto -> Entity로 변환 */
     public ChemInfo toEntity() {
         return ChemInfo.builder()
@@ -103,6 +87,7 @@ public class ChemInfoDto {
 
     /* Entity -> Dto로 변환 */
     public ChemInfoDto(ChemInfo chemInfo, List<String> synonyms) {
+        this.id = chemInfo.getId();
         this.cid = chemInfo.getCid();
         this.inpacName = chemInfo.getInpacName();
         this.molecularFormula = chemInfo.getMolecularFormula();

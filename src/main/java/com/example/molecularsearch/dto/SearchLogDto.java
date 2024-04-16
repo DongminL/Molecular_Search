@@ -2,12 +2,15 @@ package com.example.molecularsearch.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SearchLogDto {
 
@@ -16,10 +19,4 @@ public class SearchLogDto {
 
     @JsonProperty("log")
     private String log; // 검색어
-
-    @Builder
-    public SearchLogDto(Long id, String log) {
-        this.id = id;
-        this.log = log;
-    }
 }

@@ -3,15 +3,14 @@ package com.example.molecularsearch.entity;
 import com.example.molecularsearch.constant.RoleTypeConverter;
 import com.example.molecularsearch.constant.SignUpTypeConverter;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @Entity
 @Getter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(indexes = @Index(name = "index_user_id", columnList = "userId", unique = true))  // userId에 대한 Index 생성
 public class Users extends BaseTime {
 
@@ -47,18 +46,4 @@ public class Users extends BaseTime {
     @Convert(converter = RoleTypeConverter.class)   // Convert로 데이터 형식 변환
     @Column(nullable = false)
     private String roleType;    // 유저 등급 (ADMIN or USER)
-
-    @Builder
-    public Users(Long id, String userId, String email, String name, String nickname, String mobile, String gender, String profileImage, String signUpType, String roleType) {
-        this.id = id;
-        this.userId = userId;
-        this.email = email;
-        this.name = name;
-        this.nickname = nickname;
-        this.mobile = mobile;
-        this.gender = gender;
-        this.profileImage = profileImage;
-        this.signUpType = signUpType;
-        this.roleType = roleType;
-    }
 }

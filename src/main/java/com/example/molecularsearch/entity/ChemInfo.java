@@ -1,10 +1,7 @@
 package com.example.molecularsearch.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -12,8 +9,10 @@ import java.util.List;
 
 @Entity
 @Getter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(indexes = {
         @Index(name = "index_smiles", columnList = "isomericSmiles", unique = true),   // isomericSmiles Column 기준으로 Unique Index 생성
         @Index(name = "index_formula", columnList = "molecularFormula") // molecularFormula에 대한 Index 생성
@@ -48,7 +47,7 @@ public class ChemInfo {
     @Column(nullable = false)
     private String inchiKey;    // InChI Key 값
 
-    @Column(columnDefinition = "json")  // MySQL에 해당 Column을 JSON 타입으로 명시 
+    @Column(columnDefinition = "json")  // MySQL에 해당 Column을 JSON 타입으로 명시
     @JdbcTypeCode(SqlTypes.JSON)    // JSON 타입으로 설정
     private List<String> synonyms;    // 상위 5개의 synonyms 값
 
@@ -60,21 +59,4 @@ public class ChemInfo {
 
     @Column
     private String image3DUrl;   // 3D 이미지 경로
-
-    @Builder
-    public ChemInfo(Long id, Long cid, String inpacName, String molecularFormula, Double molecularWeight, String isomericSmiles, String inchi, String inchiKey, String canonicalSmiles, List<String> synonyms, String description, String image2DUrl, String image3DUrl) {
-        this.id = id;
-        this.cid = cid;
-        this.inpacName = inpacName;
-        this.molecularFormula = molecularFormula;
-        this.molecularWeight = molecularWeight;
-        this.isomericSmiles = isomericSmiles;
-        this.inchi = inchi;
-        this.inchiKey = inchiKey;
-        this.canonicalSmiles = canonicalSmiles;
-        this.synonyms = synonyms;
-        this.description = description;
-        this.image2DUrl = image2DUrl;
-        this.image3DUrl = image3DUrl;
-    }
 }

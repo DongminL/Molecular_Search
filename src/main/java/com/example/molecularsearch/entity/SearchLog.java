@@ -1,13 +1,16 @@
 package com.example.molecularsearch.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class SearchLog extends BaseTime {
 
     @Id
@@ -20,11 +23,4 @@ public class SearchLog extends BaseTime {
 
     @Column
     private String log; // 검색어
-
-    @Builder
-    public SearchLog(Long id, Users user, String log) {
-        this.id = id;
-        this.user = user;
-        this.log = log;
-    }
 }

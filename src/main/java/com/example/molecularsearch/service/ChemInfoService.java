@@ -28,7 +28,7 @@ public class ChemInfoService {
         // DB에 해당 정보가 있으면
         if (entity != null) {
             log.info(entity.toString());
-            chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
+            chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());    // Synonyms List 크기를 최대 5로 줄임
             return chemInfoDto;
         }
 
@@ -36,7 +36,7 @@ public class ChemInfoService {
         log.info(chemInfoDto.toString());
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
-        chemInfoDto.updateSynonyms(entity.getSynonyms());   // Synonyms List 크기를 최대 5로 줄임
+        chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());    // Synonyms List 크기를 최대 5로 줄임
 
         return chemInfoDto;
     }

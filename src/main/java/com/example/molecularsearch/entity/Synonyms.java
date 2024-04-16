@@ -1,13 +1,16 @@
 package com.example.molecularsearch.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class Synonyms {
 
     @Id
@@ -18,13 +21,6 @@ public class Synonyms {
     @JoinColumn(name = "chemInfo_id")
     private ChemInfo chemInfo;  // ChemInfo 객체 참조
 
-    @Column(length = 10000)
+    @Column(columnDefinition = "text")
     private String synonyms;    // 비슷한 화합물들
-
-    @Builder
-    public Synonyms(Long id, ChemInfo chemInfo, String synonyms) {
-        this.id = id;
-        this.chemInfo = chemInfo;
-        this.synonyms = synonyms;
-    }
 }

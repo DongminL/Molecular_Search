@@ -1,13 +1,16 @@
 package com.example.molecularsearch.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class InfoFav extends BaseTime {
 
     @Id
@@ -24,12 +27,4 @@ public class InfoFav extends BaseTime {
     
     @Column
     private String molecularFormula;    // 분자식
-
-    @Builder
-    public InfoFav(Long id, Users user, ChemInfo chemInfo, String molecularFormula) {
-        this.id = id;
-        this.user = user;
-        this.chemInfo = chemInfo;
-        this.molecularFormula = molecularFormula;
-    }
 }
