@@ -79,7 +79,7 @@ public class UsersService {
                 new UsernameNotFoundException(userPk + "번 사용자는 존재하지 않습니다!"));
     }
 
-    /* securityContext에 저장된 Users PK에 대한 정보만 가져오는 메소드 */
+    /* Security Context에 저장된 Users PK에 대한 정보만 가져오는 메소드 */
     @Transactional(readOnly = true)
     public Optional<Users> getUserInSecurityContext() {
         return customUserService.getCurrentUserPk()

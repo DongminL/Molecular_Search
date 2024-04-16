@@ -2,8 +2,6 @@ package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.dto.SearchLogDto;
 import com.example.molecularsearch.entity.SearchLog;
-import com.example.molecularsearch.entity.Users;
-import com.example.molecularsearch.jwt.JwtProvider;
 import com.example.molecularsearch.repository.SearchLogRepository;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchLogService {
 
-    private final JwtProvider jwtProvider;
-    private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
     private final UsersRepository usersRepository;
     private final SearchLogRepository searchLogRepository;
@@ -29,6 +25,7 @@ public class SearchLogService {
     @Transactional
     public void saveSearchLog(String log) {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
+
         // Users 테이블에 해당 객체가 있으면 검색 기록 저장
         usersRepository.findById(userPk).ifPresent(user -> {
             searchLogRepository.save(SearchLog.builder()
@@ -56,9 +53,8 @@ public class SearchLogService {
     @Transactional(readOnly = true)
     public List<SearchLogDto> findSearchLog() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
-        Users user = usersRepository.findById(userPk).orElse(null);   // 해당 Entity 가져오기
 
-        List<SearchLog> searchLogs = searchLogRepository.findAllByUserOrderByCreatedDate(user);    // 해당 유저에 대한 전체 검색 기록
+        List<SearchLog> searchLogs = searchLogRepository.findAllByUser_IdOrderByCreatedDate(userPk);    // 해당 유저에 대한 전체 검색 기록
 
         // Entity List -> Dto List
         List<SearchLogDto> searchLogDtos = new ArrayList<>();
@@ -71,4 +67,6 @@ public class SearchLogService {
 
         return searchLogDtos;
     }
+
+
 }
