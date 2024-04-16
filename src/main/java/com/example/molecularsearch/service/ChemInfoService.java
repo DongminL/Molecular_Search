@@ -2,7 +2,9 @@ package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.entity.ChemInfo;
+import com.example.molecularsearch.entity.MongoTest;
 import com.example.molecularsearch.repository.ChemInfoRepository;
+import com.example.molecularsearch.repository.MongoTestRepositry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,17 +20,19 @@ public class ChemInfoService {
     private final ChemInfoWebClient chemInfoWebClient;
     private final ChemInfoRepository chemInfoRepository;
     private final SynonymsService synonymsService;
+    private final MongoTestRepositry mongoTestRepositry;
 
     /* SMILES 식으로 분자정보 검색 */
     @Transactional
     public ChemInfoDto searchSmiles(String smiles) {
         ChemInfoDto chemInfoDto;
         ChemInfo entity = findChemInfoBySmiles(smiles); // SMILES 식으로 찾아 가져오기
+        MongoTest entity1 = mongoTestRepositry.findByIsomericSmiles(smiles).orElse(null);
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
             log.info(entity.toString());
-            chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());    // Synonyms List 크기를 최대 5로 줄임
+            chemInfoDto = new ChemInfoDto(entity1, entity1.getSynonyms());    // Synonyms List 크기를 최대 5로 줄임
             return chemInfoDto;
         }
 
@@ -70,6 +74,17 @@ public class ChemInfoService {
 
             chemInfo = request.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
             ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
+            mongoTestRepositry.save(MongoTest.builder()
+                            .canonicalSmiles(request.getCanonicalSmiles())
+                            .isomericSmiles(request.getIsomericSmiles())
+                            .description(request.getDescription())
+                            .inchi(request.getInchi())
+                            .inpacName(request.getInpacName())
+                            .inchiKey(request.getInchiKey())
+                            .molecularFormula(request.getMolecularFormula())
+                            .molecularWeight(request.getMolecularWeight())
+                            .synonyms(request.getSynonyms())
+                    .build());
             synonymsService.saveSynonyms(entity, request.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
         }
 
