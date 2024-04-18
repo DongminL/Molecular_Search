@@ -1,26 +1,25 @@
 package com.example.molecularsearch.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
 @Getter
 @Builder
+@Document("Synonyms")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Synonyms {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    // Synonyms PK
+    private String id;    // Synonyms PK
     
-    @OneToOne(fetch = FetchType.LAZY)   // 지연 로딩으로 설정 (Select 시 ChemInfo와 JOIN 방지)
-    @JoinColumn(name = "chemInfo_id")
+    @DBRef
     private ChemInfo chemInfo;  // ChemInfo 객체 참조
 
-    @Column(columnDefinition = "text")
     private String synonyms;    // 비슷한 화합물들
 }

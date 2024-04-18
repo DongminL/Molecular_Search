@@ -1,7 +1,6 @@
 package com.example.molecularsearch.dto;
 
 import com.example.molecularsearch.entity.ChemInfo;
-import com.example.molecularsearch.entity.MongoTest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -17,7 +16,7 @@ import java.util.List;
 public class ChemInfoDto {
 
     @JsonProperty("id")
-    private Long id;    // ChemInfo PK
+    private String id;    // ChemInfo PK
 
     @JsonProperty("cid")
     private Long cid;   // 분자 고유 ID
@@ -89,22 +88,6 @@ public class ChemInfoDto {
     /* Entity -> Dto로 변환 */
     public ChemInfoDto(ChemInfo chemInfo, List<String> synonyms) {
         this.id = chemInfo.getId();
-        this.cid = chemInfo.getCid();
-        this.inpacName = chemInfo.getInpacName();
-        this.molecularFormula = chemInfo.getMolecularFormula();
-        this.molecularWeight = chemInfo.getMolecularWeight();
-        this.isomericSmiles = chemInfo.getIsomericSmiles();
-        this.inchi = chemInfo.getInchi();
-        this.inchiKey = chemInfo.getInchiKey();
-        this.canonicalSmiles = chemInfo.getCanonicalSmiles();
-        this.synonyms = synonyms;
-        this.description = chemInfo.getDescription();
-        this.image2DUrl = chemInfo.getImage2DUrl();
-        this.image3DUrl = chemInfo.getImage3DUrl();
-    }
-    /* Entity -> Dto로 변환 */
-    public ChemInfoDto(MongoTest chemInfo, List<String> synonyms) {
-        //this.id = chemInfo.getId();
         this.cid = chemInfo.getCid();
         this.inpacName = chemInfo.getInpacName();
         this.molecularFormula = chemInfo.getMolecularFormula();

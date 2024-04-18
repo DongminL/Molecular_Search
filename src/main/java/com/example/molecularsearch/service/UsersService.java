@@ -3,6 +3,7 @@ package com.example.molecularsearch.service;
 import com.example.molecularsearch.dto.GoogleUserDto;
 import com.example.molecularsearch.dto.NaverUserDto;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.repository.InfoFavRepository;
 import com.example.molecularsearch.repository.SearchLogRepository;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final CustomUserDetailsService customUserService;
     private final SearchLogRepository searchLogRepository;
+    private final InfoFavRepository infoFavRepository;
 
     /* 네이버 로그인으로 회원가입 */
     @Transactional
@@ -91,6 +93,7 @@ public class UsersService {
     public void deleteUser() {
         getUserInSecurityContext().ifPresent(user -> {
             searchLogRepository.deleteAllByUser(user);    // 해당 유저의 모든 검색 기록 삭제
+            infoFavRepository.deleteAllByUser(user);  // 해당 유저의 모든 즐겨찾기 기록 삭제
             usersRepository.deleteById(user.getId());   // 해당 유저 정보 삭제
         });
     }

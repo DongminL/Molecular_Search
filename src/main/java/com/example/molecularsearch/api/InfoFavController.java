@@ -17,7 +17,7 @@ public class InfoFavController {
 
     /* 즐겨찾기 추가 */
     @PostMapping("/api/save/fav/{chemId}")
-    public ResponseEntity<?> addInfoFav(@PathVariable Long chemId) {
+    public ResponseEntity<?> addInfoFav(@PathVariable String chemId) {
         infoFavService.saveInfoFav(chemId);
         return ResponseEntity.ok("즐겨찾기 추가 성공");
     }
@@ -28,7 +28,7 @@ public class InfoFavController {
         return ResponseEntity.ok(infoFavService.getFavList());
     }
 
-    /* 검색 기록 단일 삭제 */
+    /* 즐겨찾기 단일 삭제 */
     @DeleteMapping("/api/delete/fav/{infoFavId}")
     public ResponseEntity<String> editInfoFav(@PathVariable Long infoFavId) {
         infoFavService.deleteInfoFav(infoFavId);
@@ -36,7 +36,7 @@ public class InfoFavController {
         return ResponseEntity.ok("검색기록 삭제 완료");
     }
 
-    /* 검색 기록 편집을 통해 삭제 */
+    /* 즐겨찾기 편집을 통해 삭제 */
     @DeleteMapping("/api/edit/fav")
     public ResponseEntity<String> editInfoFav(@RequestBody Map<String, List<InfoFavDto>> mapInfoFavDtos) {
         infoFavService.editInfoFav(mapInfoFavDtos.get("infoFavList"));
@@ -46,7 +46,7 @@ public class InfoFavController {
 
     /* 즐겨찾기 유무 */
     @GetMapping("/api/check/fav/{chemId}")
-    public ResponseEntity<?> checkInfoFav(@PathVariable Long chemId) {
+    public ResponseEntity<?> checkInfoFav(@PathVariable String chemId) {
         return ResponseEntity.ok(infoFavService.checkInfoFav(chemId));
     }
 }
