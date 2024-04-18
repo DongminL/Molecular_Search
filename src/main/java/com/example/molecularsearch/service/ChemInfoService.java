@@ -2,7 +2,7 @@ package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.entity.ChemInfo;
-import com.example.molecularsearch.mongo.ChemInfoRepository;
+import com.example.molecularsearch.repository.ChemInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

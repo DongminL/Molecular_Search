@@ -2,7 +2,7 @@ package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.entity.ChemInfo;
 import com.example.molecularsearch.entity.Synonyms;
-import com.example.molecularsearch.mongo.SynonymsRepository;
+import com.example.molecularsearch.repository.SynonymsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,5 +25,9 @@ public class SynonymsService {
                 .build();
 
         synonymsRepository.save(synonyms);  // Synonyms 값 저장
+    }
+
+    public List<Synonyms> searchChemInfo(String keyword) {
+        return synonymsRepository.findByTextSearch(keyword);
     }
 }

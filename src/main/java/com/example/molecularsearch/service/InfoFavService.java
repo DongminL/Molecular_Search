@@ -4,7 +4,7 @@ import com.example.molecularsearch.dto.InfoFavDto;
 import com.example.molecularsearch.entity.ChemInfo;
 import com.example.molecularsearch.entity.InfoFav;
 import com.example.molecularsearch.entity.Users;
-import com.example.molecularsearch.mongo.ChemInfoRepository;
+import com.example.molecularsearch.repository.ChemInfoRepository;
 import com.example.molecularsearch.repository.InfoFavRepository;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
