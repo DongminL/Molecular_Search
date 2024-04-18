@@ -16,7 +16,7 @@ import java.util.List;
 public class ChemInfoDto {
 
     @JsonProperty("id")
-    private Long id;    // ChemInfo PK
+    private String id;    // ChemInfo PK
 
     @JsonProperty("cid")
     private Long cid;   // 분자 고유 ID

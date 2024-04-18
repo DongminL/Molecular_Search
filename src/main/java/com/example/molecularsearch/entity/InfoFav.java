@@ -21,9 +21,8 @@ public class InfoFav extends BaseTime {
     @JoinColumn(name = "user_id")
     private Users user; // Users 객체 참조
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 지연 로딩으로 설정 (Select 시 ChemInfo와 무분별한 JOIN 방지)
-    @JoinColumn(name = "chemInfo_id")
-    private ChemInfo chemInfo;  // ChemInfo 객체 참조
+    @Column
+    private String chemInfoId;  // MongoDB의 ChemInfo Documnet _id 참조
     
     @Column
     private String molecularFormula;    // 분자식

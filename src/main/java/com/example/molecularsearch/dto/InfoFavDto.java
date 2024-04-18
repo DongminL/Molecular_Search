@@ -15,20 +15,20 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InfoFavDto {
 
-    @JsonProperty
+    @JsonProperty("id")
     private Long id;    // InfoFav PK
 
-    @JsonProperty
-    private Long chemInfo;  // ChemInfo FK
+    @JsonProperty("chem_id")
+    private String chemInfo;  // ChemInfo FK
 
-    @JsonProperty
+    @JsonProperty("molecular_formula")
     private String molecularFormula;    // 분자식
 
     /* Entity -> Dto */
     public InfoFavDto toDto(InfoFav entity) {
         return InfoFavDto.builder()
                 .id(entity.getId())
-                .chemInfo(entity.getChemInfo().getId())
+                .chemInfo(entity.getChemInfoId())
                 .molecularFormula(entity.getMolecularFormula())
                 .build();
     }
