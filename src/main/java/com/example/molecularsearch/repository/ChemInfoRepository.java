@@ -1,4 +1,4 @@
-package com.example.molecularsearch.mongo;
+package com.example.molecularsearch.repository;
 
 import com.example.molecularsearch.entity.ChemInfo;
 import org.springframework.data.mongodb.repository.MongoRepository;

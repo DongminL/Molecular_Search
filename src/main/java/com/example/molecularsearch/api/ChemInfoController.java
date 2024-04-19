@@ -2,6 +2,7 @@ package com.example.molecularsearch.api;
 
 import com.example.molecularsearch.service.ChemInfoService;
 import com.example.molecularsearch.service.SearchLogService;
+import com.example.molecularsearch.service.SynonymsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +15,14 @@ public class ChemInfoController {
 
     private final ChemInfoService chemInfoService;
     private final SearchLogService searchLogService;
+    private final SynonymsService synonymsService;
 
-//    /* 분자 이름 또는 화학식으로 분자 정보 검색 */
-//    @GetMapping(value = "/api/search/chem", params = "name")
-//    public ResponseEntity<?> seearchChem(@RequestParam String name) {
-//        return ResponseEntity.ok(chemInfoService.saveChemInfo(chemInfoService.getChemInfoByName(name)));
-//    }
+    /* 분자 이름 또는 화학식으로 분자 정보 검색 */
+    @GetMapping(value = "/api/search/chem", params = "keyword")
+    public ResponseEntity<?> seearchChem(@RequestParam String keyword) {
+        searchLogService.saveSearchLog(keyword);
+        return ResponseEntity.ok(synonymsService.searchChemInfo(keyword));
+    }
 
     /* SMILES 식을 통한 분자정보 검색 */
     @GetMapping(value = "/api/search/chem", params = "smiles")

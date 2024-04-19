@@ -52,6 +52,7 @@ public class OAuthLoginService {
         return jwtDto;
     }
 
+    /* 로그아웃 시 토큰 제거 */
     public Tokens logout(String accessToken) {
         return jwtService.deleteToken(jwtService.getHeaderToken(accessToken));
     }
