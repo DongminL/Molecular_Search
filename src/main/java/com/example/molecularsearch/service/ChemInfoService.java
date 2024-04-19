@@ -47,13 +47,13 @@ public class ChemInfoService {
     }
 
     /* 응답값으로 받은 분자정보 저장 */
-    public ChemInfo saveChemInfo(ChemInfoDto request) {
+    public ChemInfo saveChemInfo(ChemInfoDto response) {
         ChemInfo chemInfo;
-        List<String> synonyms = request.getSynonyms();
+        List<String> synonyms = response.getSynonyms();
 
         // Synonyms 값 처리
         if (synonyms == null) {
-            chemInfo = request.toEntity();
+            chemInfo = response.toEntity();
             chemInfoRepository.save(chemInfo);  // 분자 정보 저장
         } else {
             List<String> entitySynonyms;
@@ -65,9 +65,9 @@ public class ChemInfoService {
                 entitySynonyms = synonyms;
             }
 
-            chemInfo = request.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
+            chemInfo = response.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
             ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
-            synonymsService.saveSynonyms(entity, request.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
+            synonymsService.saveSynonyms(entity, response.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
         }
 
         return chemInfo;

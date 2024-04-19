@@ -20,6 +20,7 @@ public class ChemInfoController {
     /* 분자 이름 또는 화학식으로 분자 정보 검색 */
     @GetMapping(value = "/api/search/chem", params = "keyword")
     public ResponseEntity<?> seearchChem(@RequestParam String keyword) {
+        searchLogService.saveSearchLog(keyword);
         return ResponseEntity.ok(synonymsService.searchChemInfo(keyword));
     }
 

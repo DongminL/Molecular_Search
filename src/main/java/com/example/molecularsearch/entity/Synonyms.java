@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Getter
 @Builder
 @Document("Synonyms")
@@ -23,5 +25,5 @@ public class Synonyms {
     private ChemInfo chemInfo;  // ChemInfo 객체 참조
 
     @TextIndexed    // TextIndex 생성 (Full Text Search 이용)
-    private String synonyms;    // 비슷한 화합물들
+    private List<String> synonyms;    // 비슷한 화합물들
 }
