@@ -1,5 +1,7 @@
 package com.example.molecularsearch.service;
 
+import com.example.molecularsearch.dto.ChemInfoDto;
+import com.example.molecularsearch.dto.SearchResultDto;
 import com.example.molecularsearch.entity.ChemInfo;
 import com.example.molecularsearch.entity.Synonyms;
 import com.example.molecularsearch.repository.SynonymsRepository;
@@ -28,9 +30,15 @@ public class SynonymsService {
     }
 
     /* keyword로 검색한 결과 리스트 가져오기 */
-    public List<Synonyms> searchChemInfo(String keyword) {
+    public SearchResultDto searchChemInfo(String keyword) {
         Sort sort = Sort.by(Sort.Direction.DESC, "meta.score");    // 검색 정확도 기준으로 내림차순 정렬
+        SearchResultDto result = new SearchResultDto(); // 검색된 분자정보 리스트 DTO
 
-        return synonymsRepository.findByTextSearch(keyword, sort);
+        // Synonyms를 이용한 분자정보 리스트를 Dto로 변환
+        synonymsRepository.findByTextSearch(keyword, sort).forEach(e -> {
+            result.getSearchResults().add(new ChemInfoDto(e.getChemInfo(), e.getChemInfo().getSynonyms()));
+        });
+        
+        return result;
     }
 }

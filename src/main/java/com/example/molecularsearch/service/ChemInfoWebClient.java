@@ -96,7 +96,6 @@ public class ChemInfoWebClient {
 
             chemInfoDto = tuple3.getT1();
             chemInfoDto.updateSynonyms(tuple3.getT2().getSynonyms());
-            log.info(tuple3.getT2().getSynonyms().toString());
             chemInfoDto.updateDescription(tuple3.getT3().getDescription());
         } catch (NullPointerException e) {
             throw new NullPointerException("요청 실패");
