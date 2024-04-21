@@ -18,10 +18,10 @@ public class ChemInfoController {
     private final SynonymsService synonymsService;
 
     /* 분자 이름 또는 화학식으로 분자 정보 검색 */
-    @GetMapping(value = "/api/search/chem", params = "keyword")
-    public ResponseEntity<?> seearchChem(@RequestParam String keyword) {
+    @GetMapping(value = "/api/search/chem", params = {"keyword", "page"})
+    public ResponseEntity<?> seearchChem(@RequestParam("keyword") String keyword, @RequestParam("page") int page) {
         searchLogService.saveSearchLog(keyword);
-        return ResponseEntity.ok(synonymsService.searchChemInfo(keyword));
+        return ResponseEntity.ok(synonymsService.searchChemInfo(keyword, page));
     }
 
     /* SMILES 식을 통한 분자정보 검색 */
