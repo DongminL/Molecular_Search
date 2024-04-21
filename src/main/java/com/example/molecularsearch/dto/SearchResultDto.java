@@ -12,6 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 public class SearchResultDto {
 
+    private Long totalElements;
+
+    private Integer totalPages;
+
+    private Integer pageNumber;
+
+    private Integer pageSize;
+
     private List<ChemInfoDto> searchResults;
 
     public SearchResultDto() {

@@ -111,23 +111,6 @@ public class ChemInfoWebClient {
         return chemInfoDto;
     }
 
-//    /* FAST API에 화합물 이름으로 분자정보 가져오기 */
-//    public ChemInfoDto getChemInfoByName(String name) {
-//        WebClient webClient = createWebclient(NAME_INFO_URL);
-//
-//        ChemInfoDto request = webClient.get()    // GET 요청
-//                .uri(uriBuilder -> uriBuilder
-//                        .queryParam("mol_Name", name)   // Params 설정
-//                        .build())
-//                .retrieve() // 응답값을 가져옴
-//                .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 직렬화
-//                .block();   //  동기 방식
-//
-//        assert request != null : "찾지 못했습니다!";
-//        log.info(request.toString());
-//        return request;
-//    }
-
     /* FAST API에 SMILES 식으로 분자정보 가져오기 */
     public Mono<ChemInfoDto> getChemInfoBySmiles(String smiles) {
         try {
