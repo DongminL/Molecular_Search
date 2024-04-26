@@ -1,11 +1,11 @@
 package com.example.molecularsearch.service;
 
-import com.example.molecularsearch.dto.InfoFavDto;
+import com.example.molecularsearch.dto.InfoBookmarkDto;
 import com.example.molecularsearch.entity.ChemInfo;
-import com.example.molecularsearch.entity.InfoFav;
+import com.example.molecularsearch.entity.InfoBookmark;
 import com.example.molecularsearch.entity.Users;
 import com.example.molecularsearch.repository.ChemInfoRepository;
-import com.example.molecularsearch.repository.InfoFavRepository;
+import com.example.molecularsearch.repository.InfoBookmarkRepository;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +20,9 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class InfoFavService {
+public class InfoBookmarkService {
 
-    private final InfoFavRepository infoFavRepository;
+    private final InfoBookmarkRepository infoBookmarkRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final UsersRepository usersRepository;
     private final ChemInfoRepository chemInfoRepository;
@@ -36,13 +36,13 @@ public class InfoFavService {
             Users user = usersRepository.findById(userPk).orElse(null); // 유저 정보 가져오기
 
             // InfoFav Entity 생성
-            InfoFav entity = InfoFav.builder()
+            InfoBookmark entity = InfoBookmark.builder()
                     .user(user)
                     .chemInfoId(chemId)
                     .molecularFormula(chemInfo.getMolecularFormula())
                     .build();
 
-            infoFavRepository.save(entity); // 즐겨찾기 추가
+            infoBookmarkRepository.save(entity); // 즐겨찾기 추가
         } catch (NullPointerException e) {
             log.error(e.toString());
         }
@@ -50,14 +50,14 @@ public class InfoFavService {
 
     /* 해당 유저의 즐겨찾기 리스트 가져오기 */
     @Transactional(readOnly = true)
-    public List<InfoFavDto> getFavList() {
+    public List<InfoBookmarkDto> getBookmarkList() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
 
-        List<InfoFav> entityList = infoFavRepository.findAllByUser_IdOrderByModifiedDate(userPk);   // 해당 유저의 즐겨찾기 리스트 가져오기
+        List<InfoBookmark> entityList = infoBookmarkRepository.findAllByUser_IdOrderByModifiedDate(userPk);   // 해당 유저의 즐겨찾기 리스트 가져오기
 
         // Entity List -> DTO List
-        List<InfoFavDto> dtoList = new ArrayList<>();
-        InfoFavDto dto = new InfoFavDto();
+        List<InfoBookmarkDto> dtoList = new ArrayList<>();
+        InfoBookmarkDto dto = new InfoBookmarkDto();
         entityList.forEach(e -> {
             dtoList.add(dto.toDto(e));
         });
@@ -67,25 +67,25 @@ public class InfoFavService {
 
     /* 단일 즐겨찾기 삭제 */
     @Transactional
-    public void deleteInfoFav(Long id) {
-        infoFavRepository.deleteById(id); // 해당 검색어만 삭제
+    public void deleteInfoBookmark(Long id) {
+        infoBookmarkRepository.deleteById(id); // 해당 검색어만 삭제
     }
 
     /* 여러 즐겨찾기 항목 삭제 */
     @Transactional
-    public void editInfoFav(List<InfoFavDto> infoFavDtos) {
-        infoFavDtos.forEach(e -> {
-            deleteInfoFav(e.getId());
+    public void editInfoBookmark(List<InfoBookmarkDto> infoBookmarkDtos) {
+        infoBookmarkDtos.forEach(e -> {
+            deleteInfoBookmark(e.getId());
         });
     }
 
     /* 즐겨찾기 유무 확인 */
     @Transactional(readOnly = true)
-    public Map<String, Boolean> checkInfoFav(String chemId) {
+    public Map<String, Boolean> checkInfoBookmark(String chemId) {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
         Map<String, Boolean> state = new HashMap<>();   // 즐겨찾기 상태값
 
-        Boolean exist = infoFavRepository.existsByUser_IdAndChemInfoId(userPk, chemId);    // 즐겨찾기 유무
+        Boolean exist = infoBookmarkRepository.existsByUser_IdAndChemInfoId(userPk, chemId);    // 즐겨찾기 유무
         state.put("state", exist);
 
         return state;

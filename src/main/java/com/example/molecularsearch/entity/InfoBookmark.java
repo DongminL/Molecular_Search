@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InfoFav extends BaseTime {
+public class InfoBookmark extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

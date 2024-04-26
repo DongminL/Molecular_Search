@@ -1,6 +1,6 @@
 package com.example.molecularsearch.dto;
 
-import com.example.molecularsearch.entity.InfoFav;
+import com.example.molecularsearch.entity.InfoBookmark;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class InfoFavDto {
+public class InfoBookmarkDto {
 
     @JsonProperty("id")
     private Long id;    // InfoFav PK
@@ -25,8 +25,8 @@ public class InfoFavDto {
     private String molecularFormula;    // 분자식
 
     /* Entity -> Dto */
-    public InfoFavDto toDto(InfoFav entity) {
-        return InfoFavDto.builder()
+    public InfoBookmarkDto toDto(InfoBookmark entity) {
+        return InfoBookmarkDto.builder()
                 .id(entity.getId())
                 .chemInfo(entity.getChemInfoId())
                 .molecularFormula(entity.getMolecularFormula())
