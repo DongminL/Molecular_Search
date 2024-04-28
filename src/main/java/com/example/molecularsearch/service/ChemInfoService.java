@@ -2,6 +2,8 @@ package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.entity.ChemInfo;
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.repository.ChemInfoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,23 +53,27 @@ public class ChemInfoService {
         ChemInfo chemInfo;
         List<String> synonyms = response.getSynonyms();
 
-        // Synonyms 값 처리
-        if (synonyms == null) {
-            chemInfo = response.toEntity();
-            chemInfoRepository.save(chemInfo);  // 분자 정보 저장
-        } else {
-            List<String> entitySynonyms;
-
-            // 크기가 5인 Synonyms List로 변환
-            if (synonyms.size() > 5) {
-                entitySynonyms = synonyms.subList(0, 5);    // 0 ~ 4 번째 값만 리스트로 가져옴
+        try {
+            // Synonyms 값 처리
+            if (synonyms == null) {
+                chemInfo = response.toEntity();
+                chemInfoRepository.save(chemInfo);  // 분자 정보 저장
             } else {
-                entitySynonyms = synonyms;
-            }
+                List<String> entitySynonyms;
 
-            chemInfo = response.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
-            ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
-            synonymsService.saveSynonyms(entity, response.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
+                // 크기가 5인 Synonyms List로 변환
+                if (synonyms.size() > 5) {
+                    entitySynonyms = synonyms.subList(0, 5);    // 0 ~ 4 번째 값만 리스트로 가져옴
+                } else {
+                    entitySynonyms = synonyms;
+                }
+
+                chemInfo = response.toEntity(entitySynonyms);    // Synonyms를 크기가 5인 List로 변경
+                ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
+                synonymsService.saveSynonyms(entity, response.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
+            }
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
 
         return chemInfo;

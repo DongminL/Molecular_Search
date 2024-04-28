@@ -1,5 +1,7 @@
 package com.example.molecularsearch.jwt;
 
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -60,6 +62,6 @@ public class JwtFilter extends GenericFilterBean {
             return bearerToken.substring(7);    // "Bearer " 부분을 자르고 JWT만 가져옴
         }
 
-        return null;
+        throw new CustomException(ErrorCode.BAD_REQUEST_HAEDER);
     }
 }

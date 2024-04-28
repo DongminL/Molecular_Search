@@ -3,6 +3,8 @@ package com.example.molecularsearch.service;
 import com.example.molecularsearch.dto.GoogleUserDto;
 import com.example.molecularsearch.dto.NaverUserDto;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.repository.InfoBookmarkRepository;
 import com.example.molecularsearch.repository.SearchLogRepository;
 import com.example.molecularsearch.repository.UsersRepository;
@@ -29,7 +31,7 @@ public class UsersService {
     public Users signUp(NaverUserDto info) {
         if (usersRepository.existsByUserId(info.getUserId())) {
             log.error("이미 가입된 유저입니다!");
-            throw new RuntimeException("Already existed user");
+            throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
         // Dto -> Entity
         Users users = Users.builder()
@@ -52,7 +54,7 @@ public class UsersService {
     public Users signUp(GoogleUserDto info) {
         if(usersRepository.existsByUserId(info.getUserId())) {
             log.error("이미 가입된 유저입니다!");
-            throw new RuntimeException("Already existed user");
+            throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
         // Dto -> Entity
         Users users = Users.builder()
@@ -69,16 +71,14 @@ public class UsersService {
 
     /* User ID로 DB에서 유저 정보 찾기 */
     @Transactional(readOnly = true)
-    public Users searchByUserId(String userId) throws UsernameNotFoundException{
-        return usersRepository.findByUserId(userId).orElseThrow(() ->
-                new UsernameNotFoundException(userId + " 아이디의 사용자는 존재하지 않습니다!"));
+    public Users searchByUserId(String userId) throws UsernameNotFoundException {
+        return usersRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
     }
 
     /* Users Table의 PK로 DB에서 유저 정보 찾기 */
     @Transactional(readOnly = true)
-    public Users searchByid(Long userPk) throws UsernameNotFoundException{
-        return usersRepository.findById(userPk).orElseThrow(() ->
-                new UsernameNotFoundException(userPk + "번 사용자는 존재하지 않습니다!"));
+    public Users searchByid(Long userPk) throws UsernameNotFoundException {
+        return usersRepository.findById(userPk).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
     }
 
     /* Security Context에 저장된 Users PK에 대한 정보만 가져오는 메소드 */

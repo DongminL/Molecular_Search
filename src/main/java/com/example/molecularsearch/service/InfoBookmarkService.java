@@ -4,6 +4,8 @@ import com.example.molecularsearch.dto.InfoBookmarkDto;
 import com.example.molecularsearch.entity.ChemInfo;
 import com.example.molecularsearch.entity.InfoBookmark;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.repository.ChemInfoRepository;
 import com.example.molecularsearch.repository.InfoBookmarkRepository;
 import com.example.molecularsearch.repository.UsersRepository;
@@ -32,8 +34,8 @@ public class InfoBookmarkService {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
 
         try {
-            ChemInfo chemInfo = chemInfoRepository.findById(chemId).orElse(null);   // 분자 정보 가져오기
-            Users user = usersRepository.findById(userPk).orElse(null); // 유저 정보 가져오기
+            ChemInfo chemInfo = chemInfoRepository.findById(chemId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));   // 분자 정보 가져오기
+            Users user = usersRepository.findById(userPk).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER)); // 유저 정보 가져오기
 
             // InfoFav Entity 생성
             InfoBookmark entity = InfoBookmark.builder()
