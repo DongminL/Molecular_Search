@@ -1,6 +1,8 @@
 package com.example.molecularsearch.service;
 
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.jwt.CustomUserDetails;
 import com.example.molecularsearch.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Optional<Users> users = usersRepository.findById(Long.parseLong(id));   // Users Table PK 값으로 찾기
 
         if (users.isEmpty()) {
-            users = usersRepository.findByUserId(id);   // User Id 값으로 찾기
-        }
-
-        if (users.isEmpty()) {
-            throw new RuntimeException("Not Found Error");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         return new CustomUserDetails(users.get());

@@ -1,6 +1,8 @@
 package com.example.molecularsearch.jwt;
 
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.dto.JwtDto;
+import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -80,7 +82,7 @@ public class JwtProvider {
                     .get("role")
                     .toString();
         } catch (ExpiredJwtException e) {
-            return e.getClaims().toString();
+            throw new CustomException(ErrorCode.TOKEN_EXPIRATION);
         }
     }
 
@@ -128,15 +130,17 @@ public class JwtProvider {
             return true;    // true : 유효
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.error("잘못된 JWT 서명입니다.");
+            throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT 토큰입니다.");
+            throw new CustomException(ErrorCode.TOKEN_EXPIRATION);
         } catch (UnsupportedJwtException e) {
             log.error("지원되지 않는 JWT 토큰입니다.");
+            throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         } catch (IllegalArgumentException e) {
             log.error("JWT 토큰이 잘못되었습니다.");
+            throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
-
-        return false;   // false : 무효
     }
 
     /* Refresh Token 유효성 검증 */
@@ -151,14 +155,13 @@ public class JwtProvider {
             // Refresh Token의 만료시간이 지나지 않았을 경우, 새로운 Access Token을 생성
             if (!claims.getBody().getExpiration().before(new Date())) {
                 return reGenerateAccessToken(Long.parseLong(getUserPk(refreshToken)), getRoleType(refreshToken));
+            } else {
+                throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
             }
         } catch (Exception e) {
-            log.info("Refresh Token이 만료되었을 경우, 재로그인 필요!");
-            return null;
-
+            log.info("잘못된 Refresh Token");
+            throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
-
-        return null;
     }
 
     /* 남은 만료 시간 가져오기 */
@@ -171,10 +174,9 @@ public class JwtProvider {
 
             // token의 현재 남은시간 반환
             return (expiration.getTime() - now);
-
         } catch (SignatureException e) {
             log.error("JWT 토큰이 잘못되었습니다.");
-            throw new SignatureException("TOKEN_INVALID");
+            throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
     }
 }

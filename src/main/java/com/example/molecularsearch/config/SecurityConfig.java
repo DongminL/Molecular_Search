@@ -1,5 +1,6 @@
 package com.example.molecularsearch.config;
 
+import com.example.molecularsearch.jwt.JwtExceptionFilter;
 import com.example.molecularsearch.jwt.JwtFilter;
 import com.example.molecularsearch.jwt.JwtHandler;
 import com.example.molecularsearch.jwt.JwtProvider;
@@ -37,13 +38,14 @@ public class SecurityConfig {
                         httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(jwtHandler)
                                 .accessDeniedHandler(jwtHandler))
                 // JwtFilter를 Security 로직에 등록
-                .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)    // JwtFilter를 UsernamePasswordAuthenticationFilter보다 먼저 실행
                 // URL 권한 설정 */
                 .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests.requestMatchers("/api/login/naver", "/api/login/google", "/api/login/reissue").permitAll()  // 로그인, 토큰 갱신 요청은 누구든지 허용
                                 .anyRequest().authenticated()   // 그외 다른 요청들은 토큰 인증해야함
                 );
 
+        http.addFilterBefore(new JwtExceptionFilter(), JwtFilter.class);    // JwtExceptionFilter를 JwtFilter보다 먼저 실행
 
         return http.build();
     }

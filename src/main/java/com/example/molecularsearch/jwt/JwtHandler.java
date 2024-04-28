@@ -27,6 +27,6 @@ public class JwtHandler implements AccessDeniedHandler, AuthenticationEntryPoint
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

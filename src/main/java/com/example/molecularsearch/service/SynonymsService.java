@@ -54,13 +54,14 @@ public class SynonymsService {
             result.add(new ChemInfoDto(e.getChemInfo(), e.getChemInfo().getSynonyms()));
         });
 
+        // 불러온 페이지 정보
         Page<ChemInfoDto> chemInfoPage = PageableExecutionUtils.getPage(
                 result,
                 pageable,
-                () -> mongoTemplate.count(query.skip(-1).limit(-1), Synonyms.class)
-                // query.skip(-1).limit(-1)은 현재 쿼리가 페이징 하려고 하는 offset 까지만 보기에 이를 맨 처음부터 끝까지로 set 해줘 정확한 도큐먼트 개수를 구함
+                () -> mongoTemplate.count(query.skip(-1).limit(-1), Synonyms.class) // 현재 쿼리가 페이징 하려고 하는 offset 까지만 보기에 이를 맨 처음부터 끝까지로 set 해줘 정확한 도큐먼트 개수를 구함
         );
 
+        // 검색 결과 DTO로 변환
         return SearchResultDto.builder()
                 .totalElements(chemInfoPage.getTotalElements())
                 .totalPages(chemInfoPage.getTotalPages())
