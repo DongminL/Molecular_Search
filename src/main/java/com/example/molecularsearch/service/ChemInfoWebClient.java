@@ -3,6 +3,8 @@ package com.example.molecularsearch.service;
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.dto.DescriptionResponse;
 import com.example.molecularsearch.dto.SynonymsResponse;
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,8 +72,6 @@ public class ChemInfoWebClient {
             chemInfoDto = tuple3.getT1();
             chemInfoDto.updateSynonyms(tuple3.getT2().getSynonyms());
             chemInfoDto.updateDescription(tuple3.getT3().getDescription());
-        } catch (NullPointerException e) {
-            throw new NullPointerException("요청 실패");
         } catch (WebClientResponseException.NotFound e) {
             log.error(e.toString());
 
@@ -79,6 +79,9 @@ public class ChemInfoWebClient {
 
             chemInfoDto = tuple2.getT1();
             chemInfoDto.updateDescription(tuple2.getT2().getDescription());
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         }
 
         return chemInfoDto;
@@ -97,8 +100,6 @@ public class ChemInfoWebClient {
             chemInfoDto = tuple3.getT1();
             chemInfoDto.updateSynonyms(tuple3.getT2().getSynonyms());
             chemInfoDto.updateDescription(tuple3.getT3().getDescription());
-        } catch (NullPointerException e) {
-            throw new NullPointerException("요청 실패");
         } catch (WebClientResponseException.NotFound e) {
             log.error(e.toString());
 
@@ -106,6 +107,9 @@ public class ChemInfoWebClient {
 
             chemInfoDto = tuple2.getT1();
             chemInfoDto.updateDescription(tuple2.getT2().getDescription());
+        } catch (Exception e) {
+            log.error(e.toString());
+            throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         }
 
         return chemInfoDto;
