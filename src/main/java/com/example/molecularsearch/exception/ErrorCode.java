@@ -1,4 +1,4 @@
-package com.example.molecularsearch.constant;
+package com.example.molecularsearch.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +12,7 @@ public enum ErrorCode {
     TOKEN_EXPIRATION(HttpStatus.UNAUTHORIZED, "토큰이 만료 되었습니다."),
     TOKEN_INVALIDITY(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
     BAD_REQUEST_HAEDER(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
+    REQUIRE_RELOGIN(HttpStatus.UNAUTHORIZED, "재로그인이 필요합니다."),
 
     /* Users Error */
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "해당 유저를 찾을 수 없습니다."),
