@@ -4,6 +4,7 @@ import com.example.molecularsearch.dto.GoogleUserDto;
 import com.example.molecularsearch.dto.JwtDto;
 import com.example.molecularsearch.dto.NaverUserDto;
 import com.example.molecularsearch.entity.Users;
+import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.jwt.JwtProvider;
 import com.example.molecularsearch.jwt.Tokens;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class OAuthLoginService {
 
         try {
             users = usersService.searchByUserId(naverUserDto.getUserId());    // 로그인 요청한 계정 정보 가져오기
-        } catch (UsernameNotFoundException e) {
+        } catch (CustomException e) {
             users = usersService.signUp(naverUserDto);    // 회원가입 계정 DB에 저장
         }
 
