@@ -8,6 +8,9 @@ import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -15,6 +18,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
+
+import java.io.IOException;
+import java.util.Base64;
 
 @Slf4j
 @Component
@@ -92,14 +98,18 @@ public class ChemInfoWebClient {
         Mono<ChemInfoDto> chemInfoMono = getChemInfoByCid(cid); // 분자 정보
         Mono<SynonymsResponse> synonymsMono = getSynonymsByCid(cid);   // Synonyms
         Mono<DescriptionResponse> descriptionMono = getDescriptionByCid(cid);   // Description
+        String imageMono = getImageByCid(cid); // 2D Image
         ChemInfoDto chemInfoDto;
 
         try {
-            Tuple3<ChemInfoDto, SynonymsResponse, DescriptionResponse> tuple3 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
+            Tuple3<ChemInfoDto, SynonymsResponse, DescriptionResponse> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
 
-            chemInfoDto = tuple3.getT1();
-            chemInfoDto.updateSynonyms(tuple3.getT2().getSynonyms());
-            chemInfoDto.updateDescription(tuple3.getT3().getDescription());
+            chemInfoDto = tuple4.getT1();
+            chemInfoDto.updateSynonyms(tuple4.getT2().getSynonyms());
+            chemInfoDto.updateDescription(tuple4.getT3().getDescription());
+            chemInfoDto.update2DImage(imageMono.toString());
+
+            log.info(chemInfoDto.getImage2DUrl() + " : 생성");
         } catch (WebClientResponseException.NotFound e) {
             log.error(e.toString());
 
@@ -125,7 +135,7 @@ public class ChemInfoWebClient {
                             .queryParam("mol_Smlies", smiles)   // Params 설정
                             .build())
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(ChemInfoDto.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(ChemInfoDto.class);  // 응답값을 ChemInfoDto로 역직렬화
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
@@ -139,7 +149,7 @@ public class ChemInfoWebClient {
                     .baseUrl(PUBCHEM_SMILES_URL + smiles + REQUEST_SYNONYMS).build()
                     .get()    // GET 요청
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(SynonymsResponse.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(SynonymsResponse.class);  // 응답값을 SynonymsResponse로 역직렬화
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
@@ -153,7 +163,7 @@ public class ChemInfoWebClient {
                     .baseUrl(PUBCHEM_SMILES_URL + smiles + REQUEST_DESCRIPTION).build()
                     .get()    // GET 요청
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(DescriptionResponse.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(DescriptionResponse.class);  // 응답값을 DescriptionResponse로 역직렬화
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
@@ -170,7 +180,7 @@ public class ChemInfoWebClient {
                             .queryParam("mol_Cid", cid)   // Params 설정
                             .build())
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(ChemInfoDto.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(ChemInfoDto.class);  // 응답값을 ChemInfoDto로 역직렬화
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
@@ -184,7 +194,7 @@ public class ChemInfoWebClient {
                     .baseUrl(PUBCHEM_CID_URL + cid + REQUEST_SYNONYMS).build()
                     .get()    // GET 요청
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(SynonymsResponse.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(SynonymsResponse.class);  // 응답값을 SynonymsResponse로 역직렬화
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
@@ -198,8 +208,29 @@ public class ChemInfoWebClient {
                     .baseUrl(PUBCHEM_CID_URL + cid + REQUEST_DESCRIPTION).build()
                     .get()    // GET 요청
                     .retrieve() // 응답값을 가져옴
-                    .bodyToMono(DescriptionResponse.class);  // 응답값을 ChemInfoDto로 직렬화
+                    .bodyToMono(DescriptionResponse.class);  // 응답값을 DescriptionResponse로 역직렬화
         } catch (WebClientRequestException e) {
+            log.error(e.toString());
+            return null;
+        }
+    }
+
+    /* PubChem에서 CID에 대한 png 파일 가져오기 */
+    public String getImageByCid(Long cid) {
+        try {
+            InputStreamResource byteImage = webClient.mutate()
+                    .baseUrl(PUBCHEM_CID_URL + cid + "/png").build()
+                    .get()    // GET 요청
+                    .accept(MediaType.IMAGE_PNG)
+                    .retrieve() // 응답값을 가져옴
+                    .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
+                    })
+                    .block();
+
+            byte[] image = Base64.getEncoder().encode(byteImage.getInputStream().readAllBytes());
+
+            return new String(image, "UTF-8");
+        } catch (WebClientRequestException | IOException e) {
             log.error(e.toString());
             return null;
         }

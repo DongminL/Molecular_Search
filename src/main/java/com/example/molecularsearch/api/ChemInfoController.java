@@ -1,6 +1,7 @@
 package com.example.molecularsearch.api;
 
 import com.example.molecularsearch.service.ChemInfoService;
+import com.example.molecularsearch.service.ChemInfoWebClient;
 import com.example.molecularsearch.service.SearchLogService;
 import com.example.molecularsearch.service.SynonymsService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class ChemInfoController {
     private final ChemInfoService chemInfoService;
     private final SearchLogService searchLogService;
     private final SynonymsService synonymsService;
+    private final ChemInfoWebClient chemInfoWebClient;
 
     /* 분자 이름 또는 화학식으로 분자 정보 검색 */
     @GetMapping(value = "/api/search/chem", params = {"keyword", "page"})
@@ -35,5 +37,11 @@ public class ChemInfoController {
     @PostMapping(value = "/api/save/chem")
     public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
         return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
+    }
+
+    /* SMILES 식을 통한 분자정보 검색 */
+    @GetMapping(value = "/api/search/image/{cid}")
+    public ResponseEntity<?> imageChem(@PathVariable Long cid) {
+        return ResponseEntity.ok(chemInfoWebClient.getImageByCid(cid));
     }
 }
