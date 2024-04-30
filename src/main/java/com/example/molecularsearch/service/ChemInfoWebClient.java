@@ -8,7 +8,6 @@ import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
@@ -66,6 +65,7 @@ public class ChemInfoWebClient {
     private String REQUEST_DESCRIPTION;
 
     private final WebClient webClient = WebClient.create();
+    private final AwsS3Service awsS3Service;
 
     /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
     public ChemInfoDto requestInfoBySmiles(String smiles) {
@@ -229,9 +229,11 @@ public class ChemInfoWebClient {
                     })   // Chunk 단위로 이미지를 읽어옮
                     .block();
 
-            MultipartFile image = new ByteMultpartFile(byteImage.getInputStream().readAllBytes());
+            // Byte[] -> MultipartFile로 변환
+            MultipartFile image = new ByteMultpartFile(cid.toString(), byteImage.getInputStream().readAllBytes());
 
-            return Base64.encodeBase64String(image.getBytes());
+            // Image를 볼 수 있는 URL 받아오기
+            return awsS3Service.saveImage(image);
         } catch (WebClientRequestException | IOException e) {
             log.error(e.toString());
             return null;

@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -51,21 +53,23 @@ public class SearchLogService {
 
     /* 유저에 대한 모든 검색 기록 가져오기 */
     @Transactional(readOnly = true)
-    public List<SearchLogDto> findSearchLog() {
+    public Map<String, List<SearchLogDto>> findSearchLog() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
 
         List<SearchLog> searchLogs = searchLogRepository.findAllByUser_IdOrderByCreatedDate(userPk);    // 해당 유저에 대한 전체 검색 기록
 
         // Entity List -> Dto List
         List<SearchLogDto> searchLogDtos = new ArrayList<>();
-        for (SearchLog o : searchLogs) {
-            searchLogDtos.add(SearchLogDto.builder()
-                    .id(o.getId())
-                    .log(o.getLog())
-                    .build());
-        }
+        SearchLogDto dto = new SearchLogDto();
+        searchLogs.forEach(e -> {
+            searchLogDtos.add(dto.toDto(e));
+        });
 
-        return searchLogDtos;
+        // 쉽게 Parsing 할 수 있게 Mapping
+        Map<String, List<SearchLogDto>> result = new HashMap<>();
+        result.put("searchLogList", searchLogDtos);
+
+        return result;
     }
 
 

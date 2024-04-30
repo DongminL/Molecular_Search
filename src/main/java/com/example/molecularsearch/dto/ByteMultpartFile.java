@@ -11,16 +11,17 @@ import java.nio.file.Path;
 @AllArgsConstructor
 public class ByteMultpartFile implements MultipartFile {
 
-    private final byte[] byteImage;
+    private final String fileName;  // 파일 이름
+    private final byte[] byteImage; // Byte 형식의 File Data
 
     @Override
     public String getName() {
-        return null;
+        return fileName;
     }
 
     @Override
     public String getOriginalFilename() {
-        return null;
+        return fileName;
     }
 
     @Override
