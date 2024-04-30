@@ -1,5 +1,6 @@
 package com.example.molecularsearch.service;
 
+import com.example.molecularsearch.dto.ByteMultpartFile;
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.dto.DescriptionResponse;
 import com.example.molecularsearch.dto.SynonymsResponse;
@@ -7,11 +8,13 @@ import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -20,7 +23,6 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
 import java.io.IOException;
-import java.util.Base64;
 
 @Slf4j
 @Component
@@ -221,15 +223,15 @@ public class ChemInfoWebClient {
             InputStreamResource byteImage = webClient.mutate()
                     .baseUrl(PUBCHEM_CID_URL + cid + "/png").build()
                     .get()    // GET 요청
-                    .accept(MediaType.IMAGE_PNG)
+                    .accept(MediaType.IMAGE_PNG)    // 가져오려는 Content Type 명시
                     .retrieve() // 응답값을 가져옴
                     .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
-                    })
+                    })   // Chunk 단위로 이미지를 읽어옮
                     .block();
 
-            byte[] image = Base64.getEncoder().encode(byteImage.getInputStream().readAllBytes());
+            MultipartFile image = new ByteMultpartFile(byteImage.getInputStream().readAllBytes());
 
-            return new String(image, "UTF-8");
+            return Base64.encodeBase64String(image.getBytes());
         } catch (WebClientRequestException | IOException e) {
             log.error(e.toString());
             return null;
