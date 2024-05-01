@@ -20,7 +20,7 @@ public class APIExceptionAdvice {
                 .body(ErrorDto.builder()
                         .staus(e.getErrorCode().getStatus())
                         .error(e.getErrorCode().getError())
-                        .message(e.getErrorCode().getMessage())
+                        .message(e.getMessage())
                         .build());
     }
 }

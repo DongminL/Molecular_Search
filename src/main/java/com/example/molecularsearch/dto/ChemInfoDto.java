@@ -111,4 +111,9 @@ public class ChemInfoDto {
     public void updateDescription(String description) {
         this.description = description;
     }
+
+    /* 2D Image URL 정보 업데이트 */
+    public void update2DImage(String image2DUrl) {
+        this.image2DUrl = image2DUrl;
+    }
 }

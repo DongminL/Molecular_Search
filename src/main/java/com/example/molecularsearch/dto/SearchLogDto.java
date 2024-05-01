@@ -1,5 +1,6 @@
 package com.example.molecularsearch.dto;
 
+import com.example.molecularsearch.entity.SearchLog;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -19,4 +20,12 @@ public class SearchLogDto {
 
     @JsonProperty("log")
     private String log; // 검색어
+
+    /* Entity -> Dto */
+    public SearchLogDto toDto(SearchLog entity) {
+        return SearchLogDto.builder()
+                .id(entity.getId())
+                .log(entity.getLog())
+                .build();
+    }
 }
