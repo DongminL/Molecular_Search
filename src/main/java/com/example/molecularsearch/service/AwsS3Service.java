@@ -4,10 +4,12 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.example.molecularsearch.dto.ByteMultpartFile;
 import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,16 +26,20 @@ public class AwsS3Service {
     private String bucket = "";  // 사용할 S3 Bucket
 
     /* AWS S3에 이미지 저장 후 해당 이미지를 볼 수 있는 URL 받아오기 */
-    public String saveImage(MultipartFile multipartFile) {
-        String fileName = UUID.randomUUID().toString().concat("_"+ multipartFile.getName());    // UUID로 난수화 하여 이름으로 저장
+    public String saveImage(Long cid, byte[] byteImage) {
+        // InputStreamResource -> MultipartFile로 변환
+        MultipartFile image = new ByteMultpartFile(cid.toString(), byteImage);
+        log.info(Base64.encodeBase64String(byteImage));
+
+        String fileName = UUID.randomUUID().toString().concat("_"+ image.getName());    // UUID로 난수화 하여 이름으로 저장
 
         // Image File의 Metadata 생성
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentLength(image.getSize());
+        metadata.setContentType(image.getContentType());
 
         try {
-            InputStream inputStream = multipartFile.getInputStream();   // Image byte의 InputStream 생성
+            InputStream inputStream = image.getInputStream();   // Image byte의 InputStream 생성
 
             // 해당 S3 Bucket에 Image File 저장
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, metadata)    // S3에 업로드

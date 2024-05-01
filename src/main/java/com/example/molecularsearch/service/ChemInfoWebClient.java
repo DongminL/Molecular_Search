@@ -1,6 +1,5 @@
 package com.example.molecularsearch.service;
 
-import com.example.molecularsearch.dto.ByteMultpartFile;
 import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.dto.DescriptionResponse;
 import com.example.molecularsearch.dto.SynonymsResponse;
@@ -13,15 +12,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
-
-import java.io.IOException;
+import reactor.util.function.Tuple4;
 
 @Slf4j
 @Component
@@ -100,16 +97,16 @@ public class ChemInfoWebClient {
         Mono<ChemInfoDto> chemInfoMono = getChemInfoByCid(cid); // 분자 정보
         Mono<SynonymsResponse> synonymsMono = getSynonymsByCid(cid);   // Synonyms
         Mono<DescriptionResponse> descriptionMono = getDescriptionByCid(cid);   // Description
-        String imageMono = getImageByCid(cid); // 2D Image
+        Mono<InputStreamResource> imageMono = getImageByCid(cid); // 2D Image
         ChemInfoDto chemInfoDto;
 
         try {
-            Tuple3<ChemInfoDto, SynonymsResponse, DescriptionResponse> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
+            Tuple4<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
 
             chemInfoDto = tuple4.getT1();
             chemInfoDto.updateSynonyms(tuple4.getT2().getSynonyms());
             chemInfoDto.updateDescription(tuple4.getT3().getDescription());
-            chemInfoDto.update2DImage(imageMono.toString());
+            chemInfoDto.update2DImage(awsS3Service.saveImage(cid, tuple4.getT4().getInputStream().readAllBytes()));
 
             log.info(chemInfoDto.getImage2DUrl() + " : 생성");
         } catch (WebClientResponseException.NotFound e) {
@@ -119,6 +116,9 @@ public class ChemInfoWebClient {
 
             chemInfoDto = tuple2.getT1();
             chemInfoDto.updateDescription(tuple2.getT2().getDescription());
+        } catch (CustomException e) {
+            log.error("이미지 저장 실패");
+            throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED, "이미지 저장 실패");
         } catch (Exception e) {
             log.error(e.toString());
             throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
@@ -218,23 +218,16 @@ public class ChemInfoWebClient {
     }
 
     /* PubChem에서 CID에 대한 png 파일 가져오기 */
-    public String getImageByCid(Long cid) {
+    public Mono<InputStreamResource> getImageByCid(Long cid) {
         try {
-            InputStreamResource byteImage = webClient.mutate()
+            return webClient.mutate()
                     .baseUrl(PUBCHEM_CID_URL + cid + "/png").build()
                     .get()    // GET 요청
                     .accept(MediaType.IMAGE_PNG)    // 가져오려는 Content Type 명시
                     .retrieve() // 응답값을 가져옴
                     .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
-                    })   // Chunk 단위로 이미지를 읽어옮
-                    .block();
-
-            // Byte[] -> MultipartFile로 변환
-            MultipartFile image = new ByteMultpartFile(cid.toString(), byteImage.getInputStream().readAllBytes());
-
-            // Image를 볼 수 있는 URL 받아오기
-            return awsS3Service.saveImage(image);
-        } catch (WebClientRequestException | IOException e) {
+                    });   // Chunk 단위로 이미지를 읽어옮
+        } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
         }
