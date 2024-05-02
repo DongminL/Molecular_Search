@@ -58,3 +58,10 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+/* jar 파일명 설정 */
+bootJar {
+    archiveBaseName = 'molecularsearch'
+    archiveFileName = 'canchem.jar'
+    archiveVersion = '0.0.1'
+}
