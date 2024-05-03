@@ -1,0 +1,9 @@
+version: "3.9"  # docker-compose file version
+
+services:
+  canchem-api:  # 이미지 이름
+    build:
+      context: .  # 현재 Directory의
+      dockerfile: Dockerfile  # Dockerfile을 가져옴
+    ports:
+      - 8080:8080 # 실행시킬 포트 (로컬 포트 : 도커 포트)

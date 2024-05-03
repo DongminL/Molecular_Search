@@ -32,13 +32,13 @@ dependencies {
 
     // AWS
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+    testImplementation 'io.findify:s3mock_2.13:0.2.6'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'mysql:mysql-connector-java:8.0.32'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
@@ -46,15 +46,25 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mongodb'
     testImplementation 'org.testcontainers:mysql'
+
+    // Junit5
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine' //Junit4제외
+    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+/* jar 파일명 설정 */
+bootJar {
+    archiveBaseName = 'molecularsearch'
+    archiveFileName = 'canchem.jar'
+    archiveVersion = '0.0.1'
 }
