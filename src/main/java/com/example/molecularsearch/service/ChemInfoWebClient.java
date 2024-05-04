@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple3;
 import reactor.util.function.Tuple4;
 
 @Slf4j
@@ -64,19 +63,25 @@ public class ChemInfoWebClient {
     private final WebClient webClient = WebClient.create();
     private final AwsS3Service awsS3Service;
 
-    /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
+    /* SMILES 식으로 여러 API에서 비동기 처리로 분자 정보 가져오기 */
     public ChemInfoDto requestInfoBySmiles(String smiles) {
         Mono<ChemInfoDto> chemInfoMono = getChemInfoBySmiles(smiles); // 분자 정보
         Mono<SynonymsResponse> synonymsMono = getSynonymsBySmiles(smiles);   // Synonyms
         Mono<DescriptionResponse> descriptionMono = getDescriptionBySmiles(smiles); // Description
+        Mono<InputStreamResource> imageMono = getImageBySmiles(smiles); // 2D Image
         ChemInfoDto chemInfoDto;
 
         try {
-            Tuple3<ChemInfoDto, SynonymsResponse, DescriptionResponse> tuple3 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
+            Tuple4<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono).block();    // 네 Mono의 결과값을 묶어서 동기적으로 처리
 
-            chemInfoDto = tuple3.getT1();
-            chemInfoDto.updateSynonyms(tuple3.getT2().getSynonyms());
-            chemInfoDto.updateDescription(tuple3.getT3().getDescription());
+            chemInfoDto = tuple4.getT1();
+
+            byte[] bytes = tuple4.getT4().getInputStream().readAllBytes();  // Image Byte[]
+            if (bytes.length > 0) {
+                chemInfoDto.update2DImage(awsS3Service.saveImage(chemInfoDto.getCid(), bytes));
+            }
+            chemInfoDto.updateSynonyms(tuple4.getT2().getSynonyms());
+            chemInfoDto.updateDescription(tuple4.getT3().getDescription());
         } catch (WebClientResponseException.NotFound e) {
             log.error(e.toString());
 
@@ -92,7 +97,7 @@ public class ChemInfoWebClient {
         return chemInfoDto;
     }
 
-    /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
+    /* CID 값으로 여러 API에서 비동기 처리로 분자 정보 가져오기 */
     public ChemInfoDto requestInfoByCid(Long cid) {
         Mono<ChemInfoDto> chemInfoMono = getChemInfoByCid(cid); // 분자 정보
         Mono<SynonymsResponse> synonymsMono = getSynonymsByCid(cid);   // Synonyms
@@ -101,12 +106,16 @@ public class ChemInfoWebClient {
         ChemInfoDto chemInfoDto;
 
         try {
-            Tuple4<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono).block();    // 세 Mono의 결과값을 묶어서 동기적으로 처리
+            Tuple4<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono).block();    // 네 Mono의 결과값을 묶어서 동기적으로 처리
 
             chemInfoDto = tuple4.getT1();
+
+            byte[] bytes = tuple4.getT4().getInputStream().readAllBytes();  // Image Byte[]
+            if (bytes.length > 0) {
+                chemInfoDto.update2DImage(awsS3Service.saveImage(cid, bytes));
+            }
             chemInfoDto.updateSynonyms(tuple4.getT2().getSynonyms());
             chemInfoDto.updateDescription(tuple4.getT3().getDescription());
-            chemInfoDto.update2DImage(awsS3Service.saveImage(cid, tuple4.getT4().getInputStream().readAllBytes()));
 
             log.info(chemInfoDto.getImage2DUrl() + " : 생성");
         } catch (WebClientResponseException.NotFound e) {
@@ -166,6 +175,22 @@ public class ChemInfoWebClient {
                     .get()    // GET 요청
                     .retrieve() // 응답값을 가져옴
                     .bodyToMono(DescriptionResponse.class);  // 응답값을 DescriptionResponse로 역직렬화
+        } catch (WebClientRequestException e) {
+            log.error(e.toString());
+            return null;
+        }
+    }
+
+    /* PubChem에서 SMILES에 대한 png 파일 가져오기 */
+    public Mono<InputStreamResource> getImageBySmiles(String smiles) {
+        try {
+            return webClient.mutate()
+                    .baseUrl(PUBCHEM_SMILES_URL + smiles + "/png").build()
+                    .get()    // GET 요청
+                    .accept(MediaType.IMAGE_PNG)    // 가져오려는 Content Type 명시
+                    .retrieve() // 응답값을 가져옴
+                    .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
+                    });   // Chunk 단위로 이미지를 읽어옮
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
