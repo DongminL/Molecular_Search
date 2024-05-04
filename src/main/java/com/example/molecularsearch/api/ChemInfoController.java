@@ -38,10 +38,4 @@ public class ChemInfoController {
     public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
         return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
     }
-
-    /* SMILES 식을 통한 분자정보 검색 */
-    @GetMapping(value = "/api/search/image/{cid}")
-    public ResponseEntity<?> imageChem(@PathVariable Long cid) {
-        return ResponseEntity.ok(chemInfoWebClient.getImageByCid(cid));
-    }
 }

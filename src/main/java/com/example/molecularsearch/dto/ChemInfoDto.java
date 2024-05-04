@@ -66,6 +66,7 @@ public class ChemInfoDto {
                 .canonicalSmiles(this.canonicalSmiles)
                 .isomericSmiles(this.isomericSmiles)
                 .description(this.description)
+                .image2DUrl(this.getImage2DUrl())
                 .build();
     }
 
@@ -82,6 +83,7 @@ public class ChemInfoDto {
                 .isomericSmiles(this.isomericSmiles)
                 .synonyms(synonyms)
                 .description(this.description)
+                .image2DUrl(this.getImage2DUrl())
                 .build();
     }
 
