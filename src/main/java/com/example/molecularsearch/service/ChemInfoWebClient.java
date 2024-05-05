@@ -24,32 +24,14 @@ import reactor.util.function.Tuple4;
 @RequiredArgsConstructor
 public class ChemInfoWebClient {
 
-    @Value("${fastapi.search.name.info}")
-    private String NAME_INFO_URL; // 화합물 이름으로 분자 정보 검색 API URL
-
-    @Value("${fastapi.search.name.2d-image}")
-    private String NAME_2D_URL;   // 화합물 이름으로 2D 이미지 검색 API URL
-
-    @Value("${fastapi.search.name.3d-image}")
-    private String NAME_3D_URL;   // 화합물 이름으로 3D 이미지 검색 API URL
-
     @Value("${fastapi.search.smiles.info}")
     private String SMILES_INFO_URL;   // SMILES 식으로 분자 정보 검색 API URL
-
-    @Value("${fastapi.search.smiles.2d-image}")
-    private String SMILES_2D_URL; // SMILES 식으로 2D 이미지 검색 API URL
-
-    @Value("${fastapi.search.smiles.3d-image}")
-    private String SMILES_3D_URL; // SMILES 식으로 3D 이미지 검색 API URL
 
     @Value("${fastapi.search.cid.info}")
     private String CID_INFO_URL;    // cid로 분자 정보 검색 API URL
 
     @Value("${pubchem.search.cid}")
     private String PUBCHEM_CID_URL;
-
-    @Value("${pubchem.search.name}")
-    private String PUBCHEM_NAME_URL;
 
     @Value("${pubchem.search.smiles}")
     private String PUBCHEM_SMILES_URL;

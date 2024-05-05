@@ -9,7 +9,7 @@ import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,15 +23,16 @@ public class AwsS3Service {
 
     private final AmazonS3 amazonS3;
 
-    private String bucket = "";  // 사용할 S3 Bucket
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;  // 사용할 S3 Bucket
 
     /* AWS S3에 이미지 저장 후 해당 이미지를 볼 수 있는 URL 받아오기 */
     public String saveImage(Long cid, byte[] byteImage) {
-        // InputStreamResource -> MultipartFile로 변환
-        MultipartFile image = new ByteMultpartFile(cid.toString(), byteImage);
-        log.info(Base64.encodeBase64String(byteImage));
+        String uuid = UUID.randomUUID().toString().replace("-", "");    // UUID 생성 후 "-"값 제거
+        String fileName = uuid.concat("-" + cid);   // 파일 이름
 
-        String fileName = UUID.randomUUID().toString().concat("_"+ image.getName());    // UUID로 난수화 하여 이름으로 저장
+        // InputStreamResource -> MultipartFile로 변환
+        MultipartFile image = new ByteMultpartFile(fileName, byteImage);
 
         // Image File의 Metadata 생성
         ObjectMetadata metadata = new ObjectMetadata();
