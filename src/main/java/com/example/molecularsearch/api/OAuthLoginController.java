@@ -30,16 +30,12 @@ public class OAuthLoginController {
     public ResponseEntity<String> reissueToken(@RequestHeader("Authorization") String token) {
         String accessToken = jwtService.getHeaderToken(token);  // Header 값에서 Bearer 값 제외
 
-        try {
-            String newAccessToken = jwtService.reissueAccessToken(accessToken);
+        String newAccessToken = jwtService.reissueAccessToken(accessToken);
 
-            if (newAccessToken != null) {
-                return  ResponseEntity.ok(newAccessToken);
-            } else {
-                return ResponseEntity.badRequest().body("갱신 불필요");
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("토큰 만료");
+        if (newAccessToken != null) {
+            return  ResponseEntity.ok(newAccessToken);
+        } else {
+            return ResponseEntity.badRequest().body("갱신 불필요");
         }
     }
 

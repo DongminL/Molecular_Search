@@ -22,11 +22,6 @@ public class UsersApiController {
     public ResponseEntity<?> withdrawUser(@RequestHeader("Authorization") String token) {
         String accessToken = jwtService.getHeaderToken(token);
 
-        if (accessToken == null) {
-            return ResponseEntity.badRequest().body("Authorization의 값이 잘못됨");
-        }
-
-        Long id = Long.parseLong(jwtProvider.getUserPk(accessToken));   // 토큰에 있는 Users Table의 PK 값 가져오기
         usersService.deleteUser();    // PK로 유저 정보 삭제
         jwtService.deleteToken(accessToken);    // 해당 토큰 정보도 삭제
 
