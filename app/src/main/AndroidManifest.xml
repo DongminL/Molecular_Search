@@ -2,14 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.canchem">
-
-<!--    서버 통신을 위한 인터넷 권한 얻기-->
-    <uses-permission android:name="android.permission.INTERNET"/>
-
+    <!-- 서버 통신을 위한 인터넷 권한 얻기 -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
-        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -17,7 +14,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CanChem"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.test.YeonjeTestActivity"
+            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".ui.test.YeonjeTest"-->
+<!--            android:exported="false" /> &lt;!&ndash; <activity &ndash;&gt;-->
+        <!-- android:name=".ui.searchHistory.SearchHistoryActivity" -->
+        <!-- android:exported="false" /> -->
+        <!-- <activity -->
+        <!-- android:name=".ui.myFavorite.MyFavoriteActivity" -->
+        <!-- android:exported="false" /> exported가 뭔지 몰라서 일단 주석해놓음 -->
+        <activity android:name=".ui.searchHistory.SearchHistoryActivity" />
+        <activity android:name=".ui.myFavorite.MyFavoriteActivity" />
 
         <meta-data
             android:name="com.google.android.gms.auth.api.client.default_client_id"
@@ -32,9 +43,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.canchem.SearchActivity"/>
-        <activity android:name="com.example.canchem.ApiActivity"/>
-
+        <activity android:name=".SearchActivity" />
+        <activity android:name=".ApiActivity" />
     </application>
 
 </manifest>

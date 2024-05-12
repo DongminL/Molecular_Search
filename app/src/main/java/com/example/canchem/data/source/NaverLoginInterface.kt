@@ -7,7 +7,7 @@ import retrofit2.http.POST
 interface NaverLoginInterface{
     @POST("api/login/naver")
     fun getLoginToken(
-        //@Header("Authorization") accessToken: String?,  // Baerer AccessToken
+        //@Header("Authorization") accessToken: String?,  // Bearer AccessToken
         @Body naverToken: NaverToken
     ) : Call<Token>
 }

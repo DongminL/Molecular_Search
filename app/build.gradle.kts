@@ -50,15 +50,26 @@ android {
 }
 
 dependencies {
+    implementation("androidx.credentials:credentials:1.3.0-alpha03")
+//    implementation ("androidx.credentials:credentials:<latest version>")
+    implementation ("androidx.credentials:credentials-play-services-auth:20.7.0")
+//    implementation ("com.google.android.libraries.identity.googleid:googleid:<latest version>")
+    //firebase auth
+    implementation ("com.google.firebase:firebase-auth:21.0.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+
+    //recyclerview
+    implementation ("androidx.recyclerview:recyclerview:1.3.2")
 
     //Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
 
     //firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation ("com.google.firebase:firebase-database-ktx:20.0.0")
+    implementation ("com.google.firebase:firebase-database-ktx:21.0.0")
 
     //okhttps3
     implementation (platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
@@ -70,7 +81,8 @@ dependencies {
 
     /* Google OAuth2.0 API */
     implementation ("com.google.gms:google-services:4.3.15")
-    implementation ("com.google.android.gms:play-services-auth:20.4.1")
+    implementation ("com.google.android.gms:play-services-auth:20.5.0")
+    implementation ("com.google.android.gms:play-services-location:18.0.0")
 
     /* 네이버 아이디 로그인 API 서비스*/
     implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK
@@ -96,6 +108,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

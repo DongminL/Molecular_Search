@@ -4,9 +4,9 @@ import retrofit2.Call
 import retrofit2.http.Header
 import retrofit2.http.POST
 
-interface SignoutInterface {
+interface MyFavoriteInterface {
     @POST("api/login/naver") // 변경해야됨.
-    fun signout(
+    fun getFavoriteInfo(
         @Header("Authorization") accessToken: String?,  // Baerer AccessToken
-    ) : Call<Token>
+    ) : Call<ArrayList<FavoriteData>>
 }
