@@ -83,4 +83,10 @@ public class ChemInfoService {
     public ChemInfo findChemInfoBySmiles(String smiles) {
         return chemInfoRepository.findByIsomericSmiles(smiles).orElse(null);    // 없으면 null 반환
     }
+
+    /* _id로 분자 정보 가져오기 */
+    public ChemInfo findChemInfoById(String id) {
+        return chemInfoRepository.findById(id).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
+    }
 }

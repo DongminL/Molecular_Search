@@ -38,4 +38,10 @@ public class ChemInfoController {
     public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
         return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
     }
+
+    /* 즐겨찾기에서 chem_id를 통한 분자정보 가져오기 */
+    @GetMapping(value = "/api/search/{chemId}")
+    public ResponseEntity<?> idChem(@PathVariable String chemId) {
+        return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
+    }
 }
