@@ -31,9 +31,9 @@ public class WebClientConfig {
                     .evictInBackground(Duration.ofMillis(1000L)) // 1초마다 유휴 Connections 확인하고 제거
                     .build()
             )
-            .responseTimeout(Duration.ofSeconds(10));    // 응답 초과 시간 10초로 설정
+            .responseTimeout(Duration.ofSeconds(30));    // 응답 초과 시간 30초로 설정
 
-    /*  */
+    /* 응답값 크기 */
     ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024 * 5)) // 5MB로 제한
             .build();

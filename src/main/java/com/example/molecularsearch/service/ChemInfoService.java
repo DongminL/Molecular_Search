@@ -16,7 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChemInfoService {
 
-    private final ChemInfoWebClient chemInfoWebClient;
+    private final GenericWebclient<String> webclientBySmiles;
+    private final GenericWebclient<Long> webclientByCid;
     private final ChemInfoRepository chemInfoRepository;
     private final SynonymsService synonymsService;
 
@@ -32,7 +33,7 @@ public class ChemInfoService {
             return chemInfoDto;
         }
 
-        chemInfoDto = chemInfoWebClient.requestInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
+        chemInfoDto = webclientBySmiles.requestInfo(smiles);  // Fast API로 요청하여 가져옴
         log.info(chemInfoDto.toString());
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
@@ -43,7 +44,7 @@ public class ChemInfoService {
 
     /* CID 값으로 요청한 분자정보 저장*/
     public ChemInfo saveInfoByCid(Long cid) {
-        ChemInfoDto chemInfoDto = chemInfoWebClient.requestInfoByCid(cid);
+        ChemInfoDto chemInfoDto = webclientByCid.requestInfo(cid);
 
         return saveChemInfo(chemInfoDto);
     }

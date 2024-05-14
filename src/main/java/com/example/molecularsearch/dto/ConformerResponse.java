@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -13,6 +14,10 @@ public class ConformerResponse {
 
     @JsonProperty("PC_Compounds")
     private List<CompoundList> compounds;
+
+    public ConformerResponse() {
+        this.compounds = Collections.emptyList();
+    }
 
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)

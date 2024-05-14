@@ -86,6 +86,7 @@ public class ChemInfoDto {
                 .synonyms(synonyms)
                 .description(this.description)
                 .image2DUrl(this.getImage2DUrl())
+                .image3DConformer(this.image3DConformer)
                 .build();
     }
 
@@ -123,11 +124,18 @@ public class ChemInfoDto {
 
     /* 3D Images 정보 업데이트 */
     public void update3DImage(ConformerResponse conformer) {
-        ArrayList<Float> coords = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getX(), conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getY(), conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getZ(), conformer.getCompounds().get(0).getAtoms().getElement())
+        // 좌표에 대한 정보 (4개의 배열을 하나로 합치기)
+        ArrayList<Float> coords = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getX(),
+                        conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getY(),
+                        conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getZ(),
+                        conformer.getCompounds().get(0).getAtoms().getElement())
                 .flatMap(Collection::stream)
                 .toList());
 
-        ArrayList<Integer> bonds = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getBonds().getAid1(), conformer.getCompounds().get(0).getBonds().getAid2(), conformer.getCompounds().get(0).getBonds().getOrder())
+        // 결합에 대한 정보 (3개의 배열을 하나로 합치기)
+        ArrayList<Integer> bonds = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getBonds().getAid1(),
+                        conformer.getCompounds().get(0).getBonds().getAid2(),
+                        conformer.getCompounds().get(0).getBonds().getOrder())
                 .flatMap(Collection::stream)
                 .toList());
 

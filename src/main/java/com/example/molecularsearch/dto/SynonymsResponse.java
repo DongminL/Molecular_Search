@@ -3,19 +3,21 @@ package com.example.molecularsearch.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @Slf4j
 @Getter
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SynonymsResponse {
 
     @JsonProperty("InformationList")
     private Information informationList;
+
+    public SynonymsResponse() {
+        this.informationList = null;
+    }
 
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
