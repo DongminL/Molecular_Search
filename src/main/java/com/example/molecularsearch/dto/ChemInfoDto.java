@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Getter
 @Builder
@@ -51,8 +52,8 @@ public class ChemInfoDto {
     @JsonProperty("image_2D_url")
     private String image2DUrl;   // 2D 이미지 경로
 
-    @JsonProperty("image_3D_url")
-    private String image3DUrl;   // 3D 이미지 경로
+    @JsonProperty("image_3D_conformer")
+    private Map<String, ArrayList<?>> image3DConformer;   // 3D 이미지 정보
 
     /* Dto -> Entity로 변환 */
     public ChemInfo toEntity() {
@@ -67,6 +68,7 @@ public class ChemInfoDto {
                 .isomericSmiles(this.isomericSmiles)
                 .description(this.description)
                 .image2DUrl(this.getImage2DUrl())
+                .image3DConformer(this.image3DConformer)
                 .build();
     }
 
@@ -101,7 +103,7 @@ public class ChemInfoDto {
         this.synonyms = synonyms;
         this.description = chemInfo.getDescription();
         this.image2DUrl = chemInfo.getImage2DUrl();
-        this.image3DUrl = chemInfo.getImage3DUrl();
+        this.image3DConformer = chemInfo.getImage3DConformer();
     }
 
     /* Synonyms 정보 업데이트 */
@@ -117,5 +119,22 @@ public class ChemInfoDto {
     /* 2D Image URL 정보 업데이트 */
     public void update2DImage(String image2DUrl) {
         this.image2DUrl = image2DUrl;
+    }
+
+    /* 3D Images 정보 업데이트 */
+    public void update3DImage(ConformerResponse conformer) {
+        ArrayList<Float> coords = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getX(), conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getY(), conformer.getCompounds().get(0).getCoords().get(0).getConformers().get(0).getZ(), conformer.getCompounds().get(0).getAtoms().getElement())
+                .flatMap(Collection::stream)
+                .toList());
+
+        ArrayList<Integer> bonds = new ArrayList<>(Stream.of(conformer.getCompounds().get(0).getBonds().getAid1(), conformer.getCompounds().get(0).getBonds().getAid2(), conformer.getCompounds().get(0).getBonds().getOrder())
+                .flatMap(Collection::stream)
+                .toList());
+
+        Map<String, ArrayList<?>> image3DConformer = new HashMap<>();
+        image3DConformer.put("coords", coords);
+        image3DConformer.put("bonds", bonds);
+
+        this.image3DConformer = image3DConformer;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.molecularsearch.api;
 
+import com.example.molecularsearch.dto.ChemInfoDto;
 import com.example.molecularsearch.service.ChemInfoService;
 import com.example.molecularsearch.service.ChemInfoWebClient;
 import com.example.molecularsearch.service.SearchLogService;
@@ -43,5 +44,12 @@ public class ChemInfoController {
     @GetMapping(value = "/api/search/{chemId}")
     public ResponseEntity<?> idChem(@PathVariable String chemId) {
         return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
+    }
+
+    @GetMapping(value = "/api/test/{cid}")
+    public ResponseEntity<?> idChem(@PathVariable Long cid) {
+        ChemInfoDto dto = new ChemInfoDto();
+        dto.update3DImage(chemInfoWebClient.getConformersByCid(cid));
+        return ResponseEntity.ok(dto.getImage3DConformer());
     }
 }

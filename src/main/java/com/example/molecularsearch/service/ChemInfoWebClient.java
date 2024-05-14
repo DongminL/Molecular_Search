@@ -1,6 +1,7 @@
 package com.example.molecularsearch.service;
 
 import com.example.molecularsearch.dto.ChemInfoDto;
+import com.example.molecularsearch.dto.ConformerResponse;
 import com.example.molecularsearch.dto.DescriptionResponse;
 import com.example.molecularsearch.dto.SynonymsResponse;
 import com.example.molecularsearch.exception.CustomException;
@@ -234,6 +235,24 @@ public class ChemInfoWebClient {
                     .retrieve() // 응답값을 가져옴
                     .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
                     });   // Chunk 단위로 이미지를 읽어옮
+        } catch (WebClientRequestException e) {
+            log.error(e.toString());
+            return null;
+        }
+    }
+
+    /* PubChem에서 CID에 대한 3D Conformers 가져오기 */
+    public ConformerResponse getConformersByCid(Long cid) {
+        try {
+            return webClient.mutate()
+                    .baseUrl(PUBCHEM_CID_URL + cid + "/json").build()
+                    .get()    // GET 요청
+                    .uri(uriBuilder -> uriBuilder
+                            .queryParam("record_type", "3d")
+                            .build())
+                    .retrieve()
+                    .bodyToMono(ConformerResponse.class)
+                    .block();
         } catch (WebClientRequestException e) {
             log.error(e.toString());
             return null;
