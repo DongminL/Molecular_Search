@@ -1,9 +1,6 @@
 package com.example.molecularsearch.api;
 
-import com.example.molecularsearch.service.ChemInfoService;
-import com.example.molecularsearch.service.ChemInfoWebClient;
-import com.example.molecularsearch.service.SearchLogService;
-import com.example.molecularsearch.service.SynonymsService;
+import com.example.molecularsearch.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +14,7 @@ public class ChemInfoController {
     private final ChemInfoService chemInfoService;
     private final SearchLogService searchLogService;
     private final SynonymsService synonymsService;
-    private final ChemInfoWebClient chemInfoWebClient;
+    private final GenericWebclient<Long> webclientBycid;
 
     /* 분자 이름 또는 화학식으로 분자 정보 검색 */
     @GetMapping(value = "/api/search/chem", params = {"keyword", "page"})
@@ -37,5 +34,16 @@ public class ChemInfoController {
     @PostMapping(value = "/api/save/chem")
     public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
         return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
+    }
+
+    /* 즐겨찾기에서 클릭 시 chem_id를 통한 분자정보 가져오기 */
+    @GetMapping(value = "/api/search/{chemId}")
+    public ResponseEntity<?> idChem(@PathVariable String chemId) {
+        return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
+    }
+
+    @GetMapping(value = "/api/test/{keyword}")
+    public ResponseEntity<?> test(@PathVariable Long keyword) {
+        return ResponseEntity.ok(webclientBycid.requestInfo(keyword));
     }
 }

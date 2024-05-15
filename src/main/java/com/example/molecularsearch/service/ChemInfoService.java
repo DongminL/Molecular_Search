@@ -16,7 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChemInfoService {
 
-    private final ChemInfoWebClient chemInfoWebClient;
+    private final GenericWebclient<String> webclientBySmiles;
+    private final GenericWebclient<Long> webclientByCid;
     private final ChemInfoRepository chemInfoRepository;
     private final SynonymsService synonymsService;
 
@@ -32,7 +33,7 @@ public class ChemInfoService {
             return chemInfoDto;
         }
 
-        chemInfoDto = chemInfoWebClient.requestInfoBySmiles(smiles);  // Fast API로 요청하여 가져옴
+        chemInfoDto = webclientBySmiles.requestInfo(smiles);  // Fast API로 요청하여 가져옴
         log.info(chemInfoDto.toString());
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
@@ -43,7 +44,7 @@ public class ChemInfoService {
 
     /* CID 값으로 요청한 분자정보 저장*/
     public ChemInfo saveInfoByCid(Long cid) {
-        ChemInfoDto chemInfoDto = chemInfoWebClient.requestInfoByCid(cid);
+        ChemInfoDto chemInfoDto = webclientByCid.requestInfo(cid);
 
         return saveChemInfo(chemInfoDto);
     }
@@ -82,5 +83,11 @@ public class ChemInfoService {
     /* SMILES 식으로 분자 정보 가져오기 */
     public ChemInfo findChemInfoBySmiles(String smiles) {
         return chemInfoRepository.findByIsomericSmiles(smiles).orElse(null);    // 없으면 null 반환
+    }
+
+    /* _id로 분자 정보 가져오기 */
+    public ChemInfo findChemInfoById(String id) {
+        return chemInfoRepository.findById(id).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
     }
 }
