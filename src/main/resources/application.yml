@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: MolecularSearch
+
+# yml 파일들 불러오기
+  config:
+    import:
+      - classpath:/ymls/database/application-local.yml
+      - classpath:/ymls/database/application-server.yml
+      - classpath:/ymls/api/application-pubchem.yml
+      - classpath:/ymls/api/application-fastapi.yml
+      - classpath:/ymls/multimedia/application-multipart.yml
+      - classpath:/ymls/multimedia/application-s3.yml
+      - classpath:/ymls/application-log.yml
+      - classpath:/ymls/application-jwt.yml
+      - classpath:/ymls/application-tomcat.yml
+  
+  # 설정
+  profiles:
+    # 그룹화
+    group:
+      # 로컬 환경
+      local: local, log
+      # 배포 환경
+      server: server
+      # 공통 설정
+      commen: pubchem, fastapi, multipart, s3, jwt, tomcat
+    active: local, commen # 로컬에서 실행할 그룹
+    #active: server, commen # 배포 서버에서 실행할 그룹
