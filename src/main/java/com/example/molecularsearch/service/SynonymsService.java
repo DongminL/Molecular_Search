@@ -51,7 +51,9 @@ public class SynonymsService {
         // 검색된 분자정보 리스트를 Dto로 변환
         mongoTemplate.find(query.skip((long) pageable.getPageNumber() * pageable.getPageSize())
                 .limit(pageable.getPageSize()), Synonyms.class).forEach(e -> {
-            result.add(new ChemInfoDto(e.getChemInfo(), e.getChemInfo().getSynonyms()));
+                    if (e.getChemInfo() != null) {
+                        result.add(new ChemInfoDto(e.getChemInfo(), e.getChemInfo().getSynonyms()));
+                    }
         });
 
         // 불러온 페이지 정보

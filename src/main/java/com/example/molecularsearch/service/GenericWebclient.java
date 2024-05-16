@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -60,6 +61,7 @@ public class GenericWebclient<T> {
 
             chemInfoDto = tuple5.getT1();
 
+//            // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
 //            byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
 //            if (bytes.length > 0) {
 //                chemInfoDto.update2DImage(awsS3Service.saveImage(chemInfoDto.getCid(), bytes));
@@ -135,15 +137,24 @@ public class GenericWebclient<T> {
                 .baseUrl(baseUrl).build()
                 .get()    // GET 요청
                 .retrieve() // 응답값을 가져옴
+                // 400번대 에러 시
+                .onStatus(HttpStatusCode::is4xxClientError, e -> {
+                    throw new RuntimeException("Synonyms_Not_Found");
+                })
+                // 500번대 에러 시
+                .onStatus(HttpStatusCode::is5xxServerError, e -> {
+                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
+                })
                 .bodyToMono(SynonymsResponse.class)  // 응답값을 SynonymsResponse로 역직렬화
                 .onErrorResume(e -> {
-                    log.error("Synonyms 요청 에러 : ", e);
-
-                    if (e instanceof WebClientRequestException) {
-                        throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
+                    // 400번대 에러 처리
+                    if (e instanceof RuntimeException) {
+                        return Mono.just(new SynonymsResponse());
                     }
 
-                    return Mono.just(new SynonymsResponse());
+                    // 그 외 Exception 에러 처리
+                    log.error("Synonyms 요청 에러 : ", e);
+                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                 });
     }
 
