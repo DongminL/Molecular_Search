@@ -19,6 +19,7 @@ public class ChemInfoService {
     private final GenericWebclient<String> webclientBySmiles;
     private final GenericWebclient<Long> webclientByCid;
     private final ChemInfoRepository chemInfoRepository;
+    private final SearchLogService searchLogService;
     private final SynonymsService synonymsService;
 
     /* SMILES 식으로 분자정보 검색 */
@@ -28,8 +29,9 @@ public class ChemInfoService {
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
-            log.info(entity.toString());
             chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
+
+            searchLogService.saveSearchLog(chemInfoDto.getMolecularFormula());   // 검색기록을 분자식으로 기록
             return chemInfoDto;
         }
 
@@ -38,6 +40,8 @@ public class ChemInfoService {
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
         chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
+
+        searchLogService.saveSearchLog(chemInfoDto.getMolecularFormula());   // 검색기록을 분자식으로 기록
 
         return chemInfoDto;
     }

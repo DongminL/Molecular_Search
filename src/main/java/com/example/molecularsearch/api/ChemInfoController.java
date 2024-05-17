@@ -26,7 +26,6 @@ public class ChemInfoController {
     /* SMILES 식을 통한 분자정보 검색 */
     @GetMapping(value = "/api/search/chem", params = "smiles")
     public ResponseEntity<?> smilesChem(@RequestParam String smiles) {
-        searchLogService.saveSearchLog(smiles);
         return ResponseEntity.ok(chemInfoService.searchSmiles(smiles));
     }
 

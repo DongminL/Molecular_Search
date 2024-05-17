@@ -224,15 +224,17 @@ public class GenericWebclient<T> {
                         .queryParam("record_type", "3d")
                         .build())
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, e -> {
+                    throw new RuntimeException("404 에러");
+                })
                 .bodyToMono(ConformerResponse.class)
                 .onErrorResume(e -> {
-                    log.error("3D Conformer 에러 : ", e);
-
-                    if (e instanceof WebClientRequestException) {
-                        throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
+                    if (e instanceof RuntimeException) {
+                        return Mono.just(new ConformerResponse());
                     }
 
-                    return Mono.just(new ConformerResponse());
+                    log.error("3D Conformer 에러 : ", e);
+                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                 });
     }
 }
