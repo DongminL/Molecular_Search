@@ -99,6 +99,6 @@ public class JwtService {
             return bearerToken.substring(7);    // "Bearer " 부분을 자르고 JWT만 가져옴
         }
 
-        throw new CustomException(ErrorCode.BAD_REQUEST_HAEDER);
+        throw new CustomException(ErrorCode.BAD_REQUEST);
     }
 }
