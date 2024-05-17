@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class DescriptionResponse {
         try {
             return informationList.information.get(1).getDescription();
         } catch (IndexOutOfBoundsException e) {
-            log.error(e.toString());
+            log.debug("Description Null : timestemp: {}", LocalDateTime.now());
             return null;
         }
     }

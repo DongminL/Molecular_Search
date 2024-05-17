@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ public class InfoBookmarkService {
     private final ChemInfoRepository chemInfoRepository;
 
     /* 즐겨찾기 정보 저장 */
-    public void saveInfoFav(String chemId) {
+    public void saveInfoBookmark(String chemId) {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
 
         try {
@@ -48,6 +49,8 @@ public class InfoBookmarkService {
         } catch (NullPointerException e) {
             log.error(e.toString());
         }
+
+        log.info("즐겨찾기 추가, user_PK : {}, chem_id: {}, timestemp: {}", userPk, chemId, LocalDateTime.now());
     }
 
     /* 해당 유저의 즐겨찾기 리스트 가져오기 */
@@ -68,6 +71,8 @@ public class InfoBookmarkService {
         Map<String, List<InfoBookmarkDto>> result = new HashMap<>();
         result.put("bookmarkList", dtoList);
 
+        log.debug("즐겨찾기 가져오기, user_PK : {}, timestemp: {}", userPk, LocalDateTime.now());
+
         return result;
     }
 
@@ -75,6 +80,7 @@ public class InfoBookmarkService {
     @Transactional
     public void deleteInfoBookmark(Long id) {
         infoBookmarkRepository.deleteById(id); // 해당 검색어만 삭제
+        log.info("즐겨찾기 삭제, infoBookmark_PK : {}, timestemp: {}", id, LocalDateTime.now());
     }
 
     /* 여러 즐겨찾기 항목 삭제 */
@@ -93,6 +99,8 @@ public class InfoBookmarkService {
 
         Boolean exist = infoBookmarkRepository.existsByUser_IdAndChemInfoId(userPk, chemId);    // 즐겨찾기 유무
         state.put("state", exist);
+
+        log.debug("즐겨찾기 유무, user_PK : {}, isBookmark: {}, timestemp: {}", userPk, exist, LocalDateTime.now());
 
         return state;
     }

@@ -20,6 +20,8 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple5;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Component
 @NoArgsConstructor(force = true)
@@ -75,15 +77,15 @@ public class GenericWebclient<T> {
             }
             chemInfoDto.updateDescription(tuple5.getT3().getDescription());
 
-            log.info(chemInfoDto.getImage2DUrl() + " : 생성");
+            log.debug("Image URL: {}, timestemp: {}",chemInfoDto.getImage2DUrl(), LocalDateTime.now());
         } catch (WebClientRequestException e) {
-            log.error("WebClient 요청 에러", e);
+            log.error("WebClient 요청 에러 : {}, timestemp: {}", e, LocalDateTime.now());
             throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         } catch (CustomException e) {
-            log.error("이미지 저장 실패");
-            throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED, "저장 실패");
+            log.error("이미지 저장 실패, timestemp: {}", LocalDateTime.now());
+            throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         } catch (Exception e) {
-            log.error(e.toString());
+            log.error("API 요청 실패 : {}, timestemp: {}", e, LocalDateTime.now());
             throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         }
 
@@ -103,7 +105,7 @@ public class GenericWebclient<T> {
                     .retrieve() // 응답값을 가져옴
                     .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 역직렬화
                     .onErrorMap(e -> {
-                        log.error("Fast API 요청 실패 : ", e);
+                        log.error("Fast API 요청 실패 : {}, timestemp: {}", e, LocalDateTime.now());
                         throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                     });
         }
@@ -117,7 +119,7 @@ public class GenericWebclient<T> {
                 .retrieve() // 응답값을 가져옴
                 .bodyToMono(ChemInfoDto.class)  // 응답값을 ChemInfoDto로 역직렬화
                 .onErrorMap(e -> {
-                    log.error("Fast API 요청 실패 : ", e);
+                    log.error("Fast API 요청 실패 : {}, timestemp: {}", e, LocalDateTime.now());
                     throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                 });
     }
@@ -141,10 +143,6 @@ public class GenericWebclient<T> {
                 .onStatus(HttpStatusCode::is4xxClientError, e -> {
                     throw new RuntimeException("Synonyms_Not_Found");
                 })
-                // 500번대 에러 시
-                .onStatus(HttpStatusCode::is5xxServerError, e -> {
-                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
-                })
                 .bodyToMono(SynonymsResponse.class)  // 응답값을 SynonymsResponse로 역직렬화
                 .onErrorResume(e -> {
                     // 400번대 에러 처리
@@ -153,7 +151,7 @@ public class GenericWebclient<T> {
                     }
 
                     // 그 외 Exception 에러 처리
-                    log.error("Synonyms 요청 에러 : ", e);
+                    log.error("Synonyms 요청 에러 : {}, timestemp: {}", e, LocalDateTime.now());
                     throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                 });
     }
@@ -169,16 +167,15 @@ public class GenericWebclient<T> {
             baseUrl = PUBCHEM_SMILES_URL + keyword + REQUEST_DESCRIPTION;
         }
 
-        try {
-            return webClient.mutate()
-                    .baseUrl(baseUrl).build()
-                    .get()    // GET 요청
-                    .retrieve() // 응답값을 가져옴
-                    .bodyToMono(DescriptionResponse.class);  // 응답값을 DescriptionResponse로 역직렬화
-        } catch (WebClientRequestException e) {
-            log.error(e.toString());
-            return null;
-        }
+        return webClient.mutate()
+                .baseUrl(baseUrl).build()
+                .get()    // GET 요청
+                .retrieve() // 응답값을 가져옴
+                .bodyToMono(DescriptionResponse.class)  // 응답값을 DescriptionResponse로 역직렬화
+                .onErrorResume(e -> {
+                   log.error("Description 요청 에러: {}, timestemp: {}", e, LocalDateTime.now());
+                   throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
+                });
     }
 
     /* PubChem에서 png 파일 가져오기 */
@@ -192,18 +189,16 @@ public class GenericWebclient<T> {
             baseUrl = PUBCHEM_SMILES_URL + keyword + "/png";
         }
 
-        try {
-            return webClient.mutate()
-                    .baseUrl(baseUrl).build()
-                    .get()    // GET 요청
-                    .accept(MediaType.IMAGE_PNG)    // 가져오려는 Content Type 명시
-                    .retrieve() // 응답값을 가져옴
-                    .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
-                    });   // Chunk 단위로 이미지를 읽어옮
-        } catch (WebClientRequestException e) {
-            log.error(e.toString());
-            return null;
-        }
+        return webClient.mutate()
+                .baseUrl(baseUrl).build()
+                .get()    // GET 요청
+                .accept(MediaType.IMAGE_PNG)    // 가져오려는 Content Type 명시
+                .retrieve() // 응답값을 가져옴
+                .onStatus(HttpStatusCode::is4xxClientError, e -> {
+                    throw new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO);
+                })
+                .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
+                });   // Chunk 단위로 이미지를 읽어옮
     }
 
     /* PubChem에서 3D Conformer 가져오기 */
@@ -233,7 +228,7 @@ public class GenericWebclient<T> {
                         return Mono.just(new ConformerResponse());
                     }
 
-                    log.error("3D Conformer 에러 : ", e);
+                    log.error("3D Conformer 에러: {}, timestemp: {}", e, LocalDateTime.now());
                     throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
                 });
     }

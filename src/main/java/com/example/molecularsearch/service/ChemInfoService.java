@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -36,7 +37,6 @@ public class ChemInfoService {
         }
 
         chemInfoDto = webclientBySmiles.requestInfo(smiles);  // Fast API로 요청하여 가져옴
-        log.info(chemInfoDto.toString());
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
         chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
@@ -80,6 +80,8 @@ public class ChemInfoService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
+
+        log.debug("분자정보 저장, CID: {}, timestemp: {}", chemInfo.getCid(), LocalDateTime.now());
 
         return chemInfo;
     }

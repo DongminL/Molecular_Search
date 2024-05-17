@@ -31,13 +31,13 @@ public class OAuthLoginService {
             users = usersService.searchByUserId(naverUserDto.getUserId());    // 로그인 요청한 계정 정보 가져오기
         } catch (CustomException e) {
             users = usersService.signUp(naverUserDto);    // 회원가입 계정 DB에 저장
-            log.info("네이버 회원가입, user_id : {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
+            log.info("네이버 회원가입, user_id: {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
         }
 
         JwtDto jwtDto = jwtProvider.generate(users.getId(), users.getRoleType());   // 토큰 생성
         jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
 
-        log.info("네이버 로그인, user_id : {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
+        log.info("네이버 로그인, user_id: {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
 
         return jwtDto;
     }
@@ -56,7 +56,7 @@ public class OAuthLoginService {
         JwtDto jwtDto = jwtProvider.generate(users.getId(), users.getRoleType());   // 토큰 생성
         jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
 
-        log.info("구글 로그인, user_id : {}, timestemp: {}", googleUserDto.getUserId(), LocalDateTime.now());
+        log.info("구글 로그인, user_id: {}, timestemp: {}", googleUserDto.getUserId(), LocalDateTime.now());
 
         return jwtDto;
     }

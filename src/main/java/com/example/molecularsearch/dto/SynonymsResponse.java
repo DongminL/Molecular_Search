@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -37,7 +38,7 @@ public class SynonymsResponse {
         try {
             return informationList.information.get(0).synonyms;
         } catch (Exception e) {
-            log.error(e.toString());
+            log.debug("Synonyms Null : timestemp: {}", LocalDateTime.now());
             return null;
         }
     }
