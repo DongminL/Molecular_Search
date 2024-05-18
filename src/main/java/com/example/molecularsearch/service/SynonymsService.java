@@ -39,7 +39,7 @@ public class SynonymsService {
 
         synonymsRepository.save(synonyms);  // Synonyms 값 저장
 
-        log.debug("Synonyms 저장, chem_id: {}, timestemp: {}", chemInfo.getId(), LocalDateTime.now());
+        log.info("Synonyms 저장, chem_id: {}, timestemp: {}", chemInfo.getId(), LocalDateTime.now());
     }
 
     /* keyword로 검색한 결과 리스트 가져오기 */

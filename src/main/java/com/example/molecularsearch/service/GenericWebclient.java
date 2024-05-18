@@ -63,14 +63,14 @@ public class GenericWebclient<T> {
 
             chemInfoDto = tuple5.getT1();
 
-//            // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
-//            byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
-//            if (bytes.length > 0) {
-//                chemInfoDto.update2DImage(awsS3Service.saveImage(chemInfoDto.getCid(), bytes));
-//            }
+            // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
+            byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
+            if (bytes.length > 0) {
+                chemInfoDto.update2DImage(awsS3Service.saveImage(chemInfoDto.getCid(), bytes));
+            }
             if (!(tuple5.getT5().getCompounds().isEmpty())) {
                 chemInfoDto.update3DImage(tuple5.getT5());
-                log.info("3D Conformer : " + chemInfoDto.getImage3DConformer().toString());
+                log.debug("3D Conformer : " + chemInfoDto.getImage3DConformer().toString());
             }
             if (tuple5.getT2().getInformationList() != null) {
                 chemInfoDto.updateSynonyms(tuple5.getT2().getSynonyms());

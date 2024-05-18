@@ -81,7 +81,7 @@ public class ChemInfoService {
             throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
 
-        log.debug("분자정보 저장, CID: {}, timestemp: {}", chemInfo.getCid(), LocalDateTime.now());
+        log.info("분자정보 저장, CID: {}, timestemp: {}", chemInfo.getCid(), LocalDateTime.now());
 
         return chemInfo;
     }
