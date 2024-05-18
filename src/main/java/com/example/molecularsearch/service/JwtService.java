@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -32,7 +34,7 @@ public class JwtService {
     }
 
     /* Token 값들 저장 */
-    public void saveToken(JwtDto jwtDto) {
+    public Map<String, String> saveToken(JwtDto jwtDto) {
         // Dto -> Dao
         Tokens tokens = Tokens.builder()
                 .accessToken(jwtDto.getAccessToken())
@@ -47,7 +49,15 @@ public class JwtService {
 
         tokensRepository.save(tokens);   // 토큰 값들 저장
 
+        // Client에게 전달할 값
+        Map<String, String> tokenInfo = new HashMap<>();
+        tokenInfo.put("accessToken", tokens.getAccessToken());
+        tokenInfo.put("grantType", jwtDto.getGrantType());
+        tokenInfo.put("expiredAt", jwtDto.getExpiredAt().toString());
+
         log.debug("Token 저장, timestemp: {}", LocalDateTime.now());
+
+        return tokenInfo;
     }
 
     /* Access Token 값으로 Tokens 삭제 */
