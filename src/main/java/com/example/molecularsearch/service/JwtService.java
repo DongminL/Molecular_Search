@@ -11,6 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,7 @@ public class JwtService {
     }
 
     /* Token 값들 저장 */
-    public void saveToken(JwtDto jwtDto) {
+    public Map<String, String> saveToken(JwtDto jwtDto) {
         // Dto -> Dao
         Tokens tokens = Tokens.builder()
                 .accessToken(jwtDto.getAccessToken())
@@ -44,6 +48,16 @@ public class JwtService {
         }
 
         tokensRepository.save(tokens);   // 토큰 값들 저장
+
+        // Client에게 전달할 값
+        Map<String, String> tokenInfo = new HashMap<>();
+        tokenInfo.put("accessToken", tokens.getAccessToken());
+        tokenInfo.put("grantType", jwtDto.getGrantType());
+        tokenInfo.put("expiredAt", jwtDto.getExpiredAt().toString());
+
+        log.debug("Token 저장, timestemp: {}", LocalDateTime.now());
+
+        return tokenInfo;
     }
 
     /* Access Token 값으로 Tokens 삭제 */
@@ -55,6 +69,8 @@ public class JwtService {
         }
 
         tokensRepository.deleteById(tokens.getId());    // Tokens Key로 제거
+
+        log.debug("Token 삭제, timestemp: {}", LocalDateTime.now());
 
         return tokens;
     }
@@ -70,7 +86,6 @@ public class JwtService {
             }
 
             String newAccessToken = jwtProvider.checkRefreshToken(tokens);  // Access Token 갱신
-            log.info("new Access Token : {}", newAccessToken);
             // Redis 값도 갱신
             tokens.updateAccessToken(newAccessToken);
             tokensRepository.save(tokens);
@@ -78,6 +93,8 @@ public class JwtService {
             if (newAccessToken == null) {
                 throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
             }
+
+            log.debug("Access Token 갱신, timestemp: {}", LocalDateTime.now());
 
             return newAccessToken;
         } else {    // 유효하면 null 반환
@@ -92,6 +109,6 @@ public class JwtService {
             return bearerToken.substring(7);    // "Bearer " 부분을 자르고 JWT만 가져옴
         }
 
-        throw new CustomException(ErrorCode.BAD_REQUEST_HAEDER);
+        throw new CustomException(ErrorCode.BAD_REQUEST);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -30,7 +31,7 @@ public class UsersService {
     @Transactional
     public Users signUp(NaverUserDto info) {
         if (usersRepository.existsByUserId(info.getUserId())) {
-            log.error("이미 가입된 유저입니다!");
+            log.error("이미 가입된 유저, user_id: {}, timestemp: {}", info.getUserId(), LocalDateTime.now());
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
         // Dto -> Entity
@@ -45,6 +46,8 @@ public class UsersService {
                 .signUpType("NAVER")
                 .roleType("RULE_USER")
                 .build();
+        
+        log.info("네이버 회원가입, user_id: {}, timestemp: {}", info.getUserId(), LocalDateTime.now());
 
         return usersRepository.save(users); // 유저 정보 저장
     }
@@ -53,7 +56,7 @@ public class UsersService {
     @Transactional
     public Users signUp(GoogleUserDto info) {
         if(usersRepository.existsByUserId(info.getUserId())) {
-            log.error("이미 가입된 유저입니다!");
+            log.error("이미 가입된 유저, user_id: {}, timestemp: {}", info.getUserId(), LocalDateTime.now());
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER);
         }
         // Dto -> Entity
@@ -65,6 +68,8 @@ public class UsersService {
                 .signUpType("GOOGLE")
                 .roleType("RULE_USER")
                 .build();
+
+        log.info("구글 회원가입, user_id: {}, timestemp: {}", info.getUserId(), LocalDateTime.now());
 
         return usersRepository.save(users); // 유저 정보 저장
     }
@@ -95,6 +100,8 @@ public class UsersService {
             searchLogRepository.deleteAllByUser(user);    // 해당 유저의 모든 검색 기록 삭제
             infoBookmarkRepository.deleteAllByUser(user);  // 해당 유저의 모든 즐겨찾기 기록 삭제
             usersRepository.deleteById(user.getId());   // 해당 유저 정보 삭제
+
+            log.info("회원탈퇴, user_PK: {}, timestemp: {}", user.getId(), LocalDateTime.now());
         });
     }
 }

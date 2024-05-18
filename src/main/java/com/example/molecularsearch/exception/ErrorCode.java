@@ -11,7 +11,6 @@ public enum ErrorCode {
     /* Token Error */
     TOKEN_EXPIRATION(HttpStatus.UNAUTHORIZED.value(), "TOKEN_EXPIRATION", "토큰이 만료 되었습니다."),
     TOKEN_INVALIDITY(HttpStatus.UNAUTHORIZED.value(), "TOKEN_INVALIDITY", "유효하지 않은 토큰입니다."),
-    BAD_REQUEST_HAEDER(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST_HAEDER",  "잘못된 요청입니다."),
     REQUIRE_RELOGIN(HttpStatus.UNAUTHORIZED.value(), "REQUIRE_RELOGIN", "재로그인이 필요합니다."),
 
     /* Users Error */
@@ -30,7 +29,10 @@ public enum ErrorCode {
     NOT_FOUND_CHEM_INFO(HttpStatus.NOT_FOUND.value(), "NOT_FOUND_CHEM_INFO", "해당 분자 정보를 찾을 수 없습니다."),
 
     /* WebClint Error */
-    EXTERNAL_API_REQUEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "EXTERNAL_API_REQUEST_FAILED", "알 수 없는 이유로 외부 API 요청이 실패하였습니다.");
+    EXTERNAL_API_REQUEST_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "EXTERNAL_API_REQUEST_FAILED", "알 수 없는 이유로 외부 API 요청이 실패하였습니다."),
+
+    /* Common Error */
+    BAD_REQUEST(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", "잘못된 요청입니다.");
 
     private final int status;    // HttpStatus 코드
     private final String error; // 에러 이름

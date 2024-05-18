@@ -1,6 +1,8 @@
 package com.example.molecularsearch.api;
 
 import com.example.molecularsearch.dto.SearchLogDto;
+import com.example.molecularsearch.exception.CustomException;
+import com.example.molecularsearch.exception.ErrorCode;
 import com.example.molecularsearch.service.SearchLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,12 @@ public class SearchLogController {
     /* 검색 기록 편집을 통해 삭제 */
     @DeleteMapping("/api/edit/log/search")
     public ResponseEntity<String> editSearchLog(@RequestBody Map<String, List<SearchLogDto>> mapSearchLogDtos) {
+        try {
+            mapSearchLogDtos.get("searchLogList");
+        } catch (NullPointerException e) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
         searchLogService.editSearchLog(mapSearchLogDtos.get("searchLogList"));
 
         return ResponseEntity.ok("검색기록 삭제 완료");

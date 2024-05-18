@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.TextQuery;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +38,8 @@ public class SynonymsService {
                 .build();
 
         synonymsRepository.save(synonyms);  // Synonyms 값 저장
+
+        log.info("Synonyms 저장, chem_id: {}, timestemp: {}", chemInfo.getId(), LocalDateTime.now());
     }
 
     /* keyword로 검색한 결과 리스트 가져오기 */

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -19,6 +20,7 @@ public class ChemInfoService {
     private final GenericWebclient<String> webclientBySmiles;
     private final GenericWebclient<Long> webclientByCid;
     private final ChemInfoRepository chemInfoRepository;
+    private final SearchLogService searchLogService;
     private final SynonymsService synonymsService;
 
     /* SMILES 식으로 분자정보 검색 */
@@ -28,16 +30,18 @@ public class ChemInfoService {
 
         // DB에 해당 정보가 있으면
         if (entity != null) {
-            log.info(entity.toString());
             chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
+
+            searchLogService.saveSearchLog(chemInfoDto.getMolecularFormula());   // 검색기록을 분자식으로 기록
             return chemInfoDto;
         }
 
         chemInfoDto = webclientBySmiles.requestInfo(smiles);  // Fast API로 요청하여 가져옴
-        log.info(chemInfoDto.toString());
 
         entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
         chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
+
+        searchLogService.saveSearchLog(chemInfoDto.getMolecularFormula());   // 검색기록을 분자식으로 기록
 
         return chemInfoDto;
     }
@@ -76,6 +80,8 @@ public class ChemInfoService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
+
+        log.info("분자정보 저장, CID: {}, timestemp: {}", chemInfo.getCid(), LocalDateTime.now());
 
         return chemInfo;
     }

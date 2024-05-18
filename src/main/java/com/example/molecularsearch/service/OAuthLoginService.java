@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -24,26 +25,26 @@ public class OAuthLoginService {
     private final UsersService usersService;
 
     /* 네이버 로그인 요청 */
-    public JwtDto login(NaverUserDto naverUserDto) {
+    public Map<String, String> login(NaverUserDto naverUserDto) {
         Users users;
 
         try {
             users = usersService.searchByUserId(naverUserDto.getUserId());    // 로그인 요청한 계정 정보 가져오기
         } catch (CustomException e) {
             users = usersService.signUp(naverUserDto);    // 회원가입 계정 DB에 저장
-            log.info("네이버 회원가입, user_id : {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
+            log.info("네이버 회원가입, user_id: {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
         }
 
         JwtDto jwtDto = jwtProvider.generate(users.getId(), users.getRoleType());   // 토큰 생성
-        jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
+        Map<String, String> token = jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
 
-        log.info("네이버 로그인, user_id : {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
+        log.info("네이버 로그인, user_id: {}, timestemp: {}", naverUserDto.getUserId(), LocalDateTime.now());
 
-        return jwtDto;
+        return token;
     }
 
     /* 구글 로그인 요청 */
-    public JwtDto login(GoogleUserDto googleUserDto) {
+    public Map<String, String> login(GoogleUserDto googleUserDto) {
         Users users;
 
         try {
@@ -54,11 +55,11 @@ public class OAuthLoginService {
         }
 
         JwtDto jwtDto = jwtProvider.generate(users.getId(), users.getRoleType());   // 토큰 생성
-        jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
+        Map<String, String> token = jwtService.saveToken(jwtDto);   // Redis에 생성한 토큰들 저장
 
-        log.info("구글 로그인, user_id : {}, timestemp: {}", googleUserDto.getUserId(), LocalDateTime.now());
+        log.info("구글 로그인, user_id: {}, timestemp: {}", googleUserDto.getUserId(), LocalDateTime.now());
 
-        return jwtDto;
+        return token;
     }
 
     /* 로그아웃 시 토큰 제거 */

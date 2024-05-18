@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -129,16 +130,16 @@ public class JwtProvider {
 
             return true;    // true : 유효
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.error("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_EXPIRATION);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         } catch (IllegalArgumentException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못됨, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
     }
@@ -147,7 +148,6 @@ public class JwtProvider {
     public String checkRefreshToken(Tokens tokensObj){
         
         String refreshToken = tokensObj.getRefreshToken();    // refreshToken 값 가져오기
-        log.info("Refresh Token : {}", refreshToken);
 
         try {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(refreshToken);  // Refresh Token 유효성 검증 및 토큰에서 claims 가져오기
@@ -159,7 +159,7 @@ public class JwtProvider {
                 throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
             }
         } catch (Exception e) {
-            log.info("잘못된 Refresh Token");
+            log.info("잘못된 Refresh Token, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
     }
@@ -175,7 +175,7 @@ public class JwtProvider {
             // token의 현재 남은시간 반환
             return (expiration.getTime() - now);
         } catch (SignatureException e) {
-            log.error("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못됨, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
     }

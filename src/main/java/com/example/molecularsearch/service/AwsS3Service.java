@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -46,9 +47,11 @@ public class AwsS3Service {
             amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, metadata)    // S3에 업로드
                     .withCannedAcl(CannedAccessControlList.PublicRead));    // 외부에 공개할 이미지임을 명시
         } catch (Exception e) {
-            log.error("Image를 S3에 저장 실패", e);
+            log.error("Image를 S3에 저장 실패 : {}, timestemp: {}", e, LocalDateTime.now());
             throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
         }
+
+        log.debug("S3 업로드, image_name: {}, timestemp: {}", fileName, LocalDateTime.now());
 
         return amazonS3.getUrl(bucket, fileName).toString();
     }

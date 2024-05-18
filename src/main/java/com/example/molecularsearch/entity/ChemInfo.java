@@ -4,7 +4,6 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +20,10 @@ public class ChemInfo {
     @Id
     private String id;    // ChemInfo PK
 
-    @Field
     private Long cid;   // 분자 고유 ID
 
     private String inpacName;   // 유기 화합물 이름
 
-    @Indexed(name = "index_formula",unique = false) // Index 생성
     private String molecularFormula; // 화학식
 
     private Double molecularWeight; // 분자량 (g/mol)
