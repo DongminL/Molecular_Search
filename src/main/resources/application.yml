@@ -24,6 +24,6 @@ spring:
       # 배포 환경
       server: server
       # 공통 설정
-      commen: pubchem, fastapi, multipart, s3, jwt, tomcat
-    #active: local, commen # 로컬에서 실행할 그룹
-    active: server, commen # 배포 서버에서 실행할 그룹
+      common: pubchem, fastapi, multipart, s3, jwt, tomcat
+    #active: local, common # 로컬에서 실행할 그룹
+    active: server, common # 배포 서버에서 실행할 그룹

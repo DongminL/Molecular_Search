@@ -6,8 +6,6 @@ import com.example.molecularsearch.dto.DescriptionResponse;
 import com.example.molecularsearch.dto.SynonymsResponse;
 import com.example.molecularsearch.exception.CustomException;
 import com.example.molecularsearch.exception.ErrorCode;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -24,8 +22,6 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-@NoArgsConstructor(force = true)
-@RequiredArgsConstructor
 public class GenericWebclient<T> {
 
     @Value("${fastapi.search.smiles.info}")
@@ -49,6 +45,10 @@ public class GenericWebclient<T> {
     private final WebClient webClient = WebClient.create();
     private final AwsS3Service awsS3Service;
 
+    public GenericWebclient(AwsS3Service awsS3Service) {
+        this.awsS3Service = awsS3Service;
+    }
+
     /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
     public ChemInfoDto requestInfo(T keyword) {
         Mono<ChemInfoDto> chemInfoMono = getChemInfo(keyword); // 분자 정보
@@ -65,9 +65,15 @@ public class GenericWebclient<T> {
 
             // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
             byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
-            if (bytes.length > 0) {
-                chemInfoDto.update2DImage(awsS3Service.saveImage(chemInfoDto.getCid(), bytes));
+            log.info(bytes.toString());
+            try {
+                String imageUrl = awsS3Service.saveImage(chemInfoDto.getCid(), bytes);  // image URL 가져오기
+
+                chemInfoDto.update2DImage(imageUrl);
+            } catch (NullPointerException e) {
+                log.error("AWS S3 Error", e);
             }
+
             if (!(tuple5.getT5().getCompounds().isEmpty())) {
                 chemInfoDto.update3DImage(tuple5.getT5());
                 log.debug("3D Conformer : " + chemInfoDto.getImage3DConformer().toString());
