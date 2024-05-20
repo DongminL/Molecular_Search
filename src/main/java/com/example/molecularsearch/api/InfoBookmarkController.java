@@ -32,10 +32,10 @@ public class InfoBookmarkController {
 
     /* 즐겨찾기 단일 삭제 */
     @DeleteMapping("/api/delete/bookmark/{infoBookmarkId}")
-    public ResponseEntity<String> editInfoBookmark(@PathVariable Long infoBookmarkId) {
+    public ResponseEntity<String> deleteInfoBookmark(@PathVariable Long infoBookmarkId) {
         infoBookmarkService.deleteInfoBookmark(infoBookmarkId);
 
-        return ResponseEntity.ok("검색기록 삭제 완료");
+        return ResponseEntity.ok("즐겨찾기 삭제 완료");
     }
 
     /* 즐겨찾기 편집을 통해 삭제 */
@@ -49,7 +49,15 @@ public class InfoBookmarkController {
 
         infoBookmarkService.editInfoBookmark(mapInfoBookmarkDtos.get("infoBookmarkList"));
 
-        return ResponseEntity.ok("검색기록 삭제 완료");
+        return ResponseEntity.ok("즐겨찾기 삭제 완료");
+    }
+
+    /* 즐겨찾기 전체 삭제 */
+    @DeleteMapping("/api/delete/all/bookmark")
+    public ResponseEntity<String> deleteAllInfoBookmark() {
+        infoBookmarkService.deleteAllInfoBookmark();
+
+        return ResponseEntity.ok("즐겨찾기 삭제 완료");
     }
 
     /* 즐겨찾기 유무 */

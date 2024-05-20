@@ -91,6 +91,15 @@ public class InfoBookmarkService {
         });
     }
 
+    /* 전체 즐겨찾기 삭제 */
+    @Transactional
+    public void deleteAllInfoBookmark() {
+        Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
+
+        infoBookmarkRepository.deleteAllByUser_Id(userPk); // 전체 즐겨찾기 삭제
+        log.info("전체 즐겨찾기 삭제, user_PK : {}, timestemp: {}", userPk, LocalDateTime.now());
+    }
+
     /* 즐겨찾기 유무 확인 */
     @Transactional(readOnly = true)
     public Map<String, Boolean> checkInfoBookmark(String chemId) {
