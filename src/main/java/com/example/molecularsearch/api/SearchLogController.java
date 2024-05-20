@@ -44,4 +44,12 @@ public class SearchLogController {
 
         return ResponseEntity.ok("검색기록 삭제 완료");
     }
+
+    /* 검색 기록 전체 삭제 */
+    @DeleteMapping("/api/delete/all/log/search")
+    public ResponseEntity<String> deleteAllSearchLog() {
+        searchLogService.deleteAllSearchLog();
+
+        return ResponseEntity.ok("검색기록 삭제 완료");
+    }
 }

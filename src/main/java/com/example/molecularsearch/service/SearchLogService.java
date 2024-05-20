@@ -56,6 +56,17 @@ public class SearchLogService {
         });
     }
 
+    /* 전체 검색 기록 삭제 */
+    @Transactional
+    public void deleteAllSearchLog() {
+        Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
+
+        searchLogRepository.deleteAllByUser_Id(userPk); // 전체 검색 기록 삭제
+
+        log.info("전체 검색기록 삭제, user_PK: {}, timestemp: {}", userPk, LocalDateTime.now());
+    }
+
+
     /* 유저에 대한 모든 검색 기록 가져오기 */
     @Transactional(readOnly = true)
     public Map<String, List<SearchLogDto>> findSearchLog() {
@@ -78,6 +89,4 @@ public class SearchLogService {
 
         return result;
     }
-
-
 }
