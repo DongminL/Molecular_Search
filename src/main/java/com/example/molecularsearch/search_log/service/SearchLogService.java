@@ -52,9 +52,13 @@ public class SearchLogService {
     /* 여러 검색 기록 삭제 */
     @Transactional
     public void editSearchLog(List<SearchLogDto> searchLogDtos) {
+        List<Long> idList = new ArrayList<>();
+
         searchLogDtos.forEach(e -> {
-            deleteSearchLog(e.getId());
+            idList.add(e.getId());
         });
+
+        searchLogRepository.deleteAllByList(idList);    // 선택된 검색 기록 목록 삭제
     }
 
     /* 전체 검색 기록 삭제 */
