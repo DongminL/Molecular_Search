@@ -77,8 +77,8 @@ public class JwtService {
 
     /* Access Token만 갱신 */
     public String reissueAccessToken(String accessToken) {
-        // Access Token이 유효하지 않을 때
-        if (!jwtProvider.checkToken(accessToken)) {
+        // Access Token이 유효할 때
+        if (jwtProvider.checkToken(accessToken)) {
             Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
 
             if (tokens == null) {
@@ -97,8 +97,8 @@ public class JwtService {
             log.debug("Access Token 갱신, timestemp: {}", LocalDateTime.now());
 
             return newAccessToken;
-        } else {    // 유효하면 null 반환
-            return null;
+        } else {    // 유효하지 않으면
+            throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
         }
     }
 
