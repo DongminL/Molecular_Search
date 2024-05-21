@@ -87,9 +87,13 @@ public class InfoBookmarkService {
     /* 여러 즐겨찾기 항목 삭제 */
     @Transactional
     public void editInfoBookmark(List<InfoBookmarkDto> infoBookmarkDtos) {
+        List<Long> idList = new ArrayList<>();  // 삭제하려는 즐겨찾기 id 리스트
+
         infoBookmarkDtos.forEach(e -> {
-            deleteInfoBookmark(e.getId());
+            idList.add(e.getId());
         });
+
+        infoBookmarkRepository.deleteAllByList(idList); // 선택된 즐겨찾기 목록 삭제
     }
 
     /* 전체 즐겨찾기 삭제 */
