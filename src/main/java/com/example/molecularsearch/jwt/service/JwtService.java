@@ -61,22 +61,16 @@ public class JwtService {
     }
 
     /* Access Token 값으로 Tokens 삭제 */
-    public Tokens deleteToken(String accessToken) {
+    public void deleteToken(String accessToken) {
         Tokens tokens = getToken(accessToken);  // Tokens 객체 가져오기
-
-        if (tokens == null) {
-            return null;
-        }
 
         tokensRepository.deleteById(tokens.getId());    // Tokens Key로 제거
 
         log.debug("Token 삭제, timestemp: {}", LocalDateTime.now());
-
-        return tokens;
     }
 
     /* Access Token만 갱신 */
-    public String reissueAccessToken(String accessToken) {
+    public Map<String, String> reissueAccessToken(String accessToken) {
         // Access Token이 유효할 때
         if (jwtProvider.checkToken(accessToken)) {
             Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
@@ -94,9 +88,15 @@ public class JwtService {
                 throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
             }
 
+            // Client에게 전달할 값
+            Map<String, String> tokenInfo = new HashMap<>();
+            tokenInfo.put("accessToken", newAccessToken);
+            tokenInfo.put("grantType", "Bearer");
+            tokenInfo.put("expiredAt", jwtProvider.getExpiration(newAccessToken).toString());
+
             log.debug("Access Token 갱신, timestemp: {}", LocalDateTime.now());
 
-            return newAccessToken;
+            return tokenInfo;
         } else {    // 유효하지 않으면
             throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
         }

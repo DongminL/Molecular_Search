@@ -1,13 +1,12 @@
 package com.example.molecularsearch.oauth.service;
 
-import com.example.molecularsearch.oauth.web.dto.GoogleUserDto;
+import com.example.molecularsearch.exception.error.CustomException;
+import com.example.molecularsearch.jwt.service.JwtService;
+import com.example.molecularsearch.jwt.web.JwtProvider;
 import com.example.molecularsearch.jwt.web.dto.JwtDto;
+import com.example.molecularsearch.oauth.web.dto.GoogleUserDto;
 import com.example.molecularsearch.oauth.web.dto.NaverUserDto;
 import com.example.molecularsearch.users.entity.Users;
-import com.example.molecularsearch.exception.error.CustomException;
-import com.example.molecularsearch.jwt.web.JwtProvider;
-import com.example.molecularsearch.jwt.domain.Tokens;
-import com.example.molecularsearch.jwt.service.JwtService;
 import com.example.molecularsearch.users.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,12 +64,10 @@ public class OAuthLoginService {
     }
 
     /* 로그아웃 시 토큰 제거 */
-    public Tokens logout(String accessToken) {
+    public void logout(String accessToken) {
         String token = jwtService.getHeaderToken(accessToken);  // Access Token 값만 가져오기
-        Tokens tokens = jwtService.deleteToken(token);  // 해당 토큰 정보 제거
+        jwtService.deleteToken(token);  // 해당 토큰 정보 제거
 
         log.info("로그아웃, access_token: {}, timestemp: {}", token, LocalDateTime.now());
-
-        return tokens;
     }
 }
