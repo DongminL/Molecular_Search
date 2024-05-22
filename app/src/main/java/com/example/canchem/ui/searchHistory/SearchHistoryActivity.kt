@@ -2,28 +2,28 @@ package com.example.canchem.ui.searchHistory
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.View
+import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.canchem.R
-import com.example.canchem.data.source.NaverLoginInterface
-import com.example.canchem.data.source.SearchData
-import com.example.canchem.data.source.SearchHistoryInterface
-import com.example.canchem.data.source.SearchRecyclerViewAdapter
-import com.example.canchem.data.source.Token
-import com.example.canchem.databinding.ActivityMainBinding
+import com.example.canchem.SearchActivity
+import com.example.canchem.data.source.myinterface.DeleteAllSearchHistoryInterface
+import com.example.canchem.data.source.dataclass.SearchDataList
+import com.example.canchem.data.source.myinterface.SearchHistoryInterface
+import com.example.canchem.data.source.adapter.SearchRecyclerViewAdapter
 import com.example.canchem.databinding.ActivitySearchHistoryBinding
 import com.example.canchem.ui.main.MainActivity
-import com.example.canchem.ui.myPage.SideMenu
+import com.example.canchem.ui.myFavorite.MyFavoriteActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -34,43 +34,46 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
-class SearchHistoryActivity : AppCompatActivity() {
-    private val ip : String = "192.168.45.233"
+class SearchHistoryActivity : AppCompatActivity(){
+    private val ip : String = "13.124.223.31"
     //recyclerViewAdapter
     private lateinit var adapter: SearchRecyclerViewAdapter
     private lateinit var binding:ActivitySearchHistoryBinding
-    var mDatas = mutableListOf<SearchData>() // 검색기록 데이터 리스트 변수
+//    private var instance: SearchHistoryActivity? = null
+    lateinit var mDatas : SearchDataList // 검색기록 데이터 리스트 변수
 
     companion object {
+        var isChecked = 1
         private var instance: SearchHistoryActivity? = null
-
         fun getInstance(): SearchHistoryActivity? {
-            return instance
+            if (instance == null) {
+                instance = SearchHistoryActivity()
+            }
+            return instance!!
         }
 
-        fun deleteData(searchData: SearchData){
-            val activity = instance ?: return
-            activity.mDatas.remove(searchData)
-            activity.adapter?.notifyDataSetChanged()
-            Toast.makeText(activity, "Adapter: ${activity.adapter}", Toast.LENGTH_SHORT).show()
+        // 선택삭제시 삭제할 id값 받아오기
+        private val idList = ArrayList<String>()
+
+        fun setIsChecked(isStar : Boolean, id : String){
+            if(isStar){
+                idList.add(id)
+            }else{
+                idList.remove(id)
+            }
         }
+
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        adapter = SearchRecyclerViewAdapter() //어댑터 객체 만듦
         val drawer = binding.searchHistory
-
-
-        val extra = intent.extras
-        if(extra?.getString("key") == "btnXClicked"){
-            drawer.closeDrawer(Gravity.RIGHT)
-        }
-
 
         //firebase에 저장된 토큰 가져오기
         val database = Firebase.database
@@ -94,12 +97,11 @@ class SearchHistoryActivity : AppCompatActivity() {
                 val call = searchService.getSearchInfo(accessToken)
 
 
-                call.enqueue(object : Callback<ArrayList<SearchData>> {
-                    override fun onResponse(call: Call<ArrayList<SearchData>>, response: Response<ArrayList<SearchData>>) { //요청성공시
+                call.enqueue(object : Callback<SearchDataList> {
+                    override fun onResponse(call: Call<SearchDataList>, response: Response<SearchDataList>) { //요청성공시
                         if (response.isSuccessful) {
 //                            Toast.makeText(this@SearchHistoryActivity,"retrofit도 성공!", Toast.LENGTH_SHORT).show()
-                            mDatas = response.body()?.toMutableList() ?: mutableListOf() //여기에 retrofit으로 springboot에서 받은 검색기록 추가.
-                            initializelist()
+                            mDatas = response.body()!!//여기에 retrofit으로 springboot에서 받은 검색기록 추가.
                             recyclerView(mDatas)
                             Toast.makeText(this@SearchHistoryActivity, mDatas.toString(), Toast.LENGTH_SHORT).show()
                         } else {
@@ -107,7 +109,7 @@ class SearchHistoryActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun onFailure(call: Call<ArrayList<SearchData>>, t: Throwable) { //요청실패시
+                    override fun onFailure(call: Call<SearchDataList>, t: Throwable) { //요청실패시
                         Toast.makeText(this@SearchHistoryActivity, "SearchHistoryActivity Server cannot 통신", Toast.LENGTH_SHORT).show()
                         Log.e("call error", t.toString())
                     }
@@ -119,69 +121,199 @@ class SearchHistoryActivity : AppCompatActivity() {
             }
         })
 
+        // 검색기록 전체 삭제. 서버로 전송하는 코드 작성해야 함.
+        binding.btnDeleteAll.setOnClickListener{
+            AlertDialog.Builder(this)
+                .setTitle("전체 삭제하시겠습니까?")
+                .setPositiveButton("확인", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        val database = Firebase.database
+                        val tokenInFirebase = database.getReference("Token")
+                        var accessToken : String? = null
+                        tokenInFirebase.addValueEventListener(object: ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                // This method is called once with the initial value and again
+                                // whenever data at this location is updated.
+                                accessToken = snapshot.getValue().toString()
+//                Toast.makeText(this@SearchHistoryActivity,"파이어베이스 성공!", Toast.LENGTH_SHORT).show()
 
-        //여기에 데이터 받아와서 넣기
-//        mDatas = mutableListOf(SearchData("a"),SearchData("b"))
+                                // retrofit 변수 생성
+                                val retrofit = Retrofit.Builder()
+                                    .baseUrl("http://$ip:8080/")
+                                    .addConverterFactory(ScalarsConverterFactory.create()) //kotlin to json(역 일수도)
+                                    .build()
+
+                                // retrofit객체 생성
+                                val deleteAllService = retrofit.create(
+                                    DeleteAllSearchHistoryInterface::class.java)
+                                val call = deleteAllService.deleteAll(accessToken)
 
 
+                                call.enqueue(object : Callback<String> {
+                                    override fun onResponse(call: Call<String>, response: Response<String>) { //요청성공시
+                                        if (response.isSuccessful) {
+                                            mDatas.searchList.clear()
+                                            recyclerView(mDatas)
+                                            Toast.makeText(this@SearchHistoryActivity, "전체 삭제 완료", Toast.LENGTH_SHORT).show()
+                                        } else {
+//                    Toast.makeText(this@SearchHistoryActivity, "SearchHistoryActivity Error", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
 
-        //이게 회원탈퇴.
-        //사이드메뉴 회원탈퇴 누르면 이거 작동시키면 됨.
-        binding.btnSignout.setOnClickListener{
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("function", "signout")
-            startActivity(intent)
+                                    override fun onFailure(call: Call<String>, t: Throwable) { //요청실패시
+                                        Toast.makeText(this@SearchHistoryActivity, "SearchHistoryActivity Server cannot 통신", Toast.LENGTH_SHORT).show()
+                                        Log.e("call error", t.toString())
+                                    }
+                                })
+                            }
+                            override fun onCancelled(error: DatabaseError) {
+                                Log.w(ContentValues.TAG, "Failed to read value.", error.toException())
+                            }
+                        })
+                    }
+                })
+                .setNegativeButton("취소", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        Log.d("MyTag", "negative")
+                    }
+                })
+                .create()
+                .show()
         }
 
-        //recyclerView 함수 호출. 아래에 있음
-
-
-        //side menu
-        Log.i("btnHamburger", binding.btnHamburgerSearchHistoiry.toString())
-        binding.btnHamburgerSearchHistoiry.setOnClickListener {
-            drawer.openDrawer(Gravity.RIGHT)
-//                Toast.makeText(this, "햄버거클릭딸깍", Toast.LENGTH_SHORT)
-            val intent = Intent(this@SearchHistoryActivity, SideMenu::class.java)
-            intent.putExtra("Activity", "SearchHistoryActivity")
-            startActivity(intent)
+        // 검색기록 선택삭제 클릭시
+        binding.btnDeleteSome.setOnClickListener{
+            findViewById<CheckBox>(R.id.btnChecked).visibility = View.VISIBLE
+            binding.btnDeleteAll.visibility = View.GONE
+            binding.btnDeleteSome.visibility = View.GONE
+            binding.btnDeleteSomeYes.visibility = View.VISIBLE
+            binding.btnDeleteSomeNo.visibility = View.VISIBLE
 
         }
 
-//        binding.btnSignout.setOnClickListener{
-//            Toast.makeText(this, "회원탈퇴클릭딸깍", Toast.LENGTH_SHORT)
-//            MainActivity.naverDeleteToken()
+        // 검색기록 선택삭제 중 삭제 클릭시
+        binding.btnDeleteSomeYes.setOnClickListener{
+            for(i in idList){
+                idList.forEach { id ->
+                    mDatas.searchList.removeAll { it.id == id }
+                }
+            }
+            recyclerView(mDatas)
+            findViewById<CheckBox>(R.id.btnChecked).visibility = View.GONE
+            binding.btnDeleteAll.visibility = View.VISIBLE
+            binding.btnDeleteSome.visibility = View.VISIBLE
+            binding.btnDeleteSomeYes.visibility = View.GONE
+            binding.btnDeleteSomeNo.visibility = View.GONE
+        }
+
+        // 검색기록 선택삭제 중 취소 클릭시
+        binding.btnDeleteSomeYes.setOnClickListener{
+            findViewById<CheckBox>(R.id.btnChecked).visibility = View.GONE
+            binding.btnDeleteAll.visibility = View.VISIBLE
+            binding.btnDeleteSome.visibility = View.VISIBLE
+            binding.btnDeleteSomeYes.visibility = View.GONE
+            binding.btnDeleteSomeNo.visibility = View.GONE
+        }
+
+        // 실험코드
+//        for(i in idList){
+//            idList.forEach { id ->
+//                mDatas.searchList.removeAll { it.id == id }
+//            }
 //        }
+//        recyclerView(mDatas)
+        // side menu. 여기부터 아래 코드는 모든 액티비티에 포함됨.
+        // 메뉴 클릭시
+        binding.btnMenu.setOnClickListener {
+            drawer.openDrawer(Gravity.RIGHT)
+        }
+        // x버튼 클릭시
+        findViewById<ImageView>(R.id.btnX).setOnClickListener{
+            drawer.closeDrawer(Gravity.RIGHT)
+        }
+        // My Page 열기 버튼 클릭시
+        findViewById<ImageView>(R.id.btnOpenDown).setOnClickListener{
+            findViewById<ImageView>(R.id.btnOpenDown).visibility = View.GONE
+            findViewById<ImageView>(R.id.btnCloseUp).visibility = View.VISIBLE
+            findViewById<TextView>(R.id.btnMyFavorite).visibility = View.VISIBLE
+            findViewById<TextView>(R.id.btnSearchHistory).visibility = View.VISIBLE
+        }
+        // My Page 닫기 버튼 클릭시
+        findViewById<ImageView>(R.id.btnCloseUp).setOnClickListener{
+            findViewById<ImageView>(R.id.btnOpenDown).visibility = View.VISIBLE
+            findViewById<ImageView>(R.id.btnCloseUp).visibility = View.GONE
+            findViewById<TextView>(R.id.btnMyFavorite).visibility = View.GONE
+            findViewById<TextView>(R.id.btnSearchHistory).visibility = View.GONE
+        }
+        // 회원탈퇴 클릭시
+        findViewById<TextView>(R.id.btnSignout).setOnClickListener{
+            AlertDialog.Builder(this)
+                .setTitle("정말 탈퇴하시겠습니까?")
+                .setMessage("탈퇴하실 경우, 모든 정보가 삭제됩니다.")
+                .setPositiveButton("확인", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        val intent = Intent(this@SearchHistoryActivity, MainActivity::class.java)
+                        intent.putExtra("function", "signout")
+                        startActivity(intent)
+                    }
+                })
+                .setNegativeButton("취소", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        Log.d("MyTag", "negative")
+                    }
+                })
+                .create()
+                .show()
+        }
+        // 로그아웃 클릭시
+        findViewById<TextView>(R.id.btnLogout).setOnClickListener{
+            AlertDialog.Builder(this)
+                .setTitle("정말 로그아웃 하시겠습니까?")
+                .setPositiveButton("확인", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        val intent = Intent(this@SearchHistoryActivity, MainActivity::class.java)
+                        intent.putExtra("function", "logout")
+                        startActivity(intent)
+                    }
+                })
+                .setNegativeButton("취소", object : DialogInterface.OnClickListener {
+                    override fun onClick(dialog: DialogInterface, which: Int) {
+                        Log.d("MyTag", "negative")
+                    }
+                })
+                .create()
+                .show()
+
+        }
+        // 즐겨찾기 클릭시
+        findViewById<TextView>(R.id.btnMyFavorite).setOnClickListener{
+            val intent = Intent(this, MyFavoriteActivity::class.java)
+            startActivity(intent)
+        }
+        // 검색기록 클릭시
+        findViewById<TextView>(R.id.btnSearchHistory).setOnClickListener{
+            drawer.closeDrawer(Gravity.RIGHT)
+        }
+        // 홈버튼 클릭시
+        findViewById<ImageView>(R.id.btnHome).setOnClickListener{
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
-        finish()
+        val drawer = binding.searchHistory
+        if(drawer.isDrawerOpen(Gravity.RIGHT)){
+            drawer.closeDrawer(Gravity.RIGHT)
+        }else{
+            finish()
+        }
     }
 
-    fun recyclerView(mData: MutableList<SearchData>){
-        val adapter = SearchRecyclerViewAdapter() //어댑터 객체 만듦
+    fun recyclerView(mData: SearchDataList){
         adapter.datalist = mData //데이터 넣어줌
         binding.recyclerView.adapter = adapter //리사이클러뷰에 어댑터 연결
         binding.recyclerView.layoutManager = LinearLayoutManager(this) //레이아웃 매니저 연결
-    }
-
-    fun initializelist(){ //임의로 데이터 넣어서 만들어봄
-//        adapter.datalist = mutableListOf(SearchData("aa"),SearchData("bb"))
-//        with(mDatas){
-//            add(SearchData("H2O"))
-//            add(SearchData("H2O"))
-//            add(SearchData("H2O"))
-//            add(SearchData("H2O"))
-//        }
-    }
-
-//    fun deleteData(searchData: SearchData){
-//        mDatas.remove(searchData)
-//        Toast.makeText(this, "$adapter", Toast.LENGTH_SHORT).show()
-//        adapter?.notifyDataSetChanged()
-//    }
-
-    fun sayHello(){
-        Toast.makeText(this, "hellooooo", Toast.LENGTH_SHORT).show()
     }
 }

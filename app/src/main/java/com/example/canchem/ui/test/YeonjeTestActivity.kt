@@ -20,10 +20,22 @@ class YeonjeTestActivity : AppCompatActivity() {
 
         binding = ActivityYeonjeTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val intent = intent.extras
-        if(intent?.getString("key") == "yes"){
-            sayHello()
+        var mToast : Toast ?= null
+//        val intent = intent.extras
+//        if(intent?.getString("key") == "yes"){
+//            sayHello()
+//        }
+
+        // 토스트 메시지 띄우기
+        binding.testText1.setOnClickListener{
+            mToast = Toast.makeText(this, "ddddddddddddd", Toast.LENGTH_SHORT)
+            mToast?.show()
         }
+        // 토스트 메시지 삭제
+        binding.testText2.setOnClickListener{
+            mToast?.cancel()
+        }
+
 
         binding.btnGo.setOnClickListener{
             val intent = Intent(this@YeonjeTestActivity, MyFavoriteActivity::class.java)
@@ -37,7 +49,7 @@ class YeonjeTestActivity : AppCompatActivity() {
             insets
         }
     }
-    fun sayHello(){
-        binding.testText.text = "jkjkjkjkjk"
-    }
+//    fun sayHello(){
+//        binding.testText.text = "jkjkjkjkjk"
+//    }
 }

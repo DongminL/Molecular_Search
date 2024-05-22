@@ -1,39 +1,30 @@
 package com.example.canchem.ui.main
 
-import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.canchem.R
-import com.example.canchem.data.source.GoogleLoginInterface
-import com.example.canchem.data.source.GoogleSignoutInterface
-import com.example.canchem.data.source.GoogleToken
-import com.example.canchem.data.source.NaverLoginInterface
-import com.example.canchem.data.source.NaverSignoutInterface
-import com.example.canchem.data.source.NaverToken
-import com.example.canchem.data.source.Token
+import com.example.canchem.data.source.dataclass.DeleteToken
+import com.example.canchem.data.source.myinterface.NaverLoginInterface
+import com.example.canchem.data.source.myinterface.NaverLogoutInterface
+import com.example.canchem.data.source.myinterface.NaverSignoutInterface
+import com.example.canchem.data.source.dataclass.NaverToken
+import com.example.canchem.data.source.dataclass.Token
 import com.example.canchem.databinding.ActivityMainBinding
-import com.example.canchem.ui.searchHistory.SearchHistoryActivity
 import com.example.canchem.ui.test.YeonjeTestActivity
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -47,9 +38,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class MainActivity : AppCompatActivity() {
-    private val ip : String = "192.168.45.233"
+    private val ip : String = "13.124.223.31"
     private val RC_SIGN_IN = 9001
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -68,6 +60,10 @@ class MainActivity : AppCompatActivity() {
         if (extras?.getString("function") == "signout") {
             naverDeleteToken()
         }
+        if (extras?.getString("function") == "logout") {
+            naverLogout()
+        }
+
 
         mAuth = FirebaseAuth.getInstance()
 
@@ -100,10 +96,10 @@ class MainActivity : AppCompatActivity() {
 
 
         /* Google 로그인 버튼 클릭*/
-        binding.btnGoogleLogin.setOnClickListener {
-//            resultLauncher.launch(googleSignInClient.getSignInIntent())  // 구글 로그인 창으로 넘어감
-            googleSignIn()
-        }
+//        binding.btnGoogleLogin.setOnClickListener {
+////            resultLauncher.launch(googleSignInClient.getSignInIntent())  // 구글 로그인 창으로 넘어감
+//            googleSignIn()
+//        }
 
         /* 네이버 로그인 버튼 클릭 */
         binding.btnNaverLogin.setOnClickListener {
@@ -136,11 +132,11 @@ class MainActivity : AppCompatActivity() {
             NaverIdLoginSDK.authenticate(this, oauthLoginCallback)  // 토큰 가져오기
         }
 
-        /* 로그아웃 버튼 클릭 */
-        binding.btnNaverLogout.setOnClickListener {
-            naverLogout()   // 네이버 로그아웃
-//            googleLogout()  // 구글 로그아웃
-        }
+//        /* 로그아웃 버튼 클릭 */
+//        binding.btnNaverLogout.setOnClickListener {
+//            naverLogout()   // 네이버 로그아웃
+////            googleLogout()  // 구글 로그아웃
+//        }
 
     }
 
@@ -205,6 +201,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+
     /* 네이버 사용자 정보 가져오기*/
     val nidProfileCallback = object : NidProfileCallback<NidProfileResponse> {
         override fun onSuccess(response: NidProfileResponse) {
@@ -224,13 +221,6 @@ class MainActivity : AppCompatActivity() {
                 .baseUrl("http://$ip:8080/")
                 .addConverterFactory(GsonConverterFactory.create()) //kotlin to json(역 일수도)
                 .build()
-
-
-//            val autInfo = FirebaseDatabase.getInstance().reference
-//            val aut : String = autInfo.child("User").child("Token").toString() //맞는지 모름 일단 임시
-//
-//            val firebase = FirebaseDatabase.getInstance().reference
-
 
             // retrofit객체 생성
             val naverLoginService = retrofit.create(NaverLoginInterface::class.java)
@@ -300,7 +290,7 @@ class MainActivity : AppCompatActivity() {
 
                 val retrofit = Retrofit.Builder()
                     .baseUrl("http://$ip:8080/")
-                    .addConverterFactory(GsonConverterFactory.create()) //kotlin to json(역 일수도)
+                    .addConverterFactory(ScalarsConverterFactory.create()) //kotlin to json(역 일수도)
                     .build()
 
                 val signoutService = retrofit.create(NaverSignoutInterface::class.java)
@@ -317,17 +307,14 @@ class MainActivity : AppCompatActivity() {
                         call.enqueue(object : Callback<String> {
                             override fun onResponse(call: Call<String>, response: Response<String>) { // spring boot에 데이터 전송 성공시
                                 if (response.isSuccessful) {
-//                            googleSignInClient.revokeAccess() //이거 네이버임 수정해야 함.
-                                    naverLogout()
-
-                                    Toast.makeText(this@MainActivity, response.body(), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@MainActivity, "회원탈퇴 성공", Toast.LENGTH_SHORT).show()
                                 } else {
                                     Log.e(TAG, "Response unsuccessful: ${response.code()}")
                                     Toast.makeText(this@MainActivity, "실패", Toast.LENGTH_SHORT).show()
                                 }
                             }
                             override fun onFailure(call: Call<String>, t: Throwable) { //spring boot에 데이터 전송 실패시
-                                Toast.makeText(this@MainActivity, "네이버 데이터 전송 실패", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@MainActivity, "네이버 연동 해제 데이터 전송 실패", Toast.LENGTH_SHORT).show()
                                 Log.e("call error", t.toString())
                             }
                         })
@@ -355,8 +342,43 @@ class MainActivity : AppCompatActivity() {
     /* 네이버 로그아웃 */
     private fun naverLogout() {
         NaverIdLoginSDK.logout()
-        tokenInFirebase.setValue("logout") //firebase DB의 accessToken에 null값 저장
-        Toast.makeText(this@MainActivity, "네이버 로그아웃 성공", Toast.LENGTH_SHORT).show()
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://$ip:8080/")
+            .addConverterFactory(ScalarsConverterFactory.create()) //kotlin to json(역 일수도)
+            .build()
+
+        val logoutService = retrofit.create(NaverLogoutInterface::class.java)
+
+        tokenInFirebase.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                val value = snapshot.getValue().toString()
+                Toast.makeText(this@MainActivity, value, Toast.LENGTH_LONG).show()
+                Log.d(TAG, "Value is: " + value)
+                val call = logoutService.logout(value)
+                Log.i("call", call.toString())
+                call.enqueue(object : Callback<DeleteToken> {
+                    override fun onResponse(call: Call<DeleteToken>, response: Response<DeleteToken>) { // spring boot에 데이터 전송 성공시
+                        if (response.isSuccessful) {
+                            tokenInFirebase.setValue("logout") //firebase DB의 accessToken에 null값 저장
+                            Toast.makeText(this@MainActivity, "로그아웃 성공", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Log.e(TAG, "Response unsuccessful: ${response.code()}")
+                            Toast.makeText(this@MainActivity, "실패", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    override fun onFailure(call: Call<DeleteToken>, t: Throwable) { //spring boot에 데이터 전송 실패시
+                        Toast.makeText(this@MainActivity, "네이버 로그아웃 데이터 전송 실패", Toast.LENGTH_SHORT).show()
+                        Log.e("call error", t.toString())
+                    }
+                })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w(TAG, "Failed to read value.", error.toException())
+            }
+        })
     }
 
 

@@ -52,7 +52,7 @@ android {
 dependencies {
     implementation("androidx.credentials:credentials:1.3.0-alpha03")
 //    implementation ("androidx.credentials:credentials:<latest version>")
-    implementation ("androidx.credentials:credentials-play-services-auth:20.7.0")
+//    implementation ("androidx.credentials:credentials-play-services-auth:21.0.0")
 //    implementation ("com.google.android.libraries.identity.googleid:googleid:<latest version>")
     //firebase auth
     implementation ("com.google.firebase:firebase-auth:21.0.0")
@@ -65,9 +65,11 @@ dependencies {
     //Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation ("com.squareup.retrofit2:converter-scalars:2.9.0") // 문자열 응답을 처리하기 위한 의존성
+
 
     //firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation(platform("com.google.firebase:firebase-bom:31.5.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.google.firebase:firebase-database-ktx:21.0.0")
 
@@ -82,7 +84,7 @@ dependencies {
     /* Google OAuth2.0 API */
     implementation ("com.google.gms:google-services:4.3.15")
     implementation ("com.google.android.gms:play-services-auth:20.5.0")
-    implementation ("com.google.android.gms:play-services-location:18.0.0")
+    implementation ("com.google.android.gms:play-services-location:21.2.0")
 
     /* 네이버 아이디 로그인 API 서비스*/
     implementation(files("libs/oauth-5.9.0.aar"))  // 네아로 SDK
