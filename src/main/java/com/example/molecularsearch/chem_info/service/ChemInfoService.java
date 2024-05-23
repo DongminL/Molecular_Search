@@ -98,4 +98,19 @@ public class ChemInfoService {
         return chemInfoRepository.findById(id).orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
     }
+
+    /* CID로 분자 정보 가져오기 */
+    public ChemInfo findChemInfoByCid(Long cid) {
+        return chemInfoRepository.findByCid(cid).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
+    }
+
+    /* CID 값으로 3D Image 정보 변경 */
+    public String update3DImage(Long cid) {
+        ChemInfo chemInfo = findChemInfoByCid(cid);
+
+        String sdf = webclientByCid.getSdf(cid).block();
+
+        return sdf;
+    }
 }

@@ -66,7 +66,6 @@ public class GenericWebclient<T> {
 
             // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
             byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
-            log.info(bytes.toString());
             try {
                 String imageUrl = awsS3Service.saveImage(chemInfoDto.getCid(), bytes);  // image URL 가져오기
 
@@ -233,6 +232,38 @@ public class GenericWebclient<T> {
                 .onErrorResume(e -> {
                     if (e instanceof RuntimeException) {
                         return Mono.just(new ConformerResponse());
+                    }
+
+                    log.error("3D Conformer 에러: {}, timestemp: {}", e, LocalDateTime.now());
+                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
+                });
+    }
+
+    /* PubChem에서 SDF형식 내용 가져오기 */
+    public Mono<String> getSdf(T keyword) {
+        String baseUrl;
+
+        // 타입에 따라 URL 변경
+        if (keyword instanceof Long) {
+            baseUrl = PUBCHEM_CID_URL + keyword + "/sdf";
+        } else {
+            baseUrl = PUBCHEM_SMILES_URL + keyword + "/sdf";
+        }
+
+        return webClient.mutate()
+                .baseUrl(baseUrl).build()
+                .get()    // GET 요청
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("record_type", "3d")
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, e -> {
+                    throw new RuntimeException("404 에러");
+                })
+                .bodyToMono(String.class)
+                .onErrorResume(e -> {
+                    if (e instanceof RuntimeException) {
+                        return Mono.just("");
                     }
 
                     log.error("3D Conformer 에러: {}, timestemp: {}", e, LocalDateTime.now());
