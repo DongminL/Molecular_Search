@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface ChemInfoRepository extends MongoRepository<ChemInfo, String> {
 
     Optional<ChemInfo> findByIsomericSmiles(String isomericSmiles); // 이성질체 SMILES로 분자 정보 조회
+    
+    Optional<ChemInfo> findByCid(Long cid); // CID 값으로 분자 정보 조회
 }

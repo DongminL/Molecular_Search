@@ -33,14 +33,19 @@ public class ChemInfoController {
     }
 
     /* cid 값으로 분자 정보를 가져와 저장 */
-    @PostMapping(value = "/api/save/chem")
+    @PostMapping("/api/save/chem")
     public ResponseEntity<?> saveInfo(@RequestBody Map<String, Long> cidMap) {
         return ResponseEntity.ok(chemInfoService.saveInfoByCid(cidMap.get("cid")));
     }
 
     /* 즐겨찾기에서 클릭 시 chem_id를 통한 분자정보 가져오기 */
-    @GetMapping(value = "/api/search/{chemId}")
+    @GetMapping("/api/search/{chemId}")
     public ResponseEntity<?> idChem(@PathVariable String chemId) {
         return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
+    }
+
+    @GetMapping("/test/{cid}")
+    public ResponseEntity<?> test(@PathVariable Long cid) {
+        return ResponseEntity.ok(chemInfoService.update3DImage(cid));
     }
 }
