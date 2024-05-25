@@ -80,6 +80,7 @@ public class ChemInfoService {
                 synonymsService.saveSynonyms(entity, response.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
             }
         } catch (Exception e) {
+            log.error("분자정보 저장 시 에러", e);
             throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
 

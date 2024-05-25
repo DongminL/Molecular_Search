@@ -2,7 +2,7 @@ version: "3.9"  # docker-compose file version
 
 services:
   canchem-api:
-    image: ghcr.io/dongminl/canchem-api:1.1 # 불러올 Spring Boot 서버 이미지
+    image: ghcr.io/dongminl/canchem-api:1.2 # 불러올 Spring Boot 서버 이미지
     container_name: canchem-api # 컨테이너 이름
     depends_on:
       - canchem-redis # redis 먼저 생성
