@@ -77,7 +77,7 @@ public class SearchLogService {
     public Map<String, List<SearchLogDto>> findSearchLog() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
 
-        List<SearchLog> searchLogs = searchLogRepository.findAllByUser_IdOrderByCreatedDate(userPk);    // 해당 유저에 대한 전체 검색 기록
+        List<SearchLog> searchLogs = searchLogRepository.findAllByUser_IdOrderByCreatedDateDesc(userPk);    // 해당 유저에 대한 전체 검색 기록
 
         // Entity List -> Dto List
         List<SearchLogDto> searchLogDtos = new ArrayList<>();

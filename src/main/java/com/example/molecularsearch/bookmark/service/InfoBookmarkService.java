@@ -59,7 +59,7 @@ public class InfoBookmarkService {
     public Map<String, List<InfoBookmarkDto>> getBookmarkList() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
 
-        List<InfoBookmark> entityList = infoBookmarkRepository.findAllByUser_IdOrderByModifiedDate(userPk);   // 해당 유저의 즐겨찾기 리스트 가져오기
+        List<InfoBookmark> entityList = infoBookmarkRepository.findAllByUser_IdOrderByModifiedDateDesc(userPk);   // 해당 유저의 즐겨찾기 리스트 가져오기
 
         // Entity List -> DTO List
         List<InfoBookmarkDto> dtoList = new ArrayList<>();
