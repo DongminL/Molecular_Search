@@ -30,7 +30,7 @@ public class AwsS3Service {
     /* AWS S3에 이미지 저장 후 해당 이미지를 볼 수 있는 URL 받아오기 */
     public String saveImage(Long cid, byte[] byteImage) {
         String uuid = UUID.randomUUID().toString().replace("-", "");    // UUID 생성 후 "-"값 제거
-        String fileName = uuid.concat("-" + cid);   // 파일 이름
+        String fileName = cid.toString().concat("-" + uuid);   // 파일 이름
 
         // InputStreamResource -> MultipartFile로 변환
         MultipartFile image = new ByteMultpartFile(fileName, byteImage);
