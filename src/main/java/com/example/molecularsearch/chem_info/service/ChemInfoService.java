@@ -9,6 +9,7 @@ import com.example.molecularsearch.chem_info.web.api.GenericWebclient;
 import com.example.molecularsearch.search_log.service.SearchLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class ChemInfoService {
 
         chemInfoDto = webclientBySmiles.requestInfo(smiles);  // Fast API로 요청하여 가져옴
 
-        entity = saveChemInfo(chemInfoDto);  // 가져옴 값 저장
+        entity = saveChemInfo(chemInfoDto);  // 가져온 값 저장
         chemInfoDto = new ChemInfoDto(entity, entity.getSynonyms());
 
         searchLogService.saveSearchLog(chemInfoDto.getMolecularFormula());   // 검색기록을 분자식으로 기록
@@ -61,6 +62,10 @@ public class ChemInfoService {
         List<String> synonyms = response.getSynonyms();
 
         try {
+            if (response.getId() != null) {
+                throw new DuplicateKeyException("이미 저장된 데이터");
+            }
+
             // Synonyms 값 처리
             if (synonyms == null) {
                 chemInfo = response.toEntity();
@@ -79,7 +84,13 @@ public class ChemInfoService {
                 ChemInfo entity = chemInfoRepository.save(chemInfo);  // 분자 정보 저장
                 synonymsService.saveSynonyms(entity, response.getSynonyms());  // 해당 분자 정보에 대한 Synonyms 저장
             }
+        } catch (DuplicateKeyException e) {
+            log.debug("PubChem에서 SMILES 보정하여 검색한 것");
+            ChemInfo originInfo = response.toEntity();
+
+            return originInfo;
         } catch (Exception e) {
+            log.error("분자정보 저장 시 에러, CID: {}, timestemp: {}", e, LocalDateTime.now());
             throw new CustomException(ErrorCode.ALREADY_EXIST_CHEM_INFO);
         }
 

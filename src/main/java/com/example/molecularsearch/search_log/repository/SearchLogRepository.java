@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface SearchLogRepository extends JpaRepository<SearchLog, Long> {
 
-    List<SearchLog> findAllByUser_IdOrderByCreatedDate(Long users_id);  // 해당 유저 대한 검색 기록 가져오기 (생성일로 정렬)
+    List<SearchLog> findAllByUser_IdOrderByCreatedDateDesc(Long users_id);  // 해당 유저 대한 검색 기록 가져오기 (생성일로 내림차순 정렬)
 
     void deleteById(Long id);   // SearchLog PK로 검색 기록 삭제
 

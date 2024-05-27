@@ -7,6 +7,7 @@ import com.example.molecularsearch.jwt.domain.Tokens;
 import com.example.molecularsearch.jwt.service.CustomUserDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
@@ -139,7 +140,7 @@ public class JwtProvider {
         } catch (UnsupportedJwtException e) {
             log.error("지원되지 않는 JWT 토큰, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DecodingException e) {
             log.error("JWT 토큰이 잘못됨, timestemp: {}", LocalDateTime.now());
             throw new CustomException(ErrorCode.TOKEN_INVALIDITY);
         }
