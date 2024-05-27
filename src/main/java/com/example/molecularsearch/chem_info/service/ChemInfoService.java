@@ -1,11 +1,11 @@
 package com.example.molecularsearch.chem_info.service;
 
-import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
 import com.example.molecularsearch.chem_info.domain.ChemInfo;
-import com.example.molecularsearch.exception.error.CustomException;
-import com.example.molecularsearch.exception.error.ErrorCode;
 import com.example.molecularsearch.chem_info.repository.ChemInfoRepository;
 import com.example.molecularsearch.chem_info.web.api.GenericWebclient;
+import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
+import com.example.molecularsearch.exception.error.CustomException;
+import com.example.molecularsearch.exception.error.ErrorCode;
 import com.example.molecularsearch.search_log.service.SearchLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,12 +116,12 @@ public class ChemInfoService {
                 new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
     }
 
-    /* CID 값으로 3D Image 정보 변경 */
-    public String update3DImage(Long cid) {
+    /* CID 값으로 3D Image 정보 삭제 */
+    public void update3DImage(Long cid) {
         ChemInfo chemInfo = findChemInfoByCid(cid);
 
-        String sdf = webclientByCid.getSdf(cid).block();
+        chemInfoRepository.save(chemInfo);
 
-        return sdf;
+        log.info("CID: {}, 변경완료", cid.toString());
     }
 }
