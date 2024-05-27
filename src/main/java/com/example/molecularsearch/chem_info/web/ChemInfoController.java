@@ -2,7 +2,6 @@ package com.example.molecularsearch.chem_info.web;
 
 import com.example.molecularsearch.chem_info.service.ChemInfoService;
 import com.example.molecularsearch.chem_info.service.SynonymsService;
-import com.example.molecularsearch.chem_info.web.api.GenericWebclient;
 import com.example.molecularsearch.search_log.service.SearchLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ public class ChemInfoController {
     private final ChemInfoService chemInfoService;
     private final SearchLogService searchLogService;
     private final SynonymsService synonymsService;
-    private final GenericWebclient<Long> webclientBycid;
 
     /* 분자 이름 또는 화학식으로 분자 정보 검색 */
     @GetMapping(value = "/api/search/chem", params = {"keyword", "page"})
@@ -44,8 +42,9 @@ public class ChemInfoController {
         return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
     }
 
-    @GetMapping("/test/{cid}")
-    public ResponseEntity<?> test(@PathVariable Long cid) {
-        return ResponseEntity.ok(chemInfoService.update3DImage(cid));
+    @PatchMapping("/test")
+    public ResponseEntity<?> test(@RequestBody Map<String, Long> cidMap) {
+        chemInfoService.update3DImage(cidMap.get("cid"));
+        return ResponseEntity.ok(cidMap.get("cid") + " 변경 완료");
     }
 }

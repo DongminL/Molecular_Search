@@ -3,7 +3,6 @@ package com.example.molecularsearch.chem_info.web.api;
 import com.example.molecularsearch.aws.service.AwsS3Service;
 import com.example.molecularsearch.chem_info.domain.ChemInfo;
 import com.example.molecularsearch.chem_info.repository.ChemInfoRepository;
-import com.example.molecularsearch.chem_info.web.api.dto.ConformerResponse;
 import com.example.molecularsearch.chem_info.web.api.dto.DescriptionResponse;
 import com.example.molecularsearch.chem_info.web.api.dto.SynonymsResponse;
 import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple5;
+import reactor.util.function.Tuple4;
 
 import java.time.LocalDateTime;
 
@@ -60,22 +59,20 @@ public class GenericWebclient<T> {
         Mono<SynonymsResponse> synonymsMono = getSynonyms(keyword);   // Synonyms
         Mono<DescriptionResponse> descriptionMono = getDescription(keyword); // Description
         Mono<InputStreamResource> imageMono = getImage(keyword); // 2D Image
-        Mono<ConformerResponse> conformerMono = getConformers(keyword);    // 3D Image Conformer
         ChemInfoDto chemInfoDto;
 
         try {
-            Tuple5<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource, ConformerResponse> tuple5 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono, conformerMono).block();    // 다섯 개의 Mono 결과값을 묶어서 동기적으로 처리
+            Tuple4<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource> tuple4 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono).block();    // 네 개의 Mono 결과값을 묶어서 동기적으로 처리
 
-            chemInfoDto = tuple5.getT1();
+            chemInfoDto = tuple4.getT1();
 
             ChemInfo info = chemInfoRepository.findByIsomericSmiles(chemInfoDto.getIsomericSmiles()).orElse(null);
             if (info != null) {
                 return info.toDto();
             }
 
-
             // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
-            byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]
+            byte[] bytes = tuple4.getT4().getInputStream().readAllBytes();  // Image Byte[]
             try {
                 String imageUrl = awsS3Service.saveImage(chemInfoDto.getCid(), bytes);  // image URL 가져오기
 
@@ -83,15 +80,12 @@ public class GenericWebclient<T> {
             } catch (NullPointerException e) {
                 log.error("AWS S3 Error", e);
             }
-
-            if (!(tuple5.getT5().getCompounds().isEmpty())) {
-                chemInfoDto.update3DImage(tuple5.getT5());
-                log.debug("3D Conformer : " + chemInfoDto.getImage3DConformer().toString());
+            // Synonsyms 정보 가져오기
+            if (tuple4.getT2().getInformationList() != null) {
+                chemInfoDto.updateSynonyms(tuple4.getT2().getSynonyms());
             }
-            if (tuple5.getT2().getInformationList() != null) {
-                chemInfoDto.updateSynonyms(tuple5.getT2().getSynonyms());
-            }
-            chemInfoDto.updateDescription(tuple5.getT3().getDescription());
+            // Description 가져오기
+            chemInfoDto.updateDescription(tuple4.getT3().getDescription());
 
             log.debug("Image URL: {}, timestemp: {}",chemInfoDto.getImage2DUrl(), LocalDateTime.now());
         } catch (WebClientRequestException e) {
@@ -215,69 +209,5 @@ public class GenericWebclient<T> {
                 })
                 .bodyToMono(new ParameterizedTypeReference<InputStreamResource>() {
                 });   // Chunk 단위로 이미지를 읽어옮
-    }
-
-    /* PubChem에서 3D Conformer 가져오기 */
-    public Mono<ConformerResponse> getConformers(T keyword) {
-        String baseUrl;
-
-        // 타입에 따라 URL 변경
-        if (keyword instanceof Long) {
-            baseUrl = PUBCHEM_CID_URL + keyword + "/json";
-        } else {
-            baseUrl = PUBCHEM_SMILES_URL + keyword + "/json";
-        }
-
-        return webClient.mutate()
-                .baseUrl(baseUrl).build()
-                .get()    // GET 요청
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("record_type", "3d")
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, e -> {
-                    throw new RuntimeException("404 에러");
-                })
-                .bodyToMono(ConformerResponse.class)
-                .onErrorResume(e -> {
-                    if (e instanceof RuntimeException) {
-                        return Mono.just(new ConformerResponse());
-                    }
-
-                    log.error("3D Conformer 에러: {}, timestemp: {}", e, LocalDateTime.now());
-                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
-                });
-    }
-
-    /* PubChem에서 SDF형식 내용 가져오기 */
-    public Mono<String> getSdf(T keyword) {
-        String baseUrl;
-
-        // 타입에 따라 URL 변경
-        if (keyword instanceof Long) {
-            baseUrl = PUBCHEM_CID_URL + keyword + "/sdf";
-        } else {
-            baseUrl = PUBCHEM_SMILES_URL + keyword + "/sdf";
-        }
-
-        return webClient.mutate()
-                .baseUrl(baseUrl).build()
-                .get()    // GET 요청
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("record_type", "3d")
-                        .build())
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, e -> {
-                    throw new RuntimeException("404 에러");
-                })
-                .bodyToMono(String.class)
-                .onErrorResume(e -> {
-                    if (e instanceof RuntimeException) {
-                        return Mono.just("");
-                    }
-
-                    log.error("3D Conformer 에러: {}, timestemp: {}", e, LocalDateTime.now());
-                    throw new CustomException(ErrorCode.EXTERNAL_API_REQUEST_FAILED);
-                });
     }
 }

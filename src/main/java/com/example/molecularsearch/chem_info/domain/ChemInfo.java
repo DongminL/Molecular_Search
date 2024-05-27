@@ -6,9 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Builder
@@ -42,10 +40,8 @@ public class ChemInfo {
 
     private String image2DUrl;   // 2D 이미지 경로
 
-    private Map<String, ArrayList<?>> image3DConformer;   // 3D 이미지 정보
-
     private List<String> synonyms;    // 상위 5개의 synonyms 값
-    
+
     /* Dto로 변환 */
     public ChemInfoDto toDto() {
         return ChemInfoDto.builder()
@@ -53,7 +49,6 @@ public class ChemInfo {
                 .cid(this.cid)
                 .description(this.description)
                 .image2DUrl(this.image2DUrl)
-                .image3DConformer(this.image3DConformer)
                 .canonicalSmiles(this.canonicalSmiles)
                 .inchi(this.inchi)
                 .inchiKey(this.inchiKey)
