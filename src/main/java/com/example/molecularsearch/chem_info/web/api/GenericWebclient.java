@@ -1,12 +1,14 @@
 package com.example.molecularsearch.chem_info.web.api;
 
-import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
+import com.example.molecularsearch.aws.service.AwsS3Service;
+import com.example.molecularsearch.chem_info.domain.ChemInfo;
+import com.example.molecularsearch.chem_info.repository.ChemInfoRepository;
 import com.example.molecularsearch.chem_info.web.api.dto.ConformerResponse;
 import com.example.molecularsearch.chem_info.web.api.dto.DescriptionResponse;
 import com.example.molecularsearch.chem_info.web.api.dto.SynonymsResponse;
+import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
 import com.example.molecularsearch.exception.error.CustomException;
 import com.example.molecularsearch.exception.error.ErrorCode;
-import com.example.molecularsearch.aws.service.AwsS3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -45,9 +47,11 @@ public class GenericWebclient<T> {
 
     private final WebClient webClient = WebClient.create();
     private final AwsS3Service awsS3Service;
+    private final ChemInfoRepository chemInfoRepository;
 
-    public GenericWebclient(AwsS3Service awsS3Service) {
+    public GenericWebclient(AwsS3Service awsS3Service, ChemInfoRepository chemInfoRepository) {
         this.awsS3Service = awsS3Service;
+        this.chemInfoRepository = chemInfoRepository;
     }
 
     /* 여러 API에서 비동기 처리로 분자 정보 가져오기 */
@@ -63,6 +67,12 @@ public class GenericWebclient<T> {
             Tuple5<ChemInfoDto, SynonymsResponse, DescriptionResponse, InputStreamResource, ConformerResponse> tuple5 = Mono.zip(chemInfoMono, synonymsMono, descriptionMono, imageMono, conformerMono).block();    // 다섯 개의 Mono 결과값을 묶어서 동기적으로 처리
 
             chemInfoDto = tuple5.getT1();
+
+            ChemInfo info = chemInfoRepository.findByIsomericSmiles(chemInfoDto.getIsomericSmiles()).orElse(null);
+            if (info != null) {
+                return info.toDto();
+            }
+
 
             // AWS S3에 이미지 저장 후 해당 이미지의 url 가져오기
             byte[] bytes = tuple5.getT4().getInputStream().readAllBytes();  // Image Byte[]

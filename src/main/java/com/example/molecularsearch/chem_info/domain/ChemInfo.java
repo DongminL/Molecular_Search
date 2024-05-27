@@ -1,5 +1,6 @@
 package com.example.molecularsearch.chem_info.domain;
 
+import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -44,4 +45,23 @@ public class ChemInfo {
     private Map<String, ArrayList<?>> image3DConformer;   // 3D 이미지 정보
 
     private List<String> synonyms;    // 상위 5개의 synonyms 값
+    
+    /* Dto로 변환 */
+    public ChemInfoDto toDto() {
+        return ChemInfoDto.builder()
+                .id(this.id)
+                .cid(this.cid)
+                .description(this.description)
+                .image2DUrl(this.image2DUrl)
+                .image3DConformer(this.image3DConformer)
+                .canonicalSmiles(this.canonicalSmiles)
+                .inchi(this.inchi)
+                .inchiKey(this.inchiKey)
+                .isomericSmiles(this.isomericSmiles)
+                .inpacName(this.inpacName)
+                .molecularFormula(this.molecularFormula)
+                .molecularWeight(this.molecularWeight)
+                .synonyms(this.synonyms)
+                .build();
+    }
 }

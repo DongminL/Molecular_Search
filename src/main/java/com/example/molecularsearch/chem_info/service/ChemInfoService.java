@@ -62,6 +62,10 @@ public class ChemInfoService {
         List<String> synonyms = response.getSynonyms();
 
         try {
+            if (response.getId() != null) {
+                throw new DuplicateKeyException("이미 저장된 데이터");
+            }
+
             // Synonyms 값 처리
             if (synonyms == null) {
                 chemInfo = response.toEntity();
@@ -82,7 +86,7 @@ public class ChemInfoService {
             }
         } catch (DuplicateKeyException e) {
             log.debug("PubChem에서 SMILES 보정하여 검색한 것");
-            ChemInfo originInfo = findChemInfoBySmiles(response.getIsomericSmiles());   // 이미 저장되어 있는 분자정보
+            ChemInfo originInfo = response.toEntity();
 
             return originInfo;
         } catch (Exception e) {

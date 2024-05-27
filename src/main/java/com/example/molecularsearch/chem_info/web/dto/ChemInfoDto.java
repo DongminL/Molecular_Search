@@ -59,6 +59,7 @@ public class ChemInfoDto {
     /* Dto -> Entity로 변환 */
     public ChemInfo toEntity() {
         return ChemInfo.builder()
+                .id(this.id)
                 .cid(this.cid)
                 .inpacName(this.inpacName)
                 .molecularFormula(this.molecularFormula)
@@ -68,7 +69,7 @@ public class ChemInfoDto {
                 .canonicalSmiles(this.canonicalSmiles)
                 .isomericSmiles(this.isomericSmiles)
                 .description(this.description)
-                .image2DUrl(this.getImage2DUrl())
+                .image2DUrl(this.image2DUrl)
                 .image3DConformer(this.image3DConformer)
                 .build();
     }
@@ -76,6 +77,7 @@ public class ChemInfoDto {
     /* Dto -> Entity로 변환 */
     public ChemInfo toEntity(List<String> synonyms) {
         return ChemInfo.builder()
+                .id(this.id)
                 .cid(this.cid)
                 .inpacName(this.inpacName)
                 .molecularFormula(this.molecularFormula)
@@ -86,7 +88,7 @@ public class ChemInfoDto {
                 .isomericSmiles(this.isomericSmiles)
                 .synonyms(synonyms)
                 .description(this.description)
-                .image2DUrl(this.getImage2DUrl())
+                .image2DUrl(this.image2DUrl)
                 .image3DConformer(this.image3DConformer)
                 .build();
     }
