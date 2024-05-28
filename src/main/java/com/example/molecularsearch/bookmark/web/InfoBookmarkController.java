@@ -24,6 +24,14 @@ public class InfoBookmarkController {
         return ResponseEntity.ok("즐겨찾기 추가 성공");
     }
 
+    /* 즐겨찾기 해제 */
+    @DeleteMapping("/api/off/bookmark/{chemInfoId}")
+    public ResponseEntity<String> offInfoBookmark(@PathVariable String chemInfoId) {
+        infoBookmarkService.deleteInfoBookmark(chemInfoId);
+
+        return ResponseEntity.ok("즐겨찾기 해제 완료");
+    }
+
     /* 즐겨찾기 리스트 */
     @GetMapping("/api/search/bookmark")
     public ResponseEntity<?> showInfoBookmark() {

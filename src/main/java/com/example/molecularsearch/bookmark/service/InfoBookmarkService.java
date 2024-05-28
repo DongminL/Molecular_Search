@@ -77,10 +77,19 @@ public class InfoBookmarkService {
         return result;
     }
 
+    /* 단일 즐겨찾기 헤제 */
+    @Transactional
+    public void deleteInfoBookmark(String chemInfoId) {
+        Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
+
+        infoBookmarkRepository.deleteByUser_IdAndChemInfoId(userPk, chemInfoId); // 해당 즐겨찾기만 삭제
+        log.info("즐겨찾기 해제, infoBookmark_PK : {}, timestemp: {}", chemInfoId, LocalDateTime.now());
+    }
+
     /* 단일 즐겨찾기 삭제 */
     @Transactional
     public void deleteInfoBookmark(Long id) {
-        infoBookmarkRepository.deleteById(id); // 해당 검색어만 삭제
+        infoBookmarkRepository.deleteById(id); // 해당 즐겨찾기만 삭제
         log.info("즐겨찾기 삭제, infoBookmark_PK : {}, timestemp: {}", id, LocalDateTime.now());
     }
 

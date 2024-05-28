@@ -19,6 +19,8 @@ public interface InfoBookmarkRepository extends JpaRepository<InfoBookmark, Long
     
     void deleteById(Long id);   // PK 값으로 정보 삭제
 
+    void deleteByUser_IdAndChemInfoId(Long users_id, String chemId);   // ChemInfo ID 값으로 정보 삭제
+
     @Modifying
     @Query("delete from InfoBookmark b where b.id in :bookmarkList")    // 여러 데이터를 한 번에 삭제 (성능 향상)
     void deleteAllByList(@Param("bookmarkList") List<Long> bookmarkList);   // 선택된 즐겨찾기 목록 삭제

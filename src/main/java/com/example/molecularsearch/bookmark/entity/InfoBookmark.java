@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(indexes = @Index(name = "chemInfoId_index", columnList = "chemInfoId"))  // chemInfoId에 대한 Index 생성
 public class InfoBookmark extends BaseTime {
 
     @Id
