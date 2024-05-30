@@ -103,6 +103,7 @@ public class InfoBookmarkService {
         });
 
         infoBookmarkRepository.deleteAllByList(idList); // 선택된 즐겨찾기 목록 삭제
+        log.info("즐겨찾기 편집 삭제, infoBookmark_PKs : {}, timestemp: {}", idList, LocalDateTime.now());
     }
 
     /* 전체 즐겨찾기 삭제 */

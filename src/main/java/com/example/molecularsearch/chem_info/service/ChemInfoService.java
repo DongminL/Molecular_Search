@@ -105,9 +105,11 @@ public class ChemInfoService {
     }
 
     /* _id로 분자 정보 가져오기 */
-    public ChemInfo findChemInfoById(String id) {
-        return chemInfoRepository.findById(id).orElseThrow(() ->
+    public ChemInfoDto findChemInfoById(String id) {
+        ChemInfo chemInfo = chemInfoRepository.findById(id).orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
+
+        return chemInfo.toDto();    // Dto로 변환
     }
 
     /* CID로 분자 정보 가져오기 */
