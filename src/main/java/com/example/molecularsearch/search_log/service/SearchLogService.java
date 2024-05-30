@@ -59,6 +59,7 @@ public class SearchLogService {
         });
 
         searchLogRepository.deleteAllByList(idList);    // 선택된 검색 기록 목록 삭제
+        log.info("검색기록 편집 삭제, search_log_PKs : {}, timestemp: {}", idList, LocalDateTime.now());
     }
 
     /* 전체 검색 기록 삭제 */

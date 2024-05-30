@@ -25,7 +25,8 @@ public class JwtService {
 
     /* Access Token 값으로 Refresh Token 정보도 가져오기 */
     public Tokens getToken(String accessToken) {
-        return tokensRepository.findByAccessToken(accessToken).orElseThrow(() -> new CustomException(ErrorCode.REQUIRE_RELOGIN));    // 없으면 재로그인 하라는 에러 발생
+        return tokensRepository.findByAccessToken(accessToken).orElseThrow(() ->
+                new CustomException(ErrorCode.REQUIRE_RELOGIN));    // 없으면 재로그인 하라는 에러 발생
     }
 
     /* Access Token 값으로 DB에 존재 여부 확인 */
