@@ -41,10 +41,4 @@ public class ChemInfoController {
     public ResponseEntity<?> idChem(@PathVariable String chemId) {
         return ResponseEntity.ok(chemInfoService.findChemInfoById(chemId));
     }
-
-    @PatchMapping("/test")
-    public ResponseEntity<?> test(@RequestBody Map<String, Long> cidMap) {
-        chemInfoService.update3DImage(cidMap.get("cid"));
-        return ResponseEntity.ok(cidMap.get("cid") + " 변경 완료");
-    }
 }
