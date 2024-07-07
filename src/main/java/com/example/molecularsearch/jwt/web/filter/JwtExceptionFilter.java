@@ -26,13 +26,13 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         } catch (CustomException e) {
             // 에러 응답 메시지 생성
             ErrorDto errorRes = ErrorDto.builder()
-                    .staus(e.getErrorCode().getStatus())
+                    .status(e.getErrorCode().getStatus())
                     .error(e.getErrorCode().getError())
                     .message(e.getErrorCode().getMessage())
                     .build();
             
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
-            response.setStatus(errorRes.getStaus());    // 에러 응답 메시지 Status 설정
+            response.setStatus(errorRes.getStatus());    // 에러 응답 메시지 Status 설정
 
             // JSON으로 변환하여 전송
             ObjectMapper json = new ObjectMapper();
