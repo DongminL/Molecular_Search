@@ -7,12 +7,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
 
@@ -24,6 +27,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);    // 다음 filter인 JwtFilter로 값 전달
         } catch (CustomException e) {
+            SecurityContextHolder.clearContext();   // Security Context 비우기
+            log.debug("Security Context를 비웠습니다.");
+
             // 에러 응답 메시지 생성
             ErrorDto errorRes = ErrorDto.builder()
                     .status(e.getErrorCode().getStatus())
