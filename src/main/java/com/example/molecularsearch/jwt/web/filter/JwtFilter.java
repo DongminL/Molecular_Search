@@ -39,26 +39,21 @@ public class JwtFilter extends GenericFilterBean {
         String token = getToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
-        try {
-            // 유효한 토큰인지 확인
-            if (StringUtils.hasText(token) && jwtProvider.checkToken(token)) {
-                if (tokensRepository.existsByAccessToken(token)) {  // Redis에 토큰이 있는지 확인
-                    Authentication authentication = jwtProvider.getAuthentication(token);   // 토큰으로부터 유저 정보 받아옴
+        // 유효한 토큰인지 확인
+        if (StringUtils.hasText(token) && jwtProvider.checkToken(token)) {
+            if (tokensRepository.existsByAccessToken(token)) {  // Redis에 토큰이 있는지 확인
+                Authentication authentication = jwtProvider.getAuthentication(token);   // 토큰으로부터 유저 정보 받아옴
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);   // Security Context에 인증 저장
-                    log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
-                } else {    // 재로그인 요청
-                    throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
-                }
-            } else {
-                log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+                SecurityContextHolder.getContext().setAuthentication(authentication);   // Security Context에 인증 저장
+                log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+            } else {    // 재로그인 요청
+                throw new CustomException(ErrorCode.REQUIRE_RELOGIN);
             }
-
-            filterChain.doFilter(servletRequest, servletResponse);
-        } finally { // 다시 Filter를 빠져 나가기 전에
-            SecurityContextHolder.clearContext();   // Security Context 비우기
-            log.debug("Security Context를 비웠습니다.");
+        } else {
+            log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
         }
+
+        filterChain.doFilter(servletRequest, servletResponse);
     }
 
     /* Request Header 에서 토큰 정보를 꺼내오기 */
