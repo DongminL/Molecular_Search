@@ -28,7 +28,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);    // 다음 filter인 JwtFilter로 값 전달
         } catch (CustomException e) {
             SecurityContextHolder.clearContext();   // Security Context 비우기
-            log.debug("Security Context를 비웠습니다.");
+            log.debug("Security Context를 비웠습니다, message : {}", e.getMessage());
 
             // 에러 응답 메시지 생성
             ErrorDto errorRes = ErrorDto.builder()
