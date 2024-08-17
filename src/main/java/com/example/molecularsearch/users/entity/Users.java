@@ -47,4 +47,9 @@ public class Users extends BaseTime {
     @Convert(converter = RoleTypeConverter.class)   // Convert로 데이터 형식 변환
     @Column(nullable = false)
     private String roleType;    // 유저 등급 (ADMIN or USER)
+
+    /* 닉네임 변경 */
+    public void changeNicname(String changed) {
+        this.nickname = changed;
+    }
 }
