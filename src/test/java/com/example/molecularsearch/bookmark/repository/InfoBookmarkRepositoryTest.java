@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@DisplayName("Select 선행 문제 분석")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // 클래스 당 하나의 인스턴스 사용
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)    // 인메모리 DB 사용하지 않음
 class InfoBookmarkRepositoryTest {
@@ -85,6 +86,7 @@ class InfoBookmarkRepositoryTest {
     }
 
     @Test
+    @Transactional  // 단위 테스트할 땐 주석처리 하기
     @DisplayName("Update 시 Select 선행 O")
     void update() {
         // given
@@ -97,18 +99,60 @@ class InfoBookmarkRepositoryTest {
         usersRepository.findById(1L).ifPresent(updatedUser -> assertEquals("바뀐 닉네임", updatedUser.getNickname()));
     }
 
+    /*
+    * 이 테스트의 경우, UPDATE 쿼리만 발생하지만 Detached Entity로 인해 변경이 제대로 반영되지 않음
+    * modifiedDate만 초기화 되는 것이 아닌 createdDate도 같이 초기화 되는 문제가 발생함
+    */
+    @Test
+    @Transactional
+    @DisplayName("Update 시 Select 선행 X")
+    void onlyUpdate() {
+        // given
+        user.changeNicname("바뀐 닉네임2");
+
+        // when
+        usersRepository.updateNickname(user);
+
+        // then
+        usersRepository.findById(1L).ifPresent(updatedUser -> {
+            assertEquals(updatedUser.getCreatedDate(), updatedUser.getModifiedDate());
+            assertEquals("바뀐 닉네임2", updatedUser.getNickname());
+
+            System.out.println("createdDate: " + updatedUser.getCreatedDate());
+            System.out.println("modifiedDate: " + updatedUser.getModifiedDate());
+        });
+    }
+
     @Test
     @DisplayName("Delete 시 Select 선행 O")
     void delete() {
         // given
         InfoBookmark bookmark = InfoBookmark.builder()
-                .chemInfoId(String.valueOf(1))
+                .chemInfoId("1")
                 .user(user)
                 .molecularFormula("화학식 - " + 1).build();
 
         // when
         bookmark = infoBookmarkRepository.save(bookmark);
         infoBookmarkRepository.delete(bookmark);
+
+        // then
+        assertEquals(0, infoBookmarkRepository.count());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("Delete 시 Select 선행 X")
+    void onlyDelete() {
+        // given
+        InfoBookmark bookmark = InfoBookmark.builder()
+                .chemInfoId("1")
+                .user(user)
+                .molecularFormula("화학식 - " + 1).build();
+
+        // when
+        bookmark = infoBookmarkRepository.save(bookmark);
+        infoBookmarkRepository.onlyDelete(bookmark);
 
         // then
         assertEquals(0, infoBookmarkRepository.count());
