@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@DisplayName("N개의 Delete 요청 문제 테스트")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // 클래스 당 하나의 인스턴스 사용
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)    // 인메모리 DB 사용하지 않음
 class SearchLogRepositoryTest {
