@@ -1,11 +1,11 @@
 package com.example.molecularsearch.jwt.service;
 
-import com.example.molecularsearch.jwt.web.dto.JwtDto;
 import com.example.molecularsearch.exception.error.CustomException;
 import com.example.molecularsearch.exception.error.ErrorCode;
-import com.example.molecularsearch.jwt.web.JwtProvider;
 import com.example.molecularsearch.jwt.domain.Tokens;
 import com.example.molecularsearch.jwt.repository.TokensRepository;
+import com.example.molecularsearch.jwt.web.JwtProvider;
+import com.example.molecularsearch.jwt.web.dto.JwtDto;
 import com.example.molecularsearch.jwt.web.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -69,7 +67,7 @@ public class JwtService {
     }
 
     /* Access Token만 갱신 */
-    public Map<String, String> reissueAccessToken(String accessToken) {
+    public TokenResponse reissueAccessToken(String accessToken) {
         // Access Token이 유효할 때
         if (jwtProvider.checkToken(accessToken)) {
             Tokens tokens = getToken(accessToken);  // Token 값들 가져오기
@@ -88,10 +86,11 @@ public class JwtService {
             }
 
             // Client에게 전달할 값
-            Map<String, String> tokenInfo = new HashMap<>();
-            tokenInfo.put("accessToken", newAccessToken);
-            tokenInfo.put("grantType", "Bearer");
-            tokenInfo.put("expiredAt", jwtProvider.getExpiration(newAccessToken).toString());
+            TokenResponse tokenInfo = TokenResponse.builder()
+                    .accessToken(newAccessToken)
+                    .grantType("Bearer")
+                    .expiredAt(jwtProvider.getExpiration(newAccessToken))
+                    .build();
 
             log.debug("Access Token 갱신, timestemp: {}", LocalDateTime.now());
 
