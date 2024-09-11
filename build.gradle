@@ -86,7 +86,7 @@ bootJar {
     archiveVersion = '0.0.1'
 
     dependsOn asciidoctor   // 문서 작성 후에 .jar 생성
-    from ("${asciidoctor.outputDir}/html5") {   // "./build/asciidoc/outputDir/html5/"에 html 파일 생성됨
+    from ("${asciidoctor.outputDir}/html5") {   // "./build/generated-snippets/html5/"에 html 파일 생성됨
         into 'static/docs'  // .jar의 static/docs 폴더에 복사됨
     }
 }
