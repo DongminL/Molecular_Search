@@ -14,13 +14,4 @@ public class TokenResponse {
     private String accessToken; // 접근 토큰
     private String grantType;   // 토큰 타입
     private Long expiredAt; // 만료 시간 (ms)
-
-    /* JwtDto -> TokenResponse */
-    public TokenResponse toResponse(JwtDto dto) {
-        return TokenResponse.builder()
-                .accessToken(dto.getAccessToken())
-                .grantType(dto.getGrantType())
-                .expiredAt(dto.getExpiredAt())
-                .build();
-    }
 }
