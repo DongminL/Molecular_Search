@@ -42,7 +42,7 @@ public class S3MockConfig {
                 .withEndpointConfiguration(endpointConfiguration)
                 .build();
 
-            amazonS3Client.createBucket(bucketName);
+        amazonS3Client.createBucket(bucketName);
 
         return amazonS3Client;
     }
