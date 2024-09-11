@@ -28,14 +28,12 @@ public class OAuthLoginController {
     }
 
     /* 만료된 Access Token 갱신 */
-//    @PatchMapping("/api/login/reissue")
-//    public ResponseEntity<?> reissueToken(@RequestHeader("Authorization") String token) {
-//        String accessToken = jwtService.getHeaderToken(token);  // Header 값에서 Bearer 값 제외
-//
-//        Map<String, String> newAccessToken = jwtService.reissueAccessToken(accessToken);
-//
-//        return  ResponseEntity.ok(newAccessToken);
-//    }
+    @PatchMapping("/api/login/reissue")
+    public ResponseEntity<?> reissueToken(@RequestHeader("Authorization") String token) {
+        String accessToken = jwtService.getHeaderToken(token);  // Header 값에서 Bearer 제거
+
+        return  ResponseEntity.ok(jwtService.reissueAccessToken(accessToken));
+    }
 
     /* 로그아웃 */
     @DeleteMapping("/api/logout")

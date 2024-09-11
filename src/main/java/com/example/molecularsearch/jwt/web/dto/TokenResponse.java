@@ -9,19 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtDto {
+public class TokenResponse {
 
     private String accessToken; // 접근 토큰
-    private String refreshToken;    // 갱신 토큰
     private String grantType;   // 토큰 타입
     private Long expiredAt; // 만료 시간 (ms)
-
-    /* JwtDto -> TokenResponse */
-    public TokenResponse toResponse() {
-        return TokenResponse.builder()
-                .accessToken(this.accessToken)
-                .grantType(this.grantType)
-                .expiredAt(this.expiredAt)
-                .build();
-    }
 }
