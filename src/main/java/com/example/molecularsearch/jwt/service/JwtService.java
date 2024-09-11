@@ -6,6 +6,7 @@ import com.example.molecularsearch.exception.error.ErrorCode;
 import com.example.molecularsearch.jwt.web.JwtProvider;
 import com.example.molecularsearch.jwt.domain.Tokens;
 import com.example.molecularsearch.jwt.repository.TokensRepository;
+import com.example.molecularsearch.jwt.web.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class JwtService {
     }
 
     /* Token 값들 저장 */
-    public Map<String, String> saveToken(JwtDto jwtDto) {
+    public TokenResponse saveToken(JwtDto jwtDto) {
         // Dto -> Dao
         Tokens tokens = Tokens.builder()
                 .accessToken(jwtDto.getAccessToken())
@@ -51,10 +52,7 @@ public class JwtService {
         tokensRepository.save(tokens);   // 토큰 값들 저장
 
         // Client에게 전달할 값
-        Map<String, String> tokenInfo = new HashMap<>();
-        tokenInfo.put("accessToken", tokens.getAccessToken());
-        tokenInfo.put("grantType", jwtDto.getGrantType());
-        tokenInfo.put("expiredAt", jwtDto.getExpiredAt().toString());
+        TokenResponse tokenInfo = jwtDto.toResponse();
 
         log.debug("Token 저장, timestemp: {}", LocalDateTime.now());
 
