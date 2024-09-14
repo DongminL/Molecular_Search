@@ -1,0 +1,19 @@
+= OAuthLogin API
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 1
+:sectlinks:
+
+== 네이버 로그인
+operation::naver-login[snippets='http-request,request-fields,http-response,response-fields']
+
+== 구글 로그인
+operation::google-login[snippets='http-request,request-fields,http-response,response-fields']
+
+== 토큰 갱신
+operation::token-reissue[snippets='http-request,request-headers,http-response,response-fields']
+
+== 로그아웃
+operation::logout[snippets='http-request,request-headers,http-response']
