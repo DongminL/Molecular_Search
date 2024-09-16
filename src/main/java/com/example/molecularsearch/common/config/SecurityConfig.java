@@ -1,10 +1,11 @@
 package com.example.molecularsearch.common.config;
 
 import com.example.molecularsearch.jwt.repository.TokensRepository;
+import com.example.molecularsearch.jwt.web.JwtProvider;
 import com.example.molecularsearch.jwt.web.filter.JwtExceptionFilter;
 import com.example.molecularsearch.jwt.web.filter.JwtFilter;
-import com.example.molecularsearch.jwt.web.handler.JwtHandler;
-import com.example.molecularsearch.jwt.web.JwtProvider;
+import com.example.molecularsearch.jwt.web.handler.JwtAcessDeniedHandler;
+import com.example.molecularsearch.jwt.web.handler.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,13 +24,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
-    private final JwtHandler jwtHandler;
+    private final JwtAcessDeniedHandler acessDeniedHandler;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final TokensRepository tokensRepository;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 // JWT로 안드로이드와 통신하기 때문에 csrf disable
+
                 .csrf(AbstractHttpConfigurer::disable)
                 // 세션 사용 X
                 .sessionManagement((sessionManagement) ->
@@ -37,13 +40,13 @@ public class SecurityConfig {
                 )
                 // JWT Handler 등록
                 .exceptionHandling(httpSecurityExceptionHandlingConfigurer ->
-                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(jwtHandler)
-                                .accessDeniedHandler(jwtHandler))
+                        httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(acessDeniedHandler))
                 // JwtFilter를 Security 로직에 등록
                 .addFilterBefore(new JwtFilter(jwtProvider, tokensRepository), UsernamePasswordAuthenticationFilter.class)    // JwtFilter를 UsernamePasswordAuthenticationFilter보다 먼저 실행
                 // URL 권한 설정 */
                 .authorizeHttpRequests((authorizeRequests) ->
-                        authorizeRequests.requestMatchers("/api/login/naver", "/api/login/google", "/docs/*").permitAll()  // 로그인 요청은 누구든지 허용
+                        authorizeRequests.requestMatchers("/api/login/naver", "/api/login/google", "/docs/*", "/error").permitAll()  // 로그인 요청은 누구든지 허용
                                 .anyRequest().authenticated()   // 그외 다른 요청들은 토큰 인증해야함
                 );
 
