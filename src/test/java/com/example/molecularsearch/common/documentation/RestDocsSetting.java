@@ -16,8 +16,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
-@ExtendWith(MockitoExtension.class)
-@AutoConfigureRestDocs
+@ExtendWith(MockitoExtension.class) // Mockito 사용
+@AutoConfigureRestDocs  // REST Docs 사용
 public class RestDocsSetting {
 
     protected MockMvc mockMvc;

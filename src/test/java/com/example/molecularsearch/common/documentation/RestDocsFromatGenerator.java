@@ -22,4 +22,8 @@ public interface RestDocsFromatGenerator {
     static Attributes.Attribute tokenFormat() {
         return key("format").value("Bearer YOUR_TOKEN");
     }
+
+    static Attributes.Attribute smilesFormat() {
+        return key("format").value("URL 인코딩 필수");
+    }
 }
