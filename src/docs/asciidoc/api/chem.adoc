@@ -1,0 +1,57 @@
+=== 분자 정보 (Chem Info)
+`Keyword`, `SMILES`, `ID` 값을 통해 원하는 `분자 정보` 를 `요청` 및 `저장` 할 수 있습니다.
+
+==== Keyword로 분자 정보 검색
+네이버 계정으로 로그인합니다.
+최초 로그인 시, 자동으로 회원가입 됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/naver-login/http-request.adoc[]
+
+include::{snippets}/naver-login/request-fields.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/naver-login/http-response.adoc[]
+include::{snippets}/naver-login/response-fields.adoc[]
+
+==== SMILES로 분자 정보 검색
+SMILES 식으로 분자 정보를 검색합니다.
+
+[discrete]
+===== 요청
+include::{snippets}/search-smiles/http-request.adoc[]
+include::{snippets}/search-smiles/request-headers.adoc[]
+include::{snippets}/search-smiles/query-parameters.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/search-smiles/http-response.adoc[]
+include::{snippets}/search-smiles/response-fields.adoc[]
+
+==== CID 값으로 저장
+CID 값으로 PubChem에서 분자 정보 데이터를 가져와 저장합니다.
+
+[discrete]
+===== 요청
+include::{snippets}/token-reissue/http-request.adoc[]
+include::{snippets}/token-reissue/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/token-reissue/http-response.adoc[]
+include::{snippets}/token-reissue/response-fields.adoc[]
+
+==== ID 값으로 분자 정보 검색
+ID 값으로 분자 정보를 검색합니다. +
+즐겨 찾기에서 해당 분자 정보 창으로 넘어갈 때 사용됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/logout/http-request.adoc[]
+include::{snippets}/logout/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/logout/http-response.adoc[]
