@@ -1,11 +1,11 @@
 package com.example.molecularsearch.jwt.web.handler;
 
 import com.example.molecularsearch.exception.dto.ErrorDto;
+import com.example.molecularsearch.exception.error.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
@@ -28,7 +28,7 @@ public class JwtAcessDeniedHandler extends AccessDeniedHandlerImpl {
         ErrorDto errorBody;
 
         if (requestEndpointUtil.isEndpointExist(request)) {
-            errorBody = requestEndpointUtil.makeErrorBody(HttpStatus.NOT_FOUND, request);
+            errorBody = requestEndpointUtil.makeErrorBody(ErrorCode.FORBIDDEN, request);
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
             response.setStatus(errorBody.getStatus());    // 에러 응답 메시지 Status 설정
@@ -37,7 +37,7 @@ public class JwtAcessDeniedHandler extends AccessDeniedHandlerImpl {
             ObjectMapper json = new ObjectMapper();
             json.writeValue(response.getOutputStream(), errorBody);
         } else {
-            errorBody = requestEndpointUtil.makeErrorBody(HttpStatus.FORBIDDEN, request);
+            errorBody = requestEndpointUtil.makeErrorBody(ErrorCode.NOT_FOUND_PATH, request);
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
             response.setStatus(errorBody.getStatus());    // 에러 응답 메시지 Status 설정
