@@ -1,76 +1,41 @@
 package com.example.molecularsearch.oauth.web;
 
 import com.example.molecularsearch.common.anotation.WithMockCustomUser;
+import com.example.molecularsearch.common.documentation.RestDocsSetting;
 import com.example.molecularsearch.jwt.service.JwtService;
 import com.example.molecularsearch.jwt.web.dto.TokenResponse;
-import com.example.molecularsearch.jwt.web.filter.JwtExceptionFilter;
-import com.example.molecularsearch.jwt.web.filter.JwtFilter;
 import com.example.molecularsearch.oauth.service.OAuthLoginService;
 import com.example.molecularsearch.oauth.web.dto.GoogleUserDto;
 import com.example.molecularsearch.oauth.web.dto.NaverUserDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
+import static com.example.molecularsearch.common.documentation.RestDocsFromatGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class) // Mockito 사용
 @WebMvcTest(OAuthLoginController.class)
-@AutoConfigureRestDocs  // REST Docs 사용
-class OAuthLoginDocumentationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+class OAuthLoginDocumentationTest extends RestDocsSetting {
 
     @MockBean
     private OAuthLoginService oAuthLoginService;
 
     @MockBean
     private JwtService jwtService;
-
-    @MockBean
-    private JwtFilter jwtFilter;
-
-    @MockBean
-    private JwtExceptionFilter jwtExceptionFilter;
-
-    /* MockMvc Rest Docs 초기 설정 */
-    @BeforeEach
-    void setUp(@Autowired RestDocumentationContextProvider restDocumentation,
-               @Autowired WebApplicationContext webApplicationContext) {
-
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(documentationConfiguration(restDocumentation))   // REST Docs의 기본 설정 적용
-                .build();
-    }
 
     @Test
     @DisplayName("네이버 로그인")
@@ -98,7 +63,6 @@ class OAuthLoginDocumentationTest {
 
         ResultActions result = mockMvc.perform(
                 post("/api/login/naver")
-                        .with(csrf())   // CSRF Token 추가
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -114,12 +78,12 @@ class OAuthLoginDocumentationTest {
                         // 요청 값 설명
                         requestFields(
                             fieldWithPath("user_id").description("네이버 ID의 고유 값"),
-                            fieldWithPath("email").description("사용자 이메일"),
+                            fieldWithPath("email").attributes(emailFormat()).description("사용자 이메일"),
                             fieldWithPath("name").description("사용자 이름"),
                             fieldWithPath("nickname").description("닉네임"),
                             fieldWithPath("gender").description("성별"),
-                            fieldWithPath("mobile").description("휴대폰 번호"),
-                            fieldWithPath("profile_image").description("프로필 사진 URL")
+                            fieldWithPath("mobile").attributes(phoneNumberFormat()).description("휴대폰 번호"),
+                            fieldWithPath("profile_image").attributes(imageUrlFormat()).description("프로필 사진 URL").optional()
                         ),
                         // 응답 값 설명
                         responseFields(
@@ -152,7 +116,6 @@ class OAuthLoginDocumentationTest {
 
         ResultActions result = mockMvc.perform(
                 post("/api/login/google")
-                        .with(csrf())   // CSRF Token 추가
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -168,9 +131,9 @@ class OAuthLoginDocumentationTest {
                         // 요청 값 설명
                         requestFields(
                                 fieldWithPath("user_id").description("구글 ID의 고유 값"),
-                                fieldWithPath("email").description("사용자 이메일"),
+                                fieldWithPath("email").attributes(emailFormat()).description("사용자 이메일"),
                                 fieldWithPath("name").description("사용자 이름"),
-                                fieldWithPath("photo_url").description("프로필 사진 URL")
+                                fieldWithPath("photo_url").attributes(imageUrlFormat()).description("프로필 사진 URL").optional()
                         ),
                         // 응답 값 설명
                         responseFields(
@@ -200,7 +163,6 @@ class OAuthLoginDocumentationTest {
 
         ResultActions result = mockMvc.perform(
                 patch("/api/login/reissue")
-                        .with(csrf())   // CSRF Token 추가
                         .header("Authorization", bearerToken)
         );
 
@@ -214,7 +176,8 @@ class OAuthLoginDocumentationTest {
                         preprocessResponse(prettyPrint()),
                         // 요청 헤더 설명
                         requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer Token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).attributes(key("type").value("String"))
+                                        .attributes(tokenFormat()).description("JWT (Your Token)")
                         ),
                         // 응답 값 설명
                         responseFields(
@@ -237,7 +200,6 @@ class OAuthLoginDocumentationTest {
         // when
         ResultActions result = mockMvc.perform(
                 delete("/api/logout")
-                        .with(csrf())   // CSRF Token 추가
                         .header("Authorization", bearerToken)
         );
 
@@ -250,7 +212,8 @@ class OAuthLoginDocumentationTest {
                         preprocessResponse(prettyPrint()),
                         // 요청 헤더 설명
                         requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer Token")
+                                headerWithName(HttpHeaders.AUTHORIZATION).attributes(key("type").value("String"))
+                                        .attributes(tokenFormat()).description("JWT (Your Token)")
                         )
                 ));
     }

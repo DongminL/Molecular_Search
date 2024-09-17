@@ -36,7 +36,7 @@ public class ChemInfoDto {
     @JsonProperty("inchi")
     private String inchi;   // 국제 화학 식별자
 
-    @JsonProperty("inchiKey")
+    @JsonProperty("inchi_key")
     private String inchiKey;    // InChI Key 값
 
     @JsonProperty("canonical_smiles")

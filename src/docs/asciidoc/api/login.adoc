@@ -1,0 +1,64 @@
+=== 로그인 (OAuth Login)
+`소셜 로그인(네이버, 구글)` 을 하고 `토큰 갱신`, `로그아웃` 처리를 할 수 있습니다.
+
+==== 네이버 로그인
+네이버 계정으로 로그인합니다.
+최초 로그인 시, 자동으로 회원가입 됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/naver-login/http-request.adoc[]
+
+성별
+|===
+| 코드 | 코드명
+
+| `M` | 남성
+| `F` | 여성
+
+|===
+include::{snippets}/naver-login/request-fields.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/naver-login/http-response.adoc[]
+include::{snippets}/naver-login/response-fields.adoc[]
+
+==== 구글 로그인
+구글 계정으로 로그인합니다.
+최초 로그인 시, 자동으로 회원가입 됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/google-login/http-request.adoc[]
+include::{snippets}/google-login/request-fields.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/google-login/http-response.adoc[]
+include::{snippets}/google-login/response-fields.adoc[]
+
+==== 토큰 갱신
+요청하는 토큰이 만료되기 않으면 새로운 토큰을 발급해줍니다.
+
+[discrete]
+===== 요청
+include::{snippets}/token-reissue/http-request.adoc[]
+include::{snippets}/token-reissue/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/token-reissue/http-response.adoc[]
+include::{snippets}/token-reissue/response-fields.adoc[]
+
+==== 로그아웃
+만료되지 않은 토큰으로 요청하면, 로그아웃 처리가 됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/logout/http-request.adoc[]
+include::{snippets}/logout/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/logout/http-response.adoc[]

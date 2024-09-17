@@ -1,12 +1,12 @@
-Request Fields
+Query Parameters
 |===
-|필드명|타입|필수 여부|양식|설명
+|파라미터명|타입|필수 여부|양식|설명
 
-{{#fields}}
-|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
+{{#parameters}}
+|{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
 |{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
 |{{#tableCellContent}}{{^optional}}O{{/optional}}{{/tableCellContent}}
 |{{#tableCellContent}}{{#format}}{{.}}{{/format}}{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
-{{/fields}}
+{{/parameters}}
 |===
