@@ -263,7 +263,7 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                                 fieldWithPath("molecularWeight").description("분자량 (g/mol)"),
                                 fieldWithPath("isomericSmiles").description("이성질체 SMILES"),
                                 fieldWithPath("inchi").description("국제 화학 식별자"),
-                                fieldWithPath("inchi_key").description("InChI Key 값"),
+                                fieldWithPath("inchiKey").description("InChI Key 값"),
                                 fieldWithPath("canonicalSmiles").description("표준 SMILES"),
                                 fieldWithPath("synonyms").description("관련 단어 목록"),
                                 fieldWithPath("description").description("화합물에 대한 설명"),
