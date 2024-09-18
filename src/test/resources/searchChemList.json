@@ -1,0 +1,48 @@
+{
+  "totalElements": 29,
+  "totalPages": 3,
+  "pageNumber": 0,
+  "pageSize": 10,
+  "searchResults": [
+    {
+      "id": "6646d98fd7e4fb17f5ee24db",
+      "cid": 962,
+      "inpac_name": "oxidane",
+      "molecular_formula": "H2O",
+      "molecular_weight": 18.015,
+      "isomeric_smiles": "O",
+      "inchi": "InChI=1S/H2O/h1H2",
+      "inchi_key": "XLYOFNOQVPJJNP-UHFFFAOYSA-N",
+      "canonical_smiles": "O",
+      "synonyms": [
+        "water",
+        "7732-18-5",
+        "Distilled water",
+        "Dihydrogen oxide",
+        "Sterile water"
+      ],
+      "description": "Water is an oxygen hydride consisting of an oxygen atom that is covalently bonded to two hydrogen atoms It has a role as an amphiprotic solvent, a member of greenhouse gas, a human metabolite, a Saccharomyces cerevisiae metabolite, an Escherichia coli metabolite and a mouse metabolite. It is an oxygen hydride, a mononuclear parent hydride and an inorganic hydroxy compound. It is a conjugate base of an oxonium. It is a conjugate acid of a hydroxide.",
+      "image_2D_url": "https://canchem-images.s3.ap-northeast-2.amazonaws.com/4d1aacae773041488da662236936ac95-962"
+    },
+    {
+      "id": "6646d68fd7e4fb17f5ee2039",
+      "cid": 297,
+      "inpac_name": "methane",
+      "molecular_formula": "CH4",
+      "molecular_weight": 16.043,
+      "isomeric_smiles": "C",
+      "inchi": "InChI=1S/CH4/h1H4",
+      "inchi_key": "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+      "canonical_smiles": "C",
+      "synonyms": [
+        "02329_FLUKA",
+        "0CB689EE-132E-4559-A597-C79A40192203",
+        "14493-06-2",
+        "150036-83-2",
+        "295477_ALDRICH"
+      ],
+      "description": "Methane is a one-carbon compound in which the carbon is attached by single bonds to four hydrogen atoms. It is a colourless, odourless, non-toxic but flammable gas (b.p. -161###). It has a role as a fossil fuel, a member of greenhouse gas and a bacterial metabolite. It is a mononuclear parent hydride, a one-carbon compound, a gas molecular entity and an alkane. It is a conjugate acid of a methanide.",
+      "image_2D_url": "https://canchem-images.s3.ap-northeast-2.amazonaws.com/abcdeff4c18449ff9f2097dd2be982f9-297"
+    }
+  ]
+}

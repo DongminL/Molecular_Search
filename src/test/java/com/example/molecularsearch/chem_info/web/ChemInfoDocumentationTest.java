@@ -4,6 +4,7 @@ import com.example.molecularsearch.chem_info.domain.ChemInfo;
 import com.example.molecularsearch.chem_info.service.ChemInfoService;
 import com.example.molecularsearch.chem_info.service.SynonymsService;
 import com.example.molecularsearch.chem_info.web.dto.ChemInfoDto;
+import com.example.molecularsearch.chem_info.web.dto.SearchResultDto;
 import com.example.molecularsearch.common.anotation.WithMockCustomUser;
 import com.example.molecularsearch.common.documentation.RestDocsSetting;
 import com.example.molecularsearch.search_log.service.SearchLogService;
@@ -11,20 +12,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.molecularsearch.common.documentation.RestDocsFromatGenerator.smilesFormat;
-import static com.example.molecularsearch.common.documentation.RestDocsFromatGenerator.tokenFormat;
-import static org.mockito.ArgumentMatchers.any;
+import static com.example.molecularsearch.common.documentation.RestDocsFromatGenerator.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -53,11 +54,78 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
     @WithMockCustomUser
     void seearchChem() throws Exception {
         // given
+        SearchResultDto response = objectMapper.readValue(new ClassPathResource("searchChemList.json").getFile(),   // ClassPathResource는 `**/resources/`에 있는 파일 읽어옴
+                SearchResultDto.class); // 읽어온 .json 파일을 SearchResultDto에 파싱하여 변환
+
+        given(synonymsService.searchChemInfo(anyString(), anyInt())).willReturn(response);
 
         // when
+        String keyword = "water";
+        String bearerToken = "Bearer Json Web Token";
+        int page = 0;
+
+        ResultActions result = mockMvc.perform(
+                get("/api/search/chem")
+                        .header("Authorization", bearerToken)
+                        .param("keyword", keyword)
+                        .param("page", String.valueOf(page))
+        );
+
+        // page 파라미터가 생략될 때 (default: 0)
+        ResultActions defaultParamPageResult = mockMvc.perform(
+                get("/api/search/chem")
+                        .header("Authorization", bearerToken)
+                        .param("keyword", keyword)
+        );
+
+        doNothing().when(searchLogService).saveSearchLog(anyString());
 
         // then
+        defaultParamPageResult.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.pageNumber").value(0))
+                .andExpect(jsonPath("$.searchResults[1].id").value(response.getSearchResults().get(1).getId()));
 
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.searchResults[1].id").value(response.getSearchResults().get(1).getId()))
+                .andDo(document("search-keyword",
+                        // JSON 값 예쁘게 출력
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        // 요청 헤더 설명
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).attributes(key("type").value("String"))
+                                        .attributes(tokenFormat()).description("JWT (Your Token)")
+                        ),
+                        // 요청 파라미터 설명
+                        queryParameters(
+                                parameterWithName("keyword").attributes(key("type").value("String"))
+                                        .attributes(encodingFormat()).description("검색하려는 분자의 SMILES 식"),
+                                parameterWithName("page").attributes(key("type").value("Number"))
+                                        .attributes(pageFormat()).description("검색 리스트에서 원하는 페이지 번호").optional()
+                        ),
+                        // 응답 값 설명
+                        responseFields(
+                                fieldWithPath("totalElements").description("검색 결과의 총 개수"),
+                                fieldWithPath("totalPages").description("전체 검색 페이지 수"),
+                                fieldWithPath("pageNumber").description("현재 페이지 번호 (0부터 시작)"),
+                                fieldWithPath("pageSize").description("페이지 당 크기"),
+                                fieldWithPath("searchResults[]").description("검색 결과 목록"),
+                                fieldWithPath("searchResults[].id").description("DB에 저장된 ID(PK)"),
+                                fieldWithPath("searchResults[].cid").description("분자 고유 번호"),
+                                fieldWithPath("searchResults[].inpac_name").description("유기 화합물 이름"),
+                                fieldWithPath("searchResults[].molecular_formula").description("화학식"),
+                                fieldWithPath("searchResults[].molecular_weight").description("분자량 (g/mol)"),
+                                fieldWithPath("searchResults[].isomeric_smiles").description("이성질체 SMILES"),
+                                fieldWithPath("searchResults[].inchi").description("국제 화학 식별자"),
+                                fieldWithPath("searchResults[].inchi_key").description("InChI Key 값"),
+                                fieldWithPath("searchResults[].canonical_smiles").description("표준 SMILES"),
+                                fieldWithPath("searchResults[].synonyms[]").description("관련 단어 목록"),
+                                fieldWithPath("searchResults[].description").description("화합물에 대한 설명"),
+                                fieldWithPath("searchResults[].image_2D_url").description("2D 이미지 경로")
+                        )
+                ));
     }
 
     @Test
@@ -80,10 +148,10 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                         "It is functionally related to a propionic acid. " +
                         "It is a conjugate acid of a glycerate.")
                 .synonyms(List.of("GLYCERIC ACID", "DL-Glyceric acid", "473-81-4", "2,3-Dihydroxypropanoic acid", "600-19-1"))
-                .image2DUrl("https://chem-image.com")
+                .image2DUrl("https://canchem-images.s3.ap-northeast-2.amazonaws.com/4c1f89676d874801939b1b4b2a371172-752")
                 .build();
 
-        given(chemInfoService.searchSmiles(any())).willReturn(response);
+        given(chemInfoService.searchSmiles(anyString())).willReturn(response);
 
         // when
         String paramSmiles = "C(C(C(=O)O)O)O";
@@ -112,7 +180,7 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                         // 요청 파라미터 설명
                         queryParameters(
                                 parameterWithName("smiles").attributes(key("type").value("String"))
-                                        .attributes(smilesFormat()).description("검색하려는 분자의 SMILES 식")
+                                        .attributes(encodingFormat()).description("검색하려는 분자의 SMILES 식")
                         ),
                         // 응답 값 설명
                         responseFields(
@@ -121,12 +189,12 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                                 fieldWithPath("inpac_name").description("유기 화합물 이름"),
                                 fieldWithPath("molecular_formula").description("화학식"),
                                 fieldWithPath("molecular_weight").description("분자량 (g/mol)"),
+                                fieldWithPath("isomeric_smiles").description("이성질체 SMILES"),
                                 fieldWithPath("inchi").description("국제 화학 식별자"),
                                 fieldWithPath("inchi_key").description("InChI Key 값"),
                                 fieldWithPath("canonical_smiles").description("표준 SMILES"),
-                                fieldWithPath("isomeric_smiles").description("이성질체 SMILES"),
-                                fieldWithPath("description").description("화합물에 대한 설명"),
                                 fieldWithPath("synonyms").description("관련 단어 목록"),
+                                fieldWithPath("description").description("화합물에 대한 설명"),
                                 fieldWithPath("image_2D_url").description("2D 이미지 경로")
                         )
                 ));
@@ -152,10 +220,10 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                         "It is functionally related to a propionic acid. " +
                         "It is a conjugate acid of a glycerate.")
                 .synonyms(List.of("GLYCERIC ACID", "DL-Glyceric acid", "473-81-4", "2,3-Dihydroxypropanoic acid", "600-19-1"))
-                .image2DUrl("https://chem-image.com")
+                .image2DUrl("https://canchem-images.s3.ap-northeast-2.amazonaws.com/4c1f89676d874801939b1b4b2a371172-752")
                 .build();
 
-        given(chemInfoService.saveInfoByCid(any())).willReturn(response);
+        given(chemInfoService.saveInfoByCid(anyLong())).willReturn(response);
 
         // when
         String bearerToken = "Bearer Json Web Token";
@@ -165,7 +233,7 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
         ResultActions result = mockMvc.perform(
                 post("/api/save/chem")
                         .header("Authorization", bearerToken)
-                        .content(new ObjectMapper().writeValueAsString(request))
+                        .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
@@ -193,12 +261,12 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                                 fieldWithPath("inpacName").description("유기 화합물 이름"),
                                 fieldWithPath("molecularFormula").description("화학식"),
                                 fieldWithPath("molecularWeight").description("분자량 (g/mol)"),
-                                fieldWithPath("inchi").description("국제 화학 식별자"),
-                                fieldWithPath("inchiKey").description("InChI Key 값"),
-                                fieldWithPath("canonicalSmiles").description("표준 SMILES"),
                                 fieldWithPath("isomericSmiles").description("이성질체 SMILES"),
-                                fieldWithPath("description").description("화합물에 대한 설명"),
+                                fieldWithPath("inchi").description("국제 화학 식별자"),
+                                fieldWithPath("inchi_key").description("InChI Key 값"),
+                                fieldWithPath("canonicalSmiles").description("표준 SMILES"),
                                 fieldWithPath("synonyms").description("관련 단어 목록"),
+                                fieldWithPath("description").description("화합물에 대한 설명"),
                                 fieldWithPath("image2DUrl").description("2D 이미지 경로")
                         )
                 ));
@@ -224,10 +292,10 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                         "It is functionally related to a propionic acid. " +
                         "It is a conjugate acid of a glycerate.")
                 .synonyms(List.of("GLYCERIC ACID", "DL-Glyceric acid", "473-81-4", "2,3-Dihydroxypropanoic acid", "600-19-1"))
-                .image2DUrl("https://chem-image.com")
+                .image2DUrl("https://canchem-images.s3.ap-northeast-2.amazonaws.com/4c1f89676d874801939b1b4b2a371172-752")
                 .build();
 
-        given(chemInfoService.findChemInfoById(any())).willReturn(response);
+        given(chemInfoService.findChemInfoById(anyString())).willReturn(response);
 
         String chemId = "6646d897d7e4fb17f5ee2362";
         String bearerToken = "Bearer Json Web Token";
@@ -262,12 +330,12 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
                                 fieldWithPath("inpac_name").description("유기 화합물 이름"),
                                 fieldWithPath("molecular_formula").description("화학식"),
                                 fieldWithPath("molecular_weight").description("분자량 (g/mol)"),
+                                fieldWithPath("isomeric_smiles").description("이성질체 SMILES"),
                                 fieldWithPath("inchi").description("국제 화학 식별자"),
                                 fieldWithPath("inchi_key").description("InChI Key 값"),
                                 fieldWithPath("canonical_smiles").description("표준 SMILES"),
-                                fieldWithPath("isomeric_smiles").description("이성질체 SMILES"),
-                                fieldWithPath("description").description("화합물에 대한 설명"),
                                 fieldWithPath("synonyms").description("관련 단어 목록"),
+                                fieldWithPath("description").description("화합물에 대한 설명"),
                                 fieldWithPath("image_2D_url").description("2D 이미지 경로")
                         )
                 ));

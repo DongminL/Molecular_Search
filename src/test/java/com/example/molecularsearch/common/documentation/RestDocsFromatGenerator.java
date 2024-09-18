@@ -23,7 +23,11 @@ public interface RestDocsFromatGenerator {
         return key("format").value("Bearer YOUR_TOKEN");
     }
 
-    static Attributes.Attribute smilesFormat() {
+    static Attributes.Attribute encodingFormat() {
         return key("format").value("URL 인코딩 필수");
+    }
+
+    static Attributes.Attribute pageFormat() {
+        return  key("format").value("0부터 시작");
     }
 }
