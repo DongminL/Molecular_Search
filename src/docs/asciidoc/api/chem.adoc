@@ -1,20 +1,31 @@
 === 분자 정보 (Chem Info)
 `Keyword`, `SMILES`, `ID` 값을 통해 원하는 `분자 정보` 를 `요청` 및 `저장` 할 수 있습니다.
 
+==== 에러 코드
+분자정보 API 사용 시, 발생할 수 있는 에러
+|====
+| Http Status | 에러 이름 | 메시지 | 설명
+
+| `NOT_FOUND(404)` | `NOT_FOUND_CHEM_INFO` | "해당 분자 정보를 찾을 수 없습니다." | 존재하지 않는 분자를 요청
+| `CONFLICT(409)` | `ALREADY_EXIST_CHEM_INFO` | "이미 존재하는 분자 정보입니다." | 중복된 분자 데이터 저장
+| `INTERNAL_SERVER_ERROR(500)` | `EXTERNAL_API_REQUEST_FAILED` | "알 수 없는 이유로 외부 API 요청이 실패하였습니다." | AWS나 인공지능 서버로 인한 오류
+
+|====
+
 ==== Keyword로 분자 정보 검색
-네이버 계정으로 로그인합니다.
-최초 로그인 시, 자동으로 회원가입 됩니다.
+Keyword로 분자 정보를 검색합니다.
+검색창으로 분자 정보를 검색할 때 사용됩니다.
 
 [discrete]
 ===== 요청
-include::{snippets}/naver-login/http-request.adoc[]
-
-include::{snippets}/naver-login/request-fields.adoc[]
+include::{snippets}/search-keyword/http-request.adoc[]
+include::{snippets}/search-keyword/request-headers.adoc[]
+include::{snippets}/search-keyword/query-parameters.adoc[]
 
 [discrete]
 ===== 응답
-include::{snippets}/naver-login/http-response.adoc[]
-include::{snippets}/naver-login/response-fields.adoc[]
+include::{snippets}/search-keyword/http-response.adoc[]
+include::{snippets}/search-keyword/response-fields.adoc[]
 
 ==== SMILES로 분자 정보 검색
 SMILES 식으로 분자 정보를 검색합니다.
@@ -35,13 +46,14 @@ CID 값으로 PubChem에서 분자 정보 데이터를 가져와 저장합니다
 
 [discrete]
 ===== 요청
-include::{snippets}/token-reissue/http-request.adoc[]
-include::{snippets}/token-reissue/request-headers.adoc[]
+include::{snippets}/save-chem/http-request.adoc[]
+include::{snippets}/save-chem/request-headers.adoc[]
+include::{snippets}/save-chem/request-fields.adoc[]
 
 [discrete]
 ===== 응답
-include::{snippets}/token-reissue/http-response.adoc[]
-include::{snippets}/token-reissue/response-fields.adoc[]
+include::{snippets}/save-chem/http-response.adoc[]
+include::{snippets}/save-chem/response-fields.adoc[]
 
 ==== ID 값으로 분자 정보 검색
 ID 값으로 분자 정보를 검색합니다. +
@@ -49,9 +61,11 @@ ID 값으로 분자 정보를 검색합니다. +
 
 [discrete]
 ===== 요청
-include::{snippets}/logout/http-request.adoc[]
-include::{snippets}/logout/request-headers.adoc[]
+include::{snippets}/search-id/http-request.adoc[]
+include::{snippets}/search-id/path-parameters.adoc[]
+include::{snippets}/search-id/request-headers.adoc[]
 
 [discrete]
 ===== 응답
-include::{snippets}/logout/http-response.adoc[]
+include::{snippets}/search-id/http-response.adoc[]
+include::{snippets}/search-id/response-fields.adoc[]

@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static com.example.molecularsearch.common.documentation.RestDocsFromatGenerator.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
@@ -154,12 +155,12 @@ class OAuthLoginDocumentationTest extends RestDocsSetting {
                 .expiredAt(3600000L)
                 .build();
 
-        given(jwtService.reissueAccessToken(any())).willReturn(response);
+        given(jwtService.reissueAccessToken(anyString())).willReturn(response);
 
         // when
         String bearerToken = "Bearer Json Web Token";
 
-        when(jwtService.getHeaderToken(any())).thenReturn(bearerToken.substring(7));
+        when(jwtService.getHeaderToken(anyString())).thenReturn(bearerToken.substring(7));
 
         ResultActions result = mockMvc.perform(
                 patch("/api/login/reissue")
@@ -195,7 +196,7 @@ class OAuthLoginDocumentationTest extends RestDocsSetting {
         // given
         String bearerToken = "Bearer Json Web Token";
 
-        given(jwtService.getHeaderToken(any())).willReturn("");
+        given(jwtService.getHeaderToken(anyString())).willReturn("");
 
         // when
         ResultActions result = mockMvc.perform(
