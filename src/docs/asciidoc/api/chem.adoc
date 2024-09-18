@@ -35,13 +35,14 @@ CID 값으로 PubChem에서 분자 정보 데이터를 가져와 저장합니다
 
 [discrete]
 ===== 요청
-include::{snippets}/token-reissue/http-request.adoc[]
-include::{snippets}/token-reissue/request-headers.adoc[]
+include::{snippets}/save-chem/http-request.adoc[]
+include::{snippets}/save-chem/request-headers.adoc[]
+include::{snippets}/save-chem/request-fields.adoc[]
 
 [discrete]
 ===== 응답
-include::{snippets}/token-reissue/http-response.adoc[]
-include::{snippets}/token-reissue/response-fields.adoc[]
+include::{snippets}/save-chem/http-response.adoc[]
+include::{snippets}/save-chem/response-fields.adoc[]
 
 ==== ID 값으로 분자 정보 검색
 ID 값으로 분자 정보를 검색합니다. +
