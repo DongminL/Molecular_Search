@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,8 +30,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -172,7 +172,7 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
         // then
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.isomericSmiles").value(response.getIsomericSmiles()))
+                .andExpect(jsonPath("$.cid").value(response.getCid()))
                 .andDo(document("save-chem",
                         // JSON 값 예쁘게 출력
                         preprocessRequest(prettyPrint()),
@@ -209,10 +209,67 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
     @WithMockCustomUser
     void idChem() throws Exception {
         // given
+        ChemInfoDto response = ChemInfoDto.builder()
+                .id("6646d897d7e4fb17f5ee2362")
+                .cid(752L)
+                .inpacName("2,3-dihydroxypropanoic acid")
+                .molecularFormula("C3H6O4")
+                .molecularWeight(106.08)
+                .inchi("InChI=1S/C3H6O4/c4-1-2(5)3(6)7/h2,4-5H,1H2,(H,6,7)")
+                .inchiKey("RBNPOMFGQQGHHO-UHFFFAOYSA-N")
+                .canonicalSmiles("C(C(C(=O)O)O)O")
+                .isomericSmiles("C(C(C(=O)O)O)O")
+                .description("Glyceric acid is a trionic acid that consists of propionic acid substituted at positions 2 and 3 by hydroxy groups. " +
+                        "It has a role as a fundamental metabolite. " +
+                        "It is functionally related to a propionic acid. " +
+                        "It is a conjugate acid of a glycerate.")
+                .synonyms(List.of("GLYCERIC ACID", "DL-Glyceric acid", "473-81-4", "2,3-Dihydroxypropanoic acid", "600-19-1"))
+                .image2DUrl("https://chem-image.com")
+                .build();
 
-        // when
+        given(chemInfoService.findChemInfoById(any())).willReturn(response);
+
+        String chemId = "6646d897d7e4fb17f5ee2362";
+        String bearerToken = "Bearer Json Web Token";
+
+        ResultActions result = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/api/search/{chemId}", chemId)
+                        .header("Authorization", bearerToken)
+
+        );
 
         // then
-
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(response.getId()))
+                .andDo(document("search-id",
+                        // JSON 값 예쁘게 출력
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        // 요청 헤더 설명
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).attributes(key("type").value("String"))
+                                        .attributes(tokenFormat()).description("JWT (Your Token)")
+                        ),
+                        // 요청 파라미터 설명
+                        pathParameters(
+                                parameterWithName("chemId").attributes(key("type").value("String")).description("가져오려는 분자의 ID(PK)")
+                        ),
+                        // 응답 값 설명
+                        responseFields(
+                                fieldWithPath("id").description("DB에 저장된 ID(PK)"),
+                                fieldWithPath("cid").description("분자 고유 번호"),
+                                fieldWithPath("inpac_name").description("유기 화합물 이름"),
+                                fieldWithPath("molecular_formula").description("화학식"),
+                                fieldWithPath("molecular_weight").description("분자량 (g/mol)"),
+                                fieldWithPath("inchi").description("국제 화학 식별자"),
+                                fieldWithPath("inchi_key").description("InChI Key 값"),
+                                fieldWithPath("canonical_smiles").description("표준 SMILES"),
+                                fieldWithPath("isomeric_smiles").description("이성질체 SMILES"),
+                                fieldWithPath("description").description("화합물에 대한 설명"),
+                                fieldWithPath("synonyms").description("관련 단어 목록"),
+                                fieldWithPath("image_2D_url").description("2D 이미지 경로")
+                        )
+                ));
     }
 }

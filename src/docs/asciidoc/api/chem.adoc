@@ -50,9 +50,11 @@ ID 값으로 분자 정보를 검색합니다. +
 
 [discrete]
 ===== 요청
-include::{snippets}/logout/http-request.adoc[]
-include::{snippets}/logout/request-headers.adoc[]
+include::{snippets}/search-id/http-request.adoc[]
+include::{snippets}/search-id/path-parameters.adoc[]
+include::{snippets}/search-id/request-headers.adoc[]
 
 [discrete]
 ===== 응답
-include::{snippets}/logout/http-response.adoc[]
+include::{snippets}/search-id/http-response.adoc[]
+include::{snippets}/search-id/response-fields.adoc[]
