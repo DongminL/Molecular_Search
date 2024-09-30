@@ -21,13 +21,14 @@ public class InfoBookmarkController {
     @PostMapping("/api/save/bookmark/{chemId}")
     public ResponseEntity<?> addInfoBookmark(@PathVariable String chemId) {
         infoBookmarkService.saveInfoBookmark(chemId);
+
         return ResponseEntity.ok("즐겨찾기 추가 성공");
     }
 
     /* 즐겨찾기 해제 */
-    @DeleteMapping("/api/off/bookmark/{chemInfoId}")
-    public ResponseEntity<String> offInfoBookmark(@PathVariable String chemInfoId) {
-        infoBookmarkService.deleteInfoBookmark(chemInfoId);
+    @DeleteMapping("/api/off/bookmark/{chemId}")
+    public ResponseEntity<String> offInfoBookmark(@PathVariable String chemId) {
+        infoBookmarkService.deleteInfoBookmark(chemId);
 
         return ResponseEntity.ok("즐겨찾기 해제 완료");
     }
