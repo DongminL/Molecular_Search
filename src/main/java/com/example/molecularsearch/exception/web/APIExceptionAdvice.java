@@ -2,12 +2,13 @@ package com.example.molecularsearch.exception.web;
 
 import com.example.molecularsearch.exception.dto.ErrorDto;
 import com.example.molecularsearch.exception.error.CustomException;
+import com.example.molecularsearch.exception.error.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 
@@ -15,18 +16,18 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class APIExceptionAdvice {
 
-    /* 존재하지 않는 URL로 요청 시, NoHandlerFoundException Handling */
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorDto> handleUnknownResource(NoHandlerFoundException e) {
+    /* 존재하지 않는 자원으로 요청 시, NoResourceFoundException Handling */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorDto> handleUnknownResource(NoResourceFoundException e) {
         log.error("Global Exception, status: {}, error: {}, message: {}, requested url: {}, timestemp: {}",
-                e.getStatusCode().value(), "NOT_FOUND_PATH", "존재하지 않는 경로입니다.",
-                e.getHttpMethod().concat(" ").concat(e.getRequestURL()), LocalDateTime.now());
+                e.getStatusCode().value(), ErrorCode.NOT_FOUND_PATH.getError(), ErrorCode.NOT_FOUND_PATH.getMessage(),
+                e.getHttpMethod().name().concat(" ").concat(e.getResourcePath()), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorDto.builder()
-                        .status(e.getStatusCode().value())
-                        .error("NOT_FOUND_PATH")
-                        .message("존재하지 않는 경로입니다. path: " + e.getRequestURL())
+                        .status(ErrorCode.NOT_FOUND_PATH.getStatus())
+                        .error(ErrorCode.NOT_FOUND_PATH.getError())
+                        .message(ErrorCode.NOT_FOUND_PATH.getMessage())
                         .build());
     }
 

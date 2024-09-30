@@ -1,6 +1,7 @@
 package com.example.molecularsearch.bookmark.web;
 
 import com.example.molecularsearch.bookmark.web.dto.InfoBookmarkDto;
+import com.example.molecularsearch.bookmark.web.dto.SearchBookmarkDto;
 import com.example.molecularsearch.exception.error.CustomException;
 import com.example.molecularsearch.exception.error.ErrorCode;
 import com.example.molecularsearch.bookmark.service.InfoBookmarkService;
@@ -21,20 +22,21 @@ public class InfoBookmarkController {
     @PostMapping("/api/save/bookmark/{chemId}")
     public ResponseEntity<?> addInfoBookmark(@PathVariable String chemId) {
         infoBookmarkService.saveInfoBookmark(chemId);
+
         return ResponseEntity.ok("즐겨찾기 추가 성공");
     }
 
     /* 즐겨찾기 해제 */
-    @DeleteMapping("/api/off/bookmark/{chemInfoId}")
-    public ResponseEntity<String> offInfoBookmark(@PathVariable String chemInfoId) {
-        infoBookmarkService.deleteInfoBookmark(chemInfoId);
+    @DeleteMapping("/api/off/bookmark/{chemId}")
+    public ResponseEntity<String> offInfoBookmark(@PathVariable String chemId) {
+        infoBookmarkService.deleteInfoBookmark(chemId);
 
         return ResponseEntity.ok("즐겨찾기 해제 완료");
     }
 
     /* 즐겨찾기 리스트 */
     @GetMapping("/api/search/bookmark")
-    public ResponseEntity<?> showInfoBookmark() {
+    public ResponseEntity<SearchBookmarkDto> showInfoBookmark() {
         return ResponseEntity.ok(infoBookmarkService.getBookmarkList());
     }
 

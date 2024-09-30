@@ -54,7 +54,7 @@ class ChemInfoDocumentationTest extends RestDocsSetting {
     @WithMockCustomUser
     void seearchChem() throws Exception {
         // given
-        SearchResultDto response = objectMapper.readValue(new ClassPathResource("searchChemList.json").getFile(),   // ClassPathResource는 `**/resources/`에 있는 파일 읽어옴
+        SearchResultDto response = objectMapper.readValue(new ClassPathResource("json/searchChemList.json").getFile(),   // ClassPathResource는 `**/resources/`에 있는 파일 읽어옴
                 SearchResultDto.class); // 읽어온 .json 파일을 SearchResultDto에 파싱하여 변환
 
         given(synonymsService.searchChemInfo(anyString(), anyInt())).willReturn(response);
