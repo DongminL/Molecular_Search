@@ -1,0 +1,19 @@
+{
+  "bookmarkList": [
+    {
+      "id": 1,
+      "chem_id": "6646d897d7e4fb17f5ee2362",
+      "molecular_formula": "C3H6O4"
+    },
+    {
+      "id": 2,
+      "chem_id": "6646d98fd7e4fb17f5ee24db",
+      "molecular_formula": "H2O"
+    },
+    {
+      "id": 3,
+      "chem_id": "6646d68fd7e4fb17f5ee2039",
+      "molecular_formula": "CH4"
+    }
+  ]
+}

@@ -79,5 +79,7 @@ v2024.09.17
 == API
 include::{docdir}/src/docs/asciidoc/api/login.adoc[]
 include::{docdir}/src/docs/asciidoc/api/chem.adoc[]
+include::{docdir}/src/docs/asciidoc/api/bookmark.adoc[]
 // include::{docdir}/api/login.adoc[]
 // include::{docdir}/api/chem.adoc[]
+// include::{docdir}/api/bookmark.adoc[]

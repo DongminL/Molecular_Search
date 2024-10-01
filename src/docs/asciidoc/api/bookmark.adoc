@@ -1,0 +1,108 @@
+=== 즐겨찾기 (Info Bookmark)
+`Token` 및 `분자 정보 ID`, `즐겨찾기 ID` 값을 통해 `분자 정보` 를 `즐겨찾기` `추가` 및 `삭제`, `리스트 요청` 등을 할 수 있습니다.
+
+==== 에러 코드
+분자정보 API 사용 시, 발생할 수 있는 에러
+|====
+| Http Status | 에러 이름 | 메시지 | 설명
+
+| `NOT_FOUND(404)` | `NOT_FOUND_BOOKMARK` | "해당 즐겨찾기를 찾을 수 없습니다." | 존재하지 않는 즐겨찾기 정보 요청
+| `CONFLICT(409)` | `ALREADY_EXIST_BOOKMARK` | "이미 즐겨찾기한 분자 정보입니다." | 중복된 즐겨찾기 정보 추가
+
+|====
+
+==== 즐겨찾기 추가
+해당 분자 정보를 즐겨찾기 추가합니다.
+
+[discrete]
+===== 요청
+include::{snippets}/add-bookmark/http-request.adoc[]
+include::{snippets}/add-bookmark/request-headers.adoc[]
+include::{snippets}/add-bookmark/path-parameters.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/add-bookmark/http-response.adoc[]
+
+==== 즐겨찾기 해제
+해당 분자 정보를 즐겨찾기 해제합니다.
+
+[discrete]
+===== 요청
+include::{snippets}/off-bookmark/http-request.adoc[]
+
+include::{snippets}/off-bookmark/path-parameters.adoc[]
+include::{snippets}/off-bookmark/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/off-bookmark/http-response.adoc[]
+
+==== 즐겨찾기 여부 확인
+Token과 즐겨찾기 ID(PK) 값으로 유저의 해당 분자 정보를 즐겨찾기 했는지 확인합니다. +
+분자 정보 페이지에서 즐겨찾기 여부를 표시하기 위해 사용됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/check-bookmark/http-request.adoc[]
+include::{snippets}/check-bookmark/path-parameters.adoc[]
+include::{snippets}/check-bookmark/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/check-bookmark/http-response.adoc[]
+include::{snippets}/check-bookmark/response-fields.adoc[]
+
+==== 즐겨찾기 리스트 가져오기
+Token으로 해당 유저의 즐겨찾기 리스트를 가져옵니다.
+
+[discrete]
+===== 요청
+include::{snippets}/search-bookmark/http-request.adoc[]
+include::{snippets}/search-bookmark/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/search-bookmark/http-response.adoc[]
+include::{snippets}/search-bookmark/response-fields.adoc[]
+
+==== 즐겨찾기 단일 삭제
+ID 값으로 즐겨찾기를 삭제합니다. +
+즐겨찾기 페이지에서 하나만 삭제하려고 할 때 사용됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/remove-one-bookmark/http-request.adoc[]
+include::{snippets}/remove-one-bookmark/path-parameters.adoc[]
+include::{snippets}/remove-one-bookmark/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/remove-one-bookmark/http-response.adoc[]
+
+==== 즐겨찾기 편집 삭제
+즐겨찾기 리스트로 해당 즐겨찾기들을 삭제합니다. +
+즐겨찾기 페이지에서 편집으로 삭제하려고 할 때 사용됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/edit-bookmark/http-request.adoc[]
+include::{snippets}/edit-bookmark/request-headers.adoc[]
+include::{snippets}/edit-bookmark/request-fields.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/edit-bookmark/http-response.adoc[]
+
+==== 즐겨찾기 전체 삭제
+Token 값으로 해당 유저의 전체 즐겨찾기를 삭제합니다. +
+즐겨찾기 페이지에서 모두 삭제하려고 할 때 사용됩니다.
+
+[discrete]
+===== 요청
+include::{snippets}/remove-all-bookmark/http-request.adoc[]
+include::{snippets}/remove-all-bookmark/request-headers.adoc[]
+
+[discrete]
+===== 응답
+include::{snippets}/remove-all-bookmark/http-response.adoc[]

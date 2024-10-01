@@ -66,7 +66,7 @@ public class InfoBookmarkController {
 
     /* 즐겨찾기 유무 */
     @GetMapping("/api/check/bookmark/{chemId}")
-    public ResponseEntity<?> checkInfoFav(@PathVariable String chemId) {
+    public ResponseEntity<?> checkInfoBookmark(@PathVariable String chemId) {
         return ResponseEntity.ok(infoBookmarkService.checkInfoBookmark(chemId));
     }
 }
