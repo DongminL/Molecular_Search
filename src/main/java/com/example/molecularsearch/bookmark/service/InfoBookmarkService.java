@@ -1,7 +1,7 @@
 package com.example.molecularsearch.bookmark.service;
 
 import com.example.molecularsearch.bookmark.web.dto.InfoBookmarkDto;
-import com.example.molecularsearch.bookmark.web.dto.SearchBookmarkDto;
+import com.example.molecularsearch.bookmark.web.dto.BookmarkListDto;
 import com.example.molecularsearch.chem_info.domain.ChemInfo;
 import com.example.molecularsearch.bookmark.entity.InfoBookmark;
 import com.example.molecularsearch.users.entity.Users;
@@ -57,7 +57,7 @@ public class InfoBookmarkService {
 
     /* 해당 유저의 즐겨찾기 리스트 가져오기 */
     @Transactional(readOnly = true)
-    public SearchBookmarkDto getBookmarkList() {
+    public BookmarkListDto getBookmarkList() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();    // Security Context에 저장된 유저 PK 값 가져오기
 
         List<InfoBookmark> entityList = infoBookmarkRepository.findAllByUser_IdOrderByModifiedDateDesc(userPk);   // 해당 유저의 즐겨찾기 리스트 가져오기
@@ -70,7 +70,7 @@ public class InfoBookmarkService {
         });
 
         // 쉽게 Parsing 할 수 있게 Mapping
-        SearchBookmarkDto result = SearchBookmarkDto.builder()
+        BookmarkListDto result = BookmarkListDto.builder()
                 .bookmarkDtoList(dtoList)
                 .build();
 

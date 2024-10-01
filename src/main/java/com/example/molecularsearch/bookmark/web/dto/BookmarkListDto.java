@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchBookmarkDto {
+public class BookmarkListDto {
 
     @JsonProperty("bookmarkList")
     private List<InfoBookmarkDto> bookmarkDtoList;  // 즐겨찾기 목록
