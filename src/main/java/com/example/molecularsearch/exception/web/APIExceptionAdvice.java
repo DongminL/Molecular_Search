@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,21 @@ public class APIExceptionAdvice {
         log.error("Global Exception, status: {}, error: {}, message: {}, requested url: {}, timestemp: {}",
                 e.getStatusCode().value(), ErrorCode.NOT_FOUND_PATH.getError(), ErrorCode.NOT_FOUND_PATH.getMessage(),
                 e.getHttpMethod().name().concat(" ").concat(e.getResourcePath()), LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorDto.builder()
+                        .status(ErrorCode.NOT_FOUND_PATH.getStatus())
+                        .error(ErrorCode.NOT_FOUND_PATH.getError())
+                        .message(ErrorCode.NOT_FOUND_PATH.getMessage())
+                        .build());
+    }
+
+    /* 존재하지 않는 URL로 API 요청 시, NoHandlerFoundException Handling */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorDto> handleUnknownResource(NoHandlerFoundException e) {
+        log.error("Global Exception, status: {}, error: {}, message: {}, requested url: {}, timestemp: {}",
+                e.getStatusCode().value(), ErrorCode.NOT_FOUND_PATH.getError(), ErrorCode.NOT_FOUND_PATH.getMessage(),
+                e.getHttpMethod().concat(" ").concat(e.getRequestURL()), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorDto.builder()
