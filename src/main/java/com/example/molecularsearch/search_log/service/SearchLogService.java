@@ -1,9 +1,10 @@
 package com.example.molecularsearch.search_log.service;
 
-import com.example.molecularsearch.search_log.web.dto.SearchLogDto;
-import com.example.molecularsearch.search_log.entity.SearchLog;
 import com.example.molecularsearch.jwt.service.CustomUserDetailsService;
+import com.example.molecularsearch.search_log.entity.SearchLog;
 import com.example.molecularsearch.search_log.repository.SearchLogRepository;
+import com.example.molecularsearch.search_log.web.dto.SearchLogDto;
+import com.example.molecularsearch.search_log.web.dto.SearchLogListDto;
 import com.example.molecularsearch.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -75,7 +74,7 @@ public class SearchLogService {
 
     /* 유저에 대한 모든 검색 기록 가져오기 */
     @Transactional(readOnly = true)
-    public Map<String, List<SearchLogDto>> findSearchLog() {
+    public SearchLogListDto findSearchLog() {
         Long userPk = customUserDetailsService.getCurrentUserPk().get();  // Security Context에서 Users PK 값 가져오기
 
         List<SearchLog> searchLogs = searchLogRepository.findAllByUser_IdOrderByCreatedDateDesc(userPk);    // 해당 유저에 대한 전체 검색 기록
@@ -88,8 +87,7 @@ public class SearchLogService {
         });
 
         // 쉽게 Parsing 할 수 있게 Mapping
-        Map<String, List<SearchLogDto>> result = new HashMap<>();
-        result.put("searchLogList", searchLogDtos);
+        SearchLogListDto result = SearchLogListDto.builder().searchLogDtoList(searchLogDtos).build();
 
         log.debug("검색기록 가져오기, user_PK : {}, timestemp: {}", userPk, LocalDateTime.now());
 

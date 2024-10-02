@@ -1,15 +1,12 @@
 package com.example.molecularsearch.search_log.web;
 
-import com.example.molecularsearch.search_log.web.dto.SearchLogDto;
 import com.example.molecularsearch.exception.error.CustomException;
 import com.example.molecularsearch.exception.error.ErrorCode;
 import com.example.molecularsearch.search_log.service.SearchLogService;
+import com.example.molecularsearch.search_log.web.dto.SearchLogListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +16,7 @@ public class SearchLogController {
 
     /* 검색 기록 가져오기 */
     @GetMapping("/api/get/log/search")
-    public ResponseEntity<?> showSearchLog() {
+    public ResponseEntity<SearchLogListDto> showSearchLog() {
         return ResponseEntity.ok(searchLogService.findSearchLog());
     }
 
@@ -33,14 +30,12 @@ public class SearchLogController {
 
     /* 검색 기록 편집을 통해 삭제 */
     @DeleteMapping("/api/edit/log/search")
-    public ResponseEntity<String> editSearchLog(@RequestBody Map<String, List<SearchLogDto>> mapSearchLogDtos) {
+    public ResponseEntity<String> editSearchLog(@RequestBody SearchLogListDto searchLogListDto) {
         try {
-            mapSearchLogDtos.get("searchLogList");
+            searchLogService.editSearchLog(searchLogListDto.getSearchLogDtoList());
         } catch (NullPointerException e) {
             throw new CustomException(ErrorCode.BAD_REQUEST);
         }
-
-        searchLogService.editSearchLog(mapSearchLogDtos.get("searchLogList"));
 
         return ResponseEntity.ok("검색기록 삭제 완료");
     }
