@@ -29,22 +29,15 @@ public class JwtAcessDeniedHandler extends AccessDeniedHandlerImpl {
 
         if (requestEndpointUtil.isEndpointExist(request)) {
             errorBody = requestEndpointUtil.makeErrorBody(ErrorCode.FORBIDDEN, request);
-
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
-            response.setStatus(errorBody.getStatus());    // 에러 응답 메시지 Status 설정
-
-            // JSON으로 변환하여 전송
-            ObjectMapper json = new ObjectMapper();
-            json.writeValue(response.getOutputStream(), errorBody);
         } else {
             errorBody = requestEndpointUtil.makeErrorBody(ErrorCode.NOT_FOUND_PATH, request);
-
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
-            response.setStatus(errorBody.getStatus());    // 에러 응답 메시지 Status 설정
-
-            // JSON으로 변환하여 전송
-            ObjectMapper json = new ObjectMapper();
-            json.writeValue(response.getOutputStream(), errorBody);
         }
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // 응답 메시지 타입 JSON으로 설정
+        response.setStatus(errorBody.getStatus());    // 에러 응답 메시지 Status 설정
+
+        // JSON으로 변환하여 전송
+        ObjectMapper json = new ObjectMapper();
+        json.writeValue(response.getOutputStream(), errorBody);
     }
 }
