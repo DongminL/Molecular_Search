@@ -143,7 +143,7 @@ class InfoBookmarkDocumentationTest extends RestDocsSetting {
                         ),
                         // 응답 값 설명
                         responseFields(
-                                fieldWithPath("bookmarkList[]").description("검색 결과 목록"),
+                                fieldWithPath("bookmarkList[]").description("즐겨찾기 검색 결과 목록"),
                                 fieldWithPath("bookmarkList[].id").description("DB에 저장된 즐겨찾기 ID(PK)"),
                                 fieldWithPath("bookmarkList[].chem_id").description("DB에 저장된 분자 정보 ID(PK)"),
                                 fieldWithPath("bookmarkList[].molecular_formula").description("화학식")
@@ -230,7 +230,7 @@ class InfoBookmarkDocumentationTest extends RestDocsSetting {
                         ),
                         // 요청 값 설명
                         requestFields(
-                                fieldWithPath("bookmarkList[]").description("검색 결과 목록"),
+                                fieldWithPath("bookmarkList[]").description("즐겨찾기 검색 결과 목록"),
                                 fieldWithPath("bookmarkList[].id").description("DB에 저장된 즐겨찾기 ID(PK)"),
                                 fieldWithPath("bookmarkList[].chem_id").description("DB에 저장된 분자 정보 ID(PK)"),
                                 fieldWithPath("bookmarkList[].molecular_formula").description("화학식")

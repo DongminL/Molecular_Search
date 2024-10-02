@@ -80,6 +80,8 @@ v2024.09.17
 include::{docdir}/src/docs/asciidoc/api/login.adoc[]
 include::{docdir}/src/docs/asciidoc/api/chem.adoc[]
 include::{docdir}/src/docs/asciidoc/api/bookmark.adoc[]
+include::{docdir}/src/docs/asciidoc/api/search_log.adoc[]
 // include::{docdir}/api/login.adoc[]
 // include::{docdir}/api/chem.adoc[]
 // include::{docdir}/api/bookmark.adoc[]
+// include::{docdir}/api/search_log.adoc[]
