@@ -55,9 +55,10 @@ v2024.09.17
 [source, json]
 {
     "timestemp": "2024-04-28T22:12:52.756712100",   // 발생한 시간
+    "path": "/api/logout",     // 요청받은 URL 경로
     "status": "401",    // HTTP Status
     "error": "TOKEN_EXPIRATION",    // 에러 코드
-    "message": "토큰이 만료 되었습니다.", // 에러 관련 메시지
+    "message": "토큰이 만료 되었습니다." // 에러 관련 메시지
 }
 
 ==== 공통 에러 코드 (4XX, 5XX)
