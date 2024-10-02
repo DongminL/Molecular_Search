@@ -33,9 +33,10 @@ public enum ErrorCode {
 
     /* Common Error */
     BAD_REQUEST(HttpStatus.BAD_REQUEST.value(), "BAD_REQUEST", "잘못된 요청입니다."),
-    NOT_FOUND_PATH(HttpStatus.NOT_FOUND.value(), "NOT_FOUND_PATH", "잘못된 경로입니다."),
-    FORBIDDEN(HttpStatus.FORBIDDEN.value(), "FORBIDDEN", "접근할 권한이 없습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED.value(), "UNAUTHORIZED", "유효한 인증을 해주세요."),
+    FORBIDDEN(HttpStatus.FORBIDDEN.value(), "FORBIDDEN", "접근할 권한이 없습니다."),
+    NOT_FOUND_PATH(HttpStatus.NOT_FOUND.value(), "NOT_FOUND_PATH", "잘못된 경로입니다."),
+    METHOD_NOT_SUPPORTED(HttpStatus.METHOD_NOT_ALLOWED.value(), "METHOD_NOT_SUPPORTED", "올바르지 않은 HTTP Method 요청입니다."),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "SERVER_ERROR", "알 수 없는 에러가 발생했습니다. 관리자에게 문의하세요.");
 
     private final int status;    // HttpStatus 코드
