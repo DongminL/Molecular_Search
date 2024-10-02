@@ -28,6 +28,7 @@ public class APIExceptionAdvice {
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
                 .body(ErrorDto.builder()
+                        .path(request.getServletPath())
                         .status(ErrorCode.METHOD_NOT_SUPPORTED.getStatus())
                         .error(ErrorCode.METHOD_NOT_SUPPORTED.getError())
                         .message(ErrorCode.METHOD_NOT_SUPPORTED.getMessage())
@@ -36,13 +37,14 @@ public class APIExceptionAdvice {
 
     /* 존재하지 않는 자원으로 요청 시, NoResourceFoundException Handling */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorDto> handleUnknownResource(NoResourceFoundException e) {
+    public ResponseEntity<ErrorDto> handleUnknownResource(NoResourceFoundException e, HttpServletRequest request) {
         log.error("Global Exception, status: {}, error: {}, message: {}, requested url: {}, timestemp: {}",
                 e.getStatusCode().value(), ErrorCode.NOT_FOUND_PATH.getError(), ErrorCode.NOT_FOUND_PATH.getMessage(),
                 e.getHttpMethod().name().concat(" ").concat(e.getResourcePath()), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorDto.builder()
+                        .path(request.getServletPath())
                         .status(ErrorCode.NOT_FOUND_PATH.getStatus())
                         .error(ErrorCode.NOT_FOUND_PATH.getError())
                         .message(ErrorCode.NOT_FOUND_PATH.getMessage())
@@ -51,13 +53,14 @@ public class APIExceptionAdvice {
 
     /* 존재하지 않는 URL로 API 요청 시, NoHandlerFoundException Handling */
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorDto> handleUnknownResource(NoHandlerFoundException e) {
+    public ResponseEntity<ErrorDto> handleUnknownResource(NoHandlerFoundException e, HttpServletRequest request) {
         log.error("Global Exception, status: {}, error: {}, message: {}, requested url: {}, timestemp: {}",
                 e.getStatusCode().value(), ErrorCode.NOT_FOUND_PATH.getError(), ErrorCode.NOT_FOUND_PATH.getMessage(),
                 e.getHttpMethod().concat(" ").concat(e.getRequestURL()), LocalDateTime.now());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorDto.builder()
+                        .path(request.getServletPath())
                         .status(ErrorCode.NOT_FOUND_PATH.getStatus())
                         .error(ErrorCode.NOT_FOUND_PATH.getError())
                         .message(ErrorCode.NOT_FOUND_PATH.getMessage())
@@ -66,17 +69,18 @@ public class APIExceptionAdvice {
 
     /* CustomException 발생 시 Error Handling */
     @ExceptionHandler({CustomException.class})
-    public ResponseEntity<ErrorDto> exceptionHandler(CustomException e) {
-        return toCustomErrorDto(e);
+    public ResponseEntity<ErrorDto> exceptionHandler(CustomException e, HttpServletRequest request) {
+        return toCustomErrorDto(e, request);
     }
 
     /* CustomException Error Response 생성 */
-    private ResponseEntity<ErrorDto> toCustomErrorDto(CustomException e) {
+    private ResponseEntity<ErrorDto> toCustomErrorDto(CustomException e, HttpServletRequest request) {
         log.error("Global Exception, status: {}, error: {}, message: {}, timestemp: {}",
                 e.getErrorCode().getStatus(), e.getErrorCode().getError(), e.getMessage(), LocalDateTime.now());
 
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(ErrorDto.builder()
+                        .path(request.getServletPath())
                         .status(e.getErrorCode().getStatus())
                         .error(e.getErrorCode().getError())
                         .message(e.getMessage())
