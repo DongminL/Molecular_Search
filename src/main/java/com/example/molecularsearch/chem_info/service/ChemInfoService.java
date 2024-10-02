@@ -117,13 +117,4 @@ public class ChemInfoService {
         return chemInfoRepository.findByCid(cid).orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_FOUND_CHEM_INFO));    // 없으면 404 Error
     }
-
-    /* CID 값으로 3D Image 정보 삭제 */
-    public void update3DImage(Long cid) {
-        ChemInfo chemInfo = findChemInfoByCid(cid);
-
-        chemInfoRepository.save(chemInfo);
-
-        log.info("CID: {}, 변경완료", cid.toString());
-    }
 }
