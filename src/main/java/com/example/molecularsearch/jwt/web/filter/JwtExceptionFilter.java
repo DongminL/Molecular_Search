@@ -32,6 +32,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 
             // 에러 응답 메시지 생성
             ErrorDto errorRes = ErrorDto.builder()
+                    .path(request.getServletPath())
                     .status(e.getErrorCode().getStatus())
                     .error(e.getErrorCode().getError())
                     .message(e.getErrorCode().getMessage())

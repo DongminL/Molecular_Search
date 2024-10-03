@@ -36,9 +36,10 @@ public class HttpRequestEndpointUtil {
     /* 에러에 따른 Response Body 만들기 */
     ErrorDto makeErrorBody(ErrorCode errorCode, HttpServletRequest request) {
         Optional<ErrorDto> errorBody = Optional.ofNullable(ErrorDto.builder()
+                .path(request.getServletPath())
                 .status(errorCode.getStatus())
                 .error(errorCode.getError())
-                .message(errorCode.getMessage() + " url: " + request.getRequestURI())
+                .message(errorCode.getMessage())
                 .build());
 
         return errorBody.orElseThrow(() -> new CustomException(ErrorCode.SERVER_ERROR));
